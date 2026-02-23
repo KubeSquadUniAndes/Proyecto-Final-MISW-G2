@@ -1,0 +1,6 @@
+fastapi==0.129.0
+fastapi-cli==0.0.23
+sqlmodel==0.0.37
+pydantic[email]
+psycopg2-binary==2.9.11
+httpx==0.28.1

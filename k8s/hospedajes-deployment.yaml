@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hospedajes-deployment
+  labels:
+    app: hospedajes-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hospedajes-app
+  template:
+    metadata:
+      labels:
+        app: hospedajes-app
+    spec:
+      containers:
+      - name: hospedajesms
+        image: hospedajesms:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8000
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 5 
+          periodSeconds: 30
+          failureThreshold: 3
+---
+###################################
+# hospedajes service
+###################################
+apiVersion: v1
+kind: Service
+metadata:
+  name: hospedajes-service
+  labels:
+    app: hospedajes-app
+spec:
+  type: ClusterIP
+  selector:
+    app: hospedajes-app
+  ports:
+    - protocol: TCP
+      port: 80          # Service port
+      targetPort: 8000  # Container port
+      # nodePort: 30001   # External port (30000-32767)
