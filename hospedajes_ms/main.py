@@ -5,6 +5,19 @@ import httpx
 from fastapi import FastAPI
 from postgres_db import create_db_and_tables
 
+def get_users_base_url() -> str:
+    configured = os.getenv("USERS_MS_URL")
+    if configured:
+        return configured.rstrip("/")
+
+    # Heuristic: if running inside Kubernetes (e.g., via Ingress), prefer the
+    # in-cluster Service DNS name.
+    print(os.getenv("KUBERNETES_SERVICE_HOST"))
+    if os.getenv("KUBERNETES_SERVICE_HOST"):
+        return "http://users-service"
+
+    # Local development default.
+    return "http://localhost:9000"
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -27,7 +40,7 @@ async def health():
 
 @app.get("/call-users")
 async def call_users():
-    base_url = os.getenv("USERS_MS_URL", "http://users_ms:8000").rstrip("/")
+    base_url = get_users_base_url()
     async with httpx.AsyncClient(timeout=5.0) as client:
         resp = await client.get(f"{base_url}/health")
         resp.raise_for_status()
