@@ -18,6 +18,19 @@ spec:
       - name: usersms
         image: usersms:latest
         imagePullPolicy: IfNotPresent
+        env:
+        - name: HOSPEDAJES_MS_URL
+          value: "http://hospedajes-service"
+        - name: POSTGRES_HOST
+          value: "postgresdb-service"
+        - name: POSTGRES_PORT
+          value: "5432"
+        - name: POSTGRES_USER
+          value: "postgres"
+        - name: POSTGRES_PASSWORD
+          value: "postgres"
+        - name: POSTGRES_DB
+          value: "postgres"
         ports:
         - containerPort: 8000
         livenessProbe:
