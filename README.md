@@ -130,3 +130,33 @@ kubectl rollout status deployment/users-deployment --timeout=120s && kubectl rol
 ```bash
 minikube dashboard
 ```
+
+kubectl logs -l app=failed-app
+
+
+
+ISTIOS
+
+
+curl -L https://istio.io/downloadIstio | sh -
+
+export PATH="$PATH:/Users/juanseromo/istio-1.29.0/bin"
+
+istioctl x precheck
+
+kubectl get crd gateways.gateway.networking.k8s.io &> /dev/null || \
+  kubectl apply --server-side -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.0/experimental-install.yaml
+
+# Install Istio using the operator config (do NOT use kubectl apply for this file)
+istioctl install -f k8s/istio-operator.yaml -y
+
+# Wait for Istio to be ready
+kubectl rollout status deployment/istiod -n istio-system --timeout=120s
+
+# Apply Istio Gateway and VirtualService resources
+kubectl apply -f k8s/ingress-istios.yaml
+
+
+kubectl label namespace default istio-injection=enabled
+
+istioctl analyze  

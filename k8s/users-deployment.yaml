@@ -55,7 +55,8 @@ spec:
   selector:
     app: users-app
   ports:
-    - protocol: TCP
+    - name: http
+      protocol: TCP
       port: 80          # Service port
       targetPort: 8000  # Container port
       # nodePort: 30000   # External port (30000-32767)

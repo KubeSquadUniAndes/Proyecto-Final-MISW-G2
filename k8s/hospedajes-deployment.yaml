@@ -13,6 +13,9 @@ spec:
     metadata:
       labels:
         app: hospedajes-app
+        version: v1
+      # annotations:
+      #   sidecar.istio.io/inject: "true"
     spec:
       containers:
       - name: hospedajesms
@@ -55,7 +58,8 @@ spec:
   selector:
     app: hospedajes-app
   ports:
-    - protocol: TCP
+    - name: http
+      protocol: TCP
       port: 80          # Service port
       targetPort: 8000  # Container port
       # nodePort: 30001   # External port (30000-32767)
