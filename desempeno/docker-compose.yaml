@@ -1,0 +1,53 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: travelhub
+      POSTGRES_USER: travelhub
+      POSTGRES_PASSWORD: travelhub_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./reservations-service/init-db:/docker-entrypoint-initdb.d
+    networks:
+      - travelhub-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U travelhub -d travelhub"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  reservations-api:
+    build:
+      context: ./reservations-service
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://travelhub:travelhub_dev@postgres:5432/travelhub
+      ENCRYPTION_KEY: aes256-experiment-key-miso-uniandes-2026
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - travelhub-net
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    volumes:
+      - grafana-data:/var/lib/grafana
+    networks:
+      - travelhub-net
+
+volumes:
+  postgres-data:
+  grafana-data:
+
+networks:
+  travelhub-net:
+    driver: bridge

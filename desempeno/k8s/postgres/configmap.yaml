@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-config
+  namespace: travelhub
+data:
+  POSTGRES_DB: "travelhub"
+  POSTGRES_USER: "travelhub"
+  init-db.sql: |
+    CREATE EXTENSION IF NOT EXISTS pgcrypto;

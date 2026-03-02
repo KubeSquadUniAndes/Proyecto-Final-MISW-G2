@@ -1,0 +1,118 @@
+{
+  "info": {
+    "name": "TravelHub Reservations API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8000/health",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["health"]
+        }
+      }
+    },
+    {
+      "name": "Create Reservation",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"traveler_name\": \"Juan Pérez\",\n  \"traveler_email\": \"juan.perez@example.com\",\n  \"traveler_phone\": \"+57 300 1234567\",\n  \"traveler_document\": \"1234567890\",\n  \"destination\": \"Cartagena\",\n  \"origin\": \"Bogotá\",\n  \"departure_date\": \"2024-03-15\",\n  \"return_date\": \"2024-03-20\",\n  \"num_passengers\": 2\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8000/api/v1/reservations/",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["api", "v1", "reservations", ""]
+        }
+      }
+    },
+    {
+      "name": "Get Reservation",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8000/api/v1/reservations/:reservation_id",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["api", "v1", "reservations", ":reservation_id"],
+          "variable": [
+            {
+              "key": "reservation_id",
+              "value": "00000000-0000-0000-0000-000000000000"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "List Reservations",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8000/api/v1/reservations/?skip=0&limit=100",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["api", "v1", "reservations", ""],
+          "query": [
+            {
+              "key": "skip",
+              "value": "0"
+            },
+            {
+              "key": "limit",
+              "value": "100"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Update Reservation",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"confirmed\",\n  \"num_passengers\": 3\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8000/api/v1/reservations/:reservation_id",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["api", "v1", "reservations", ":reservation_id"],
+          "variable": [
+            {
+              "key": "reservation_id",
+              "value": "00000000-0000-0000-0000-000000000000"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
