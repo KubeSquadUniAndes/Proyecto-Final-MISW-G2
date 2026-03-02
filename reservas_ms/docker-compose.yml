@@ -1,0 +1,66 @@
+version: "3.9"
+
+services:
+  reservas_ms:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: reservas_ms
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@db:5432/reservas_db
+      - DEBUG=true
+      - DB_ECHO=false
+      - LOGIN_HANDLER_MS_URL=http://login_handler_ms:8001
+      - DETECTOR_ANOMALIAS_MS_URL=http://detector_anomalias_ms:8002
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - .:/app
+    networks:
+      - experimento_net
+
+  db:
+    image: postgres:16-alpine
+    container_name: reservas_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: reservas_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - experimento_net
+
+  # Placeholder para login_handler_ms (cuando lo implementes)
+  # login_handler_ms:
+  #   build: ../login_handler_ms
+  #   ports:
+  #     - "8001:8001"
+  #   networks:
+  #     - experimento_net
+
+  # Placeholder para detector_anomalias_ms (cuando lo implementes)
+  # detector_anomalias_ms:
+  #   build: ../detector_anomalias_ms
+  #   ports:
+  #     - "8002:8002"
+  #   networks:
+  #     - experimento_net
+
+volumes:
+  postgres_data:
+
+networks:
+  experimento_net:
+    driver: bridge
+    name: experimento_net  # Red compartida entre todos los microservicios
