@@ -1,119 +1,171 @@
 # reservas_ms
 
-Microservicio de gestión de reservas construido con **FastAPI**, **PostgreSQL** y **arquitectura hexagonal** (Ports & Adapters).
+Bookings microservice built with **FastAPI**, **PostgreSQL**, and **hexagonal architecture** (Ports & Adapters).
 
-Forma parte de un ecosistema de microservicios junto con:
-- `login_handler_ms` — Autenticación JWT y control de acceso
-- `detector_anomalias_ms` — Detección de patrones anómalos en reservas
+Part of a microservices ecosystem alongside:
+- `login_handler_ms` — JWT authentication and access control
+- `detector_anomalias_ms` — Anomaly detection on booking patterns
 
 ---
 
-## Arquitectura Hexagonal
+## Hexagonal Architecture
 
 ```
 src/
-├── domain/                          ← Núcleo puro (sin dependencias externas)
+├── domain/                               ← Pure core (no external dependencies)
 │   ├── entities/
-│   │   └── reserva.py               ← Entidad de dominio con reglas de negocio
+│   │   └── booking.py                    ← Domain entity with business rules
 │   ├── repositories/
-│   │   └── reserva_repository_port.py  ← Puerto de salida (interfaz abstracta)
+│   │   └── booking_repository_port.py    ← Output port (abstract interface)
 │   └── services/
-│       └── reserva_domain_service.py   ← Lógica de negocio entre entidades
+│       └── booking_domain_service.py     ← Cross-entity business logic
 │
-├── application/                     ← Casos de uso (orquestación)
+├── application/                          ← Use cases (orchestration)
 │   ├── dtos/
-│   │   └── reserva_dto.py           ← Objetos de transferencia de datos
+│   │   └── booking_dto.py               ← CreateBookingDTO, UpdateBookingDTO, BookingResponseDTO
 │   └── use_cases/
-│       └── crear_reserva.py         ← Puerto de entrada (driving port)
+│       ├── create_booking.py            ← Input port: create + anomaly check
+│       └── update_booking.py            ← Input port: update dates/notes + anomaly check
 │
-└── infrastructure/                  ← Adaptadores (implementaciones concretas)
+└── infrastructure/                       ← Adapters (concrete implementations)
     ├── config/
-    │   └── settings.py              ← Configuración con pydantic-settings
+    │   └── settings.py                  ← Configuration via pydantic-settings
+    ├── clients/
+    │   ├── login_handler_client.py      ← Output adapter: JWT validation + blocked status
+    │   └── anomaly_detector_client.py   ← Output adapter: calls detector_anomalias_ms
     ├── database/
-    │   ├── base.py                  ← Engine y sesión async SQLAlchemy
+    │   ├── base.py                      ← Async SQLAlchemy engine & session
     │   ├── models/
-    │   │   └── reserva_model.py     ← Modelo ORM
+    │   │   └── booking_model.py         ← ORM model
     │   └── repositories/
-    │       └── sqlalchemy_reserva_repository.py  ← Adaptador de salida
+    │       └── sqlalchemy_booking_repository.py  ← Output adapter
     └── http/
+        ├── middleware/
+        │   └── auth_dependency.py       ← FastAPI dependency: validates JWT + blocked check
         ├── routes/
-        │   ├── reserva_router.py    ← Adaptador de entrada (HTTP)
-        │   └── health_router.py     ← Health check
+        │   ├── booking_router.py        ← Input adapter (HTTP): POST + PATCH
+        │   └── health_router.py         ← Health check
         └── schemas/
-            └── reserva_schema.py   ← Esquemas Pydantic para HTTP
+            └── booking_schema.py        ← Pydantic HTTP schemas
 ```
 
-### Flujo de dependencias
+### Dependency flow
 ```
-HTTP Request
-    → Router (adaptador de entrada)
-        → CrearReservaUseCase (puerto de entrada / application)
-            → Domain Entity + Domain Service (núcleo puro)
-            → ReservaRepositoryPort (puerto de salida)
-                → SQLAlchemyReservaRepository (adaptador de salida)
-                    → PostgreSQL
+HTTP Request (Bearer token)
+    → auth_dependency (validate JWT + check user not blocked via login_handler_ms)
+        → Router (input adapter)
+            → CreateBookingUseCase / UpdateBookingUseCase (input port)
+                → Domain Entity + BookingDomainService (pure core)
+                → BookingRepositoryPort → SQLAlchemyBookingRepository → PostgreSQL
+                → AnomalyDetectorClient → detector_anomalias_ms
 ```
 
 ---
 
 ## Endpoints
 
-| Método | Ruta | Descripción |
-|--------|------|-------------|
-| `GET`  | `/health` | Estado del servicio y dependencias |
-| `POST` | `/api/v1/reservas/` | Crear nueva reserva |
+| Method  | Path                          | Auth        | Description                        |
+|---------|-------------------------------|-------------|------------------------------------|
+| `GET`   | `/health`                     | —           | Service and dependency status      |
+| `POST`  | `/api/v1/bookings/`           | Bearer JWT  | Create a new booking               |
+| `PATCH` | `/api/v1/bookings/{id}`       | Bearer JWT  | Update dates and/or notes          |
+
+### Authentication & authorization
+Every protected endpoint goes through two checks:
+
+1. **Local JWT decode** — verifies signature and expiry using the shared `JWT_SECRET_KEY` (no HTTP call).
+2. **Remote status check** — calls `login_handler_ms GET /api/v1/auth/me` to confirm the user is not blocked.
+
+| Scenario | HTTP status |
+|----------|-------------|
+| Missing or malformed token | `401 Unauthorized` |
+| Expired token | `401 Unauthorized` |
+| User is blocked | `403 Forbidden` |
+| login_handler_ms unreachable | `503 Service Unavailable` |
+| Modifying another user's booking | `403 Forbidden` |
+
+---
+
+## Anomaly detection integration
+
+After every `POST` and `PATCH`, `reservas_ms` calls `detector_anomalias_ms` in a **fire-and-forget** fashion:
+
+```
+reservas_ms ──POST /api/v1/analysis/booking──► detector_anomalias_ms
+                X-Api-Key: DETECTOR_ANOMALIAS_MS_API_KEY
+
+Response:
+  { "is_anomalous": true, "action_taken": "user_blocked_and_alerted" }
+       ↓
+  reservas_ms logs a warning — the booking is already saved,
+  but the user will be blocked for subsequent requests.
+```
+
+The anomaly call never blocks the booking response — if the detector is down, the error is logged and the booking proceeds normally.
 
 ---
 
 ## Quickstart
 
-### 1. Con Docker Compose (recomendado)
+### 1. With Docker Compose (recommended)
 
 ```bash
 cp .env.example .env
 docker compose up --build
 ```
 
-La API estará disponible en `http://localhost:8000`  
-Documentación interactiva: `http://localhost:8000/docs`
+API available at `http://localhost:8000` | Docs: `http://localhost:8000/docs`
 
 ### 2. Local
 
 ```bash
-# Instalar dependencias
 python -m venv .venv
 source .venv/bin/activate  # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 
-# Configurar entorno
 cp .env.example .env
-# Editar .env con tus credenciales de PostgreSQL
+# Edit .env with your credentials
 
-# Ejecutar migraciones
+alembic init alembic   # first time only — replace alembic/env.py with the provided one
 alembic upgrade head
 
-# Iniciar servidor
 uvicorn src.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 ---
 
-## Ejemplo de uso
+## Usage examples
 
 ```bash
-# Health check
-curl http://localhost:8000/health
+# 1. Login first via login_handler_ms to get a token
+TOKEN=$(curl -s -X POST http://localhost:8001/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email": "user@example.com", "password": "securepass123"}' \
+  | python3 -c "import sys,json; print(json.load(sys.stdin)['access_token'])")
 
-# Crear reserva
-curl -X POST http://localhost:8000/api/v1/reservas/ \
+# 2. Create a booking (user_id comes from the token automatically)
+curl -X POST http://localhost:8000/api/v1/bookings/ \
+  -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
-    "usuario_id": "123e4567-e89b-12d3-a456-426614174000",
-    "recurso_id": "987fcdeb-51a2-43f7-b234-426614174111",
-    "fecha_inicio": "2026-04-01T10:00:00",
-    "fecha_fin": "2026-04-01T12:00:00",
-    "notas": "Reunión de equipo Q2"
+    "resource_id": "987fcdeb-51a2-43f7-b234-426614174111",
+    "start_time": "2026-04-01T10:00:00",
+    "end_time": "2026-04-01T12:00:00",
+    "notes": "Q2 team meeting"
   }'
+
+# 3. Update a booking
+curl -X PATCH http://localhost:8000/api/v1/bookings/<booking_id> \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "start_time": "2026-04-01T11:00:00",
+    "end_time": "2026-04-01T13:00:00",
+    "notes": "Rescheduled"
+  }'
+
+# 4. Health check
+curl http://localhost:8000/health
 ```
 
 ---
@@ -126,46 +178,24 @@ pytest tests/ -v --cov=src
 
 ---
 
-## Migraciones con Alembic
+## Alembic migrations
 
 ```bash
-# Crear nueva migración
-alembic revision --autogenerate -m "descripcion_del_cambio"
-
-# Aplicar migraciones
+alembic revision --autogenerate -m "description_of_change"
 alembic upgrade head
-
-# Revertir última migración
 alembic downgrade -1
 ```
 
 ---
 
-## Integración con otros microservicios
+## Environment variables
 
-### login_handler_ms
-- Emitirá tokens JWT que `reservas_ms` validará (middleware por implementar).
-- Si `detector_anomalias_ms` detecta anomalías, `login_handler_ms` bloqueará el usuario.
-
-### detector_anomalias_ms
-- `reservas_ms` enviará un evento/webhook al crear una reserva.
-- El detector analiza patrones (frecuencia, horarios inusuales, recursos sospechosos).
-- Si detecta anomalía → notifica a `login_handler_ms` para bloquear al usuario.
-
-**Punto de extensión en `crear_reserva.py`:**
-```python
-# TODO: Integrar detector_anomalias_ms
-# await anomalia_client.notificar(reserva_guardada)
-```
-
----
-
-## Variables de entorno
-
-| Variable | Default | Descripción |
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `DATABASE_URL` | `postgresql+asyncpg://...` | URL de conexión a PostgreSQL |
-| `DEBUG` | `false` | Modo debug |
-| `JWT_SECRET_KEY` | `change-me` | Clave secreta JWT (compartir con login_handler_ms) |
-| `LOGIN_HANDLER_MS_URL` | `http://login_handler_ms:8001` | URL del servicio de autenticación |
-| `DETECTOR_ANOMALIAS_MS_URL` | `http://detector_anomalias_ms:8002` | URL del detector de anomalías |
+| `DATABASE_URL` | `postgresql+asyncpg://...` | PostgreSQL connection URL |
+| `DEBUG` | `false` | Debug mode |
+| `JWT_SECRET_KEY` | `change-me` | JWT secret — **must match** `login_handler_ms` |
+| `JWT_ALGORITHM` | `HS256` | JWT algorithm |
+| `LOGIN_HANDLER_MS_URL` | `http://login_handler_ms:8001` | Auth service URL (for blocked status check) |
+| `DETECTOR_ANOMALIAS_MS_URL` | `http://detector_anomalias_ms:8002` | Anomaly detector URL |
+| `DETECTOR_ANOMALIAS_MS_API_KEY` | `change-internal-key` | Internal API key for the detector |

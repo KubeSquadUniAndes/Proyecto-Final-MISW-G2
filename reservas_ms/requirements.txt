@@ -23,3 +23,7 @@ pytest-cov==6.0.0
 # Dev tools
 ruff==0.8.4
 mypy==1.13.0
+
+# HTTP client (for login_handler_ms + detector_anomalias_ms)
+httpx==0.28.1
+PyJWT==2.10.1

@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from src.infrastructure.config.settings import settings
 from src.infrastructure.database.base import Base
-import src.infrastructure.database.models.reserva_model  # noqa: F401 - registra el modelo
+import src.infrastructure.database.models.booking_model  # noqa: F401 - registers the model
 
 config = context.config
 config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)

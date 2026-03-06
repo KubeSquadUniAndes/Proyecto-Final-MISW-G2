@@ -1,0 +1,29 @@
+version: "3.9"
+
+services:
+  notificaciones_ms:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: notificaciones_ms
+    ports:
+      - "8003:8003"
+    environment:
+      - INTERNAL_API_KEY=change-internal-key-in-production
+      - SMTP_HOST=smtp.gmail.com
+      - SMTP_PORT=587
+      - SMTP_USER=
+      - SMTP_PASSWORD=
+      - EMAIL_FROM=alerts@experiment.local
+      - EMAIL_TO=security@experiment.local
+      - SLACK_WEBHOOK_URL=
+      - SLACK_CHANNEL=#security-alerts
+    volumes:
+      - .:/app
+    networks:
+      - experiment_net
+
+networks:
+  experiment_net:
+    external: true
+    name: experiment_net

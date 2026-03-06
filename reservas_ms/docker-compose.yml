@@ -9,7 +9,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@db:5432/reservas_db
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@db:5432/bookings_db
       - DEBUG=true
       - DB_ECHO=false
       - LOGIN_HANDLER_MS_URL=http://login_handler_ms:8001
@@ -20,15 +20,15 @@ services:
     volumes:
       - .:/app
     networks:
-      - experimento_net
+      - experiment_net
 
   db:
     image: postgres:16-alpine
-    container_name: reservas_db
+    container_name: bookings_db
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: reservas_db
+      POSTGRES_DB: bookings_db
     ports:
       - "5432:5432"
     volumes:
@@ -39,28 +39,28 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - experimento_net
+      - experiment_net
 
-  # Placeholder para login_handler_ms (cuando lo implementes)
+  # Placeholder for login_handler_ms (implement when ready)
   # login_handler_ms:
   #   build: ../login_handler_ms
   #   ports:
   #     - "8001:8001"
   #   networks:
-  #     - experimento_net
+  #     - experiment_net
 
-  # Placeholder para detector_anomalias_ms (cuando lo implementes)
+  # Placeholder for detector_anomalias_ms (implement when ready)
   # detector_anomalias_ms:
   #   build: ../detector_anomalias_ms
   #   ports:
   #     - "8002:8002"
   #   networks:
-  #     - experimento_net
+  #     - experiment_net
 
 volumes:
   postgres_data:
 
 networks:
-  experimento_net:
+  experiment_net:
     driver: bridge
-    name: experimento_net  # Red compartida entre todos los microservicios
+    name: experiment_net  # Shared network across all microservices

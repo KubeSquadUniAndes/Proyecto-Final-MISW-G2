@@ -11,17 +11,17 @@ router = APIRouter(tags=["Health"])
 
 @router.get(
     "/health",
-    summary="Health check del microservicio",
-    response_description="Estado del servicio y sus dependencias",
+    summary="Service health check",
+    response_description="Service and dependency status",
 )
 async def health_check(db: AsyncSession = Depends(get_db)) -> dict:
     """
-    Verifica el estado del microservicio y sus dependencias.
+    Checks the health of the microservice and its dependencies.
 
-    Devuelve:
-    - **status**: Estado general del servicio
-    - **database**: Estado de la conexión a PostgreSQL
-    - **timestamp**: Fecha y hora actual del servidor
+    Returns:
+    - **status**: Overall service status
+    - **database**: PostgreSQL connection status
+    - **timestamp**: Current server timestamp
     """
     db_status = "ok"
     db_detail = None

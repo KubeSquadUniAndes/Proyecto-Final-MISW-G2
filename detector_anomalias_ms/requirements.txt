@@ -1,0 +1,23 @@
+# Core
+greenlet>=3.0.0
+
+# Web framework
+fastapi==0.115.6
+uvicorn[standard]==0.32.1
+
+# Database
+sqlalchemy==2.0.36
+asyncpg==0.30.0
+alembic==1.14.0
+
+# Validation & settings
+pydantic>=2.11.0
+pydantic-settings==2.7.0
+
+# HTTP client (for calling login_handler_ms)
+httpx==0.28.1
+
+# Testing
+pytest==8.3.4
+pytest-asyncio==0.24.0
+pytest-cov==6.0.0
