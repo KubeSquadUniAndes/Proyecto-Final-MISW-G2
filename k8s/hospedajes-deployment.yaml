@@ -14,8 +14,6 @@ spec:
       labels:
         app: hospedajes-app
         version: v1
-      # annotations:
-      #   sidecar.istio.io/inject: "true"
     spec:
       containers:
       - name: hospedajesms
@@ -36,6 +34,13 @@ spec:
           value: "postgres"
         ports:
         - containerPort: 8000
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "256Mi"
         livenessProbe:
           httpGet:
             path: /health
@@ -43,23 +48,3 @@ spec:
           initialDelaySeconds: 5 
           periodSeconds: 30
           failureThreshold: 3
----
-###################################
-# hospedajes service
-###################################
-apiVersion: v1
-kind: Service
-metadata:
-  name: hospedajes-service
-  labels:
-    app: hospedajes-app
-spec:
-  type: ClusterIP
-  selector:
-    app: hospedajes-app
-  ports:
-    - name: http
-      protocol: TCP
-      port: 80          # Service port
-      targetPort: 8000  # Container port
-      # nodePort: 30001   # External port (30000-32767)

@@ -1,0 +1,64 @@
+###############################
+## TravelHub hospedajes virtualService
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: hospedajes-vs
+spec:
+  hosts:
+  - "*"
+  # exportTo:
+  # - "."
+  gateways:
+  - travelhub-gateway
+  http:
+  - match:
+    - uri:
+        exact: "/hospedajes"
+    - uri:
+        prefix: "/hospedajes/"
+    rewrite:
+      uri: "/"
+    route:
+    - destination:
+        host: hospedajes-service.default.svc.cluster.local
+        subset: v1
+        port:
+          number: 80
+      # weight: 50
+  # -timeout: 1s
+---
+###############################
+## TravelHub users virtualService
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: users-vs
+spec:
+  hosts:
+  - "*"
+  # "." is a reserved value that defines an export to the same namespace where the virtual service is declared in.
+  # exportTo:
+  # - "."
+  gateways:
+  - travelhub-gateway
+  http:
+  - match:
+    - uri:
+        exact: "/users"
+    - uri:
+        prefix: "/users/"
+    rewrite:
+      uri: "/"
+    headers:
+      response:
+        add:
+          x-travelhub-header: "users-service"
+    route:
+    - destination:
+        host: users-service.default.svc.cluster.local
+        subset: v1
+        port:
+          number: 80
+      # weight: 50
+
