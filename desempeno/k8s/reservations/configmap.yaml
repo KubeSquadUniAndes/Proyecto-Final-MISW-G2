@@ -5,3 +5,4 @@ metadata:
   namespace: travelhub
 data:
   APP_NAME: "TravelHub Reservations Service"
+  DATABASE_SSL: "true"

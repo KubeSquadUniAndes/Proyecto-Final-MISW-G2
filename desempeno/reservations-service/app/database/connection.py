@@ -1,3 +1,4 @@
+import ssl as ssl_module
 from typing import AsyncGenerator
 
 from sqlalchemy import text
@@ -36,11 +37,21 @@ class DatabaseManager:
             return
 
         settings = get_settings()
+
+        # --- SSL: cifrado en transito hacia PostgreSQL (ASR-01) ---
+        connect_args: dict = {}
+        if settings.database_ssl:
+            ssl_ctx = ssl_module.create_default_context()
+            ssl_ctx.check_hostname = False
+            ssl_ctx.verify_mode = ssl_module.CERT_NONE  # self-signed certs
+            connect_args["ssl"] = ssl_ctx
+
         cls._engine = create_async_engine(
             settings.database_url,
             pool_size=10,
             max_overflow=20,
             pool_pre_ping=True,
+            connect_args=connect_args,
         )
         cls._session_factory = async_sessionmaker(
             bind=cls._engine,

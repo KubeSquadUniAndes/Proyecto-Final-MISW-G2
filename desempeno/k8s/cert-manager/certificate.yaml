@@ -1,0 +1,20 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: travelhub-tls
+  namespace: travelhub
+spec:
+  secretName: travelhub-tls
+  commonName: travelhub.local
+  subject:
+    organizations:
+      - TravelHub
+    organizationalUnits:
+      - MISO
+  duration: 2160h # 90 days
+  renewBefore: 360h # 15 days
+  issuerRef:
+    name: selfsigned-issuer
+    kind: ClusterIssuer
+  dnsNames:
+    - travelhub.local

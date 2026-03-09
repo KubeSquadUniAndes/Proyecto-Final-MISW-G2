@@ -5,32 +5,32 @@ Sistema de gestión de reservas con arquitectura de microservicios, monitoreo co
 ## 📐 Diagrama de Arquitectura
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                         Kubernetes Cluster                       │
-│                                                                   │
-│  ┌──────────────┐      ┌──────────────────────────────────┐    │
-│  │   Ingress    │──────▶│   Reservations Service (x2)      │    │
-│  │  Controller  │      │   - FastAPI                       │    │
-│  └──────────────┘      │   - Port 8000                     │    │
-│                         │   - /metrics endpoint             │    │
-│                         └──────────┬───────────────────────┘    │
-│                                    │                             │
-│                         ┌──────────▼───────────┐                │
-│                         │   PostgreSQL DB      │                │
-│                         │   - Port 5432        │                │
-│                         │   - PVC Storage      │                │
-│                         └──────────────────────┘                │
-│                                    │                             │
-│  ┌──────────────┐      ┌──────────▼───────────┐                │
-│  │  Prometheus  │◀─────│   Metrics Scraper    │                │
-│  │  - Port 9090 │      │   - Interval: 5s     │                │
-│  └──────┬───────┘      └──────────────────────┘                │
-│         │                                                        │
-│  ┌──────▼───────┐                                               │
-│  │   Grafana    │                                               │
-│  │  - Port 3000 │                                               │
-│  └──────────────┘                                               │
-└─────────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────┐
+│                         Kubernetes Cluster                           │
+│                                                                      │
+│  ┌───────────────────┐    TLS 1.3     ┌────────────────────────┐     │
+│  │   NGINX Ingress   │──────────────▶│  Reservations Service   │     │
+│  │   + TLS (cert-mgr)│  Rate Limit   │  (x2 replicas)         │     │
+│  │   + Rate Limiting │  100rps/50conn│  - FastAPI + Python 3.13│     │
+│  └───────────────────┘               │  - /metrics endpoint    │     │
+│         ▲                            └──────────┬──────────────┘     │
+│         │ HTTPS                                 │ SSL                │
+│      Cliente                         ┌──────────▼──────────────┐     │
+│                                      │   PostgreSQL 16         │     │
+│                                      │   - SSL enabled         │     │
+│                                      │   - pgcrypto (AES-256)  │     │
+│                                      │   - PVC 1Gi             │     │
+│                                      └─────────────────────────┘     │
+│                                                                      │
+│  ┌──────────────┐       ┌──────────────┐                             │
+│  │  Prometheus  │◀──────│  Scraper 5s  │                             │
+│  │  - Port 9090 │       └──────────────┘                             │
+│  └──────┬───────┘                                                    │
+│  ┌──────▼───────┐       ┌──────────────┐                             │
+│  │   Grafana    │       │ cert-manager │                             │
+│  │  - Port 3000 │       │ (self-signed)│                             │
+│  └──────────────┘       └──────────────┘                             │
+└──────────────────────────────────────────────────────────────────────┘
 ```
 
 ## 📁 Estructura de Directorios
@@ -38,24 +38,27 @@ Sistema de gestión de reservas con arquitectura de microservicios, monitoreo co
 ```
 desempeno/
 ├── k8s/                                    # Manifiestos de Kubernetes
+│   ├── cert-manager/
+│   │   ├── cluster-issuer.yaml            # ClusterIssuer self-signed
+│   │   └── certificate.yaml              # Certificate TLS para travelhub.local
 │   ├── grafana/
 │   │   ├── deployment.yaml                # Deployment de Grafana
 │   │   └── service.yaml                   # Service de Grafana
 │   ├── postgres/
-│   │   ├── configmap.yaml                 # Configuración de PostgreSQL
-│   │   ├── deployment.yaml                # Deployment de PostgreSQL
+│   │   ├── configmap.yaml                 # Configuracion de PostgreSQL
+│   │   ├── deployment.yaml                # Deployment de PostgreSQL (SSL enabled)
 │   │   ├── pvc.yaml                       # Persistent Volume Claim
 │   │   ├── secret.yaml                    # Credenciales encriptadas
 │   │   └── service.yaml                   # Service de PostgreSQL
 │   ├── prometheus/
-│   │   ├── configmap.yaml                 # Configuración de scraping
+│   │   ├── configmap.yaml                 # Configuracion de scraping
 │   │   ├── deployment.yaml                # Deployment de Prometheus
 │   │   └── service.yaml                   # Service de Prometheus
 │   ├── reservations/
-│   │   ├── configmap.yaml                 # Variables de entorno
+│   │   ├── configmap.yaml                 # Variables de entorno (DATABASE_SSL)
 │   │   ├── deployment.yaml                # Deployment del servicio
 │   │   └── service.yaml                   # Service del API
-│   ├── ingress.yaml                       # Ingress Controller
+│   ├── ingress.yaml                       # Ingress con TLS + Rate Limiting
 │   └── namespace.yaml                     # Namespace travelhub
 ├── reservations-service/                  # Microservicio de reservas
 │   ├── app/
@@ -91,92 +94,109 @@ desempeno/
 
 ### Prerrequisitos
 
-- Docker Desktop con Kubernetes habilitado
+- minikube instalado con driver Docker
 - kubectl instalado
-- Imagen Docker construida
+- Addons habilitados: ingress, metrics-server
 
-### 1. Construir la Imagen Docker
+### 1. Iniciar minikube
 
 ```bash
+minikube start --memory=4096 --cpus=2 --driver=docker
+minikube addons enable ingress
+minikube addons enable metrics-server
+```
+
+### 2. Construir la Imagen Docker (dentro de minikube)
+
+```bash
+eval $(minikube docker-env)
 cd reservations-service
 docker build -t travelhub/reservations-service:latest .
 ```
 
-### 2. Crear el Namespace
+### 3. Instalar cert-manager (para TLS)
 
 ```bash
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.14.4/cert-manager.yaml
+kubectl -n cert-manager rollout status deployment/cert-manager --timeout=120s
+kubectl -n cert-manager rollout status deployment/cert-manager-webhook --timeout=120s
+```
+
+### 4. Desplegar en orden
+
+```bash
+# Namespace
 kubectl apply -f k8s/namespace.yaml
-```
 
-### 3. Desplegar PostgreSQL
+# cert-manager (TLS)
+kubectl apply -f k8s/cert-manager/cluster-issuer.yaml
+kubectl apply -f k8s/cert-manager/certificate.yaml
 
-```bash
-kubectl apply -f k8s/postgres/secret.yaml
-kubectl apply -f k8s/postgres/configmap.yaml
-kubectl apply -f k8s/postgres/pvc.yaml
-kubectl apply -f k8s/postgres/deployment.yaml
-kubectl apply -f k8s/postgres/service.yaml
-```
+# PostgreSQL (con SSL)
+kubectl apply -f k8s/postgres/
 
-### 4. Desplegar el Servicio de Reservas
+# Servicio de Reservas
+kubectl apply -f k8s/reservations/
 
-```bash
-kubectl apply -f k8s/reservations/configmap.yaml
-kubectl apply -f k8s/reservations/deployment.yaml
-kubectl apply -f k8s/reservations/service.yaml
-```
-
-### 5. Desplegar Prometheus
-
-```bash
-kubectl apply -f k8s/prometheus/configmap.yaml
-kubectl apply -f k8s/prometheus/deployment.yaml
-kubectl apply -f k8s/prometheus/service.yaml
-```
-
-### 6. Desplegar Grafana
-
-```bash
-kubectl apply -f k8s/grafana/deployment.yaml
-kubectl apply -f k8s/grafana/service.yaml
-```
-
-### 7. Configurar Ingress (Opcional)
-
-```bash
+# Ingress (TLS + Rate Limiting)
 kubectl apply -f k8s/ingress.yaml
+
+# Monitoreo
+kubectl apply -f k8s/prometheus/
+kubectl apply -f k8s/grafana/
 ```
 
-### 8. Verificar el Despliegue
+### 5. Configurar acceso
+
+```bash
+# Agregar host (una sola vez)
+sudo sh -c 'echo "127.0.0.1 travelhub.local" >> /etc/hosts'
+
+# Iniciar tunnel (dejar corriendo en terminal aparte)
+sudo minikube tunnel
+```
+
+### 6. Verificar el Despliegue
 
 ```bash
 # Ver todos los pods
 kubectl get pods -n travelhub
 
-# Ver servicios
-kubectl get svc -n travelhub
+# Verificar certificado TLS
+kubectl -n travelhub get certificate
 
-# Ver logs del servicio
-kubectl logs -n travelhub -l app=reservations-service -f
+# Verificar SSL en PostgreSQL
+kubectl -n travelhub exec deployment/postgres -- psql -U travelhub -d travelhub \
+  -c "SELECT pid, ssl FROM pg_stat_ssl JOIN pg_stat_activity USING (pid) WHERE datname = 'travelhub';"
+
+# Verificar rate limiting
+kubectl -n travelhub describe ingress travelhub-ingress | grep limit
 ```
 
-### 9. Acceder a los Servicios
-
-```bash
-# Port-forward para el API
-kubectl port-forward -n travelhub svc/reservations-service 8000:80
-
-# Port-forward para Grafana
-kubectl port-forward -n travelhub svc/grafana 3000:3000
-
-# Port-forward para Prometheus
-kubectl port-forward -n travelhub svc/prometheus 9090:9090
-```
+### 7. Acceder a los Servicios
 
 URLs de acceso:
-- API: http://localhost:8000
-- Grafana: http://localhost:3000 (admin/admin)
-- Prometheus: http://localhost:9090
+- **Swagger UI**: https://travelhub.local/docs
+- **API**: https://travelhub.local/api/v1/reservations/
+- **Health**: https://travelhub.local/health
+- **Metrics**: https://travelhub.local/metrics
+- **Grafana**: `minikube service grafana-service -n travelhub` (admin/admin)
+
+> Nota: El certificado TLS es self-signed. En el navegador aceptar la advertencia de seguridad.
+
+### 8. Pruebas con JMeter
+
+```bash
+# Crear truststore con el certificado
+echo | openssl s_client -connect 127.0.0.1:443 -servername travelhub.local 2>/dev/null \
+  | openssl x509 -outform DER > /tmp/travelhub.der
+keytool -importcert -alias travelhub -file /tmp/travelhub.der \
+  -keystore /tmp/travelhub-truststore.jks -storepass changeit -noprompt
+
+# Abrir JMeter con el truststore
+jmeter -Djavax.net.ssl.trustStore=/tmp/travelhub-truststore.jks \
+  -Djavax.net.ssl.trustStorePassword=changeit
+```
 
 ## 📊 Configuración de Prometheus
 
@@ -399,18 +419,47 @@ docker-compose down -v
 - `GET /health` - Health check
 - `GET /metrics` - Métricas de Prometheus
 
-## 🔒 Seguridad
+## 🔒 Seguridad (ASR-01)
 
-- **Encriptación en BD**: Datos sensibles encriptados con pgcrypto (AES-256)
-- **Secrets**: Credenciales en Kubernetes Secrets (base64)
-- **Variables de entorno**: Configuración externalizada
-- **Health checks**: Liveness y readiness probes
+### Cifrado en reposo (AES-256)
+- Campos sensibles cifrados con pgcrypto (`pgp_sym_encrypt` / `pgp_sym_decrypt`)
+- Campos: `traveler_name`, `traveler_email`, `traveler_phone`, `traveler_document`
+- Clave almacenada en Kubernetes Secret
 
-## 📚 Tecnologías
+### Cifrado en transito (TLS 1.3)
+- **Cliente → Ingress**: TLS 1.3 / AES-256-GCM-SHA384 via cert-manager (self-signed)
+- **App → PostgreSQL**: SSL con SSLContext (configurado via `DATABASE_SSL=true`)
+- Redireccion forzada HTTP → HTTPS (`ssl-redirect: true`)
 
-- **Backend**: FastAPI, Python 3.11+
-- **Database**: PostgreSQL 16
-- **ORM**: SQLAlchemy (async)
-- **Monitoring**: Prometheus, Grafana
-- **Container**: Docker, Kubernetes
-- **Testing**: pytest, pytest-asyncio
+### Control de demanda de recursos (Rate Limiting)
+- 100 requests/segundo por IP
+- 50 conexiones concurrentes por IP
+- Burst multiplier: x5
+- Solicitudes excedentes rechazadas con HTTP 503
+
+### Otras medidas
+- Credenciales en Kubernetes Secrets (base64)
+- Variables de entorno externalizadas
+- Health checks: Liveness y readiness probes
+- Connection pool: pool_size=10, max_overflow=20
+
+## 📊 Resultados del Experimento
+
+| Metrica | Resultado |
+|---|---|
+| POST con cifrado AES-256 | **48 ms** promedio |
+| GET con descifrado AES-256 | **493 ms** promedio |
+| Protocolo TLS | TLSv1.3 / AES-256-GCM-SHA384 |
+| SSL App→PostgreSQL | Verificado (`pg_stat_ssl: ssl = t`) |
+| Rate limiting | HTTP 503 en excedentes, 0 restarts |
+| Umbral ASR-01 | < 1.500 ms → **Cumplido** |
+
+## 📚 Tecnologias
+
+- **Backend**: FastAPI, Python 3.13
+- **Database**: PostgreSQL 16-alpine + pgcrypto
+- **ORM**: SQLAlchemy 2.0 (async + asyncpg)
+- **TLS**: cert-manager + NGINX Ingress Controller
+- **Monitoring**: Prometheus + Grafana
+- **Container**: Docker, Kubernetes (minikube)
+- **Testing**: pytest, JMeter 5.6.3

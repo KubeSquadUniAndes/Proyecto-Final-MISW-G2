@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     encryption_key: str = "default-dev-key-change-in-production"
     app_name: str = "TravelHub Reservations Service"
     debug: bool = False
+    database_ssl: bool = False
 
     model_config = {"env_file": ".env"}
 
