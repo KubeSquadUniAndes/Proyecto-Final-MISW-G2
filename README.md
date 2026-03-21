@@ -145,7 +145,7 @@ kubectl rollout status deployment/istiod -n istio-system --timeout=120s
 kubectl apply -f k8s/ingress-istios.yaml
 
 
-<!-- kubectl label namespace default istio-injection=enabled -->
+kubectl label namespace default istio-injection=enabled
 
 istioctl install --set profile=ambient --skip-confirmation
 
@@ -173,3 +173,75 @@ kubectl apply -f k8s/virtual-services.yaml
 kubectl rollout restart deployment hospedajes-deployment
 
 kubectl logs -l app=users-app --tail=20
+
+
+______________
+
+ISTIO WITH AMBIENT MODE
+
+
+istioctl install --set profile=ambient --skip-confirmation
+
+
+kubectl get crd gateways.gateway.networking.k8s.io &> /dev/null || \
+  kubectl apply --server-side -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.0/experimental-install.yaml
+
+apply gateway
+ kubectl apply -f k8s/ingress-istios.yaml
+
+kubectl get gateway
+
+minikube image load postgres
+minikube image load usersms:latest
+minikube image load hospedajesms:latest
+minikube image load publicms:latest
+
+
+kubectl apply -f k8s/namespace.yaml
+
+
+apply services
+  kubectl apply -f k8s/services.yaml
+
+
+apply deployments
+
+  kubectl apply -f k8s/hospedajes-deployment.yaml
+  kubectl apply -f k8s/publicms-deployment.yaml
+  kubectl apply -f k8s/users-deployment.yaml
+  kubectl apply -f k8s/postgres-pod.yaml
+kubectl apply -f samples/addons/prometheus.yaml    
+ kubectl apply -f samples/addons/kiali.yaml 
+
+apply routes
+  
+  kubectl apply -f k8s/http-routes.yaml
+
+
+kubectl rollout restart deployment users-deployment hospedajes-deployment publicms-deployment
+
+kubectl rollout status deployment/users-deployment --timeout=120s && kubectl rollout status deployment/hospedajes-deployment --timeout=120s && kubectl rollout status deployment/publicms-deployment --timeout=120s
+//TODO: IMPROVE README
+istioctl dashboard kiali
+
+#Confirm that the namespace is labeled with istio.io/dataplane-mode: ambient:
+
+kubectl get ns -L istio.io/dataplane-mode
+
+
+kubectl logs -l app=public-app --tail=50
+
+
+
+
+# Watch node memory pressure
+kubectl top node
+
+# Watch pod memory and OOMKills live
+kubectl top pods -n default --sort-by=memory
+
+# Check for evictions/OOMKills after the test
+kubectl get events -n default --sort-by='.lastTimestamp' | grep -E "OOMKill|Evict|Failed|Back-off"
+
+# Check waypoint health specifically
+kubectl get pods -n default -l gateway.networking.k8s.io/gateway-name=waypoint-private
