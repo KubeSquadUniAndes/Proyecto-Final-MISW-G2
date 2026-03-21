@@ -1,0 +1,37 @@
+###################################
+# PodDisruptionBudgets
+# Ensure at least 1 pod is always available during
+# voluntary disruptions (node upgrades, scaling, etc.)
+###################################
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: users-pdb
+  namespace: default
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: users-app
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: hospedajes-pdb
+  namespace: default
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: hospedajes-app
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: public-pdb
+  namespace: default
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: public-app

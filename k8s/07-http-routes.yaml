@@ -1,0 +1,79 @@
+###############################
+## TravelHub hospedajes HTTPRoute
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: hospedajes-route
+  namespace: default
+spec:
+  parentRefs:
+  - name: travelhub-gateway
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /hospedajes
+    filters:
+    - type: URLRewrite
+      urlRewrite:
+        path:
+          type: ReplacePrefixMatch
+          replacePrefixMatch: /
+    backendRefs:
+    - name: hospedajes-service
+      port: 80
+---
+###############################
+## TravelHub users HTTPRoute
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: users-route
+  namespace: default
+spec:
+  parentRefs:
+  - name: travelhub-gateway
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /users
+    filters:
+    - type: URLRewrite
+      urlRewrite:
+        path:
+          type: ReplacePrefixMatch
+          replacePrefixMatch: /
+    - type: ResponseHeaderModifier
+      responseHeaderModifier:
+        add:
+        - name: x-travelhub-header
+          value: users-service
+    backendRefs:
+    - name: users-service
+      port: 80
+---
+###############################
+## TravelHub public service HTTPRoute
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: public-service-route
+  namespace: default
+spec:
+  parentRefs:
+  - name: travelhub-gateway
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /public
+    filters:
+    - type: URLRewrite
+      urlRewrite:
+        path:
+          type: ReplacePrefixMatch
+          replacePrefixMatch: /
+    backendRefs:
+    - name: public-service
+      port: 80

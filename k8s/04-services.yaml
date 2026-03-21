@@ -1,0 +1,82 @@
+###################################
+# users service
+###################################
+apiVersion: v1
+kind: Service
+metadata:
+  name: users-service
+  namespace: default
+  labels:
+    app: users-app
+    istio.io/use-waypoint: waypoint-private
+spec:
+  type: ClusterIP
+  selector:
+    app: users-app
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: 8000
+---
+###################################
+# hospedajes service
+###################################
+apiVersion: v1
+kind: Service
+metadata:
+  name: hospedajes-service
+  namespace: default
+  labels:
+    app: hospedajes-app
+    istio.io/use-waypoint: waypoint-private
+spec:
+  type: ClusterIP
+  selector:
+    app: hospedajes-app
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: 8000
+---
+###################################
+# public service
+###################################
+apiVersion: v1
+kind: Service
+metadata:
+  name: public-service
+  namespace: default
+  labels:
+    app: public-app
+    istio.io/use-waypoint: waypoint-private
+spec:
+  type: ClusterIP
+  selector:
+    app: public-app
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: 8080
+---
+###################################
+# postgres service
+###################################
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgresdb-service
+  namespace: default
+  labels:
+    app: postgres-db
+spec:
+  type: ClusterIP
+  selector:
+    app: postgres-db
+  ports:
+  - name: tcp-postgres
+    protocol: TCP
+    port: 5432
+    targetPort: 5432

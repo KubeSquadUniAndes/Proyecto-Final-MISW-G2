@@ -9,3 +9,5 @@
 
 /jmeter*
 test-report**
+
+/k8sCopy*
