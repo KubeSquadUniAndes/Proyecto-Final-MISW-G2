@@ -10,7 +10,30 @@
 apiVersion: networking.istio.io/v1
 kind: DestinationRule
 metadata:
-  name: hospedajes
+  name: detector-anomalias-dr
+  namespace: default
+spec:
+  host: detector-anomalias-service.default.svc.cluster.local
+  trafficPolicy:
+    connectionPool:
+      tcp:
+        maxConnections: 800
+      http:
+        h2UpgradePolicy: DEFAULT
+        http1MaxPendingRequests: 500
+        http2MaxRequests: 1000
+        maxRequestsPerConnection: 10
+        maxRetries: 3
+    outlierDetection:
+      consecutive5xxErrors: 3
+      interval: 5s
+      baseEjectionTime: 30s
+      maxEjectionPercent: 50
+---
+apiVersion: networking.istio.io/v1
+kind: DestinationRule
+metadata:
+  name: hospedajes-dr
   namespace: default
 spec:
   host: hospedajes-service.default.svc.cluster.local
@@ -37,7 +60,76 @@ spec:
 apiVersion: networking.istio.io/v1
 kind: DestinationRule
 metadata:
-  name: users
+  name: login-handler-dr
+  namespace: default
+spec:
+  host: login-handler-service.default.svc.cluster.local
+  trafficPolicy:
+    connectionPool:
+      tcp:
+        maxConnections: 800
+      http:
+        h2UpgradePolicy: DEFAULT
+        http1MaxPendingRequests: 500
+        http2MaxRequests: 1000
+        maxRequestsPerConnection: 10
+        maxRetries: 3
+    outlierDetection:
+      consecutive5xxErrors: 3
+      interval: 5s
+      baseEjectionTime: 30s
+      maxEjectionPercent: 50
+---
+apiVersion: networking.istio.io/v1
+kind: DestinationRule
+metadata:
+  name: notificaciones-dr
+  namespace: default
+spec:
+  host: notificaciones-service.default.svc.cluster.local
+  trafficPolicy:
+    connectionPool:
+      tcp:
+        maxConnections: 800
+      http:
+        h2UpgradePolicy: DEFAULT
+        http1MaxPendingRequests: 500
+        http2MaxRequests: 1000
+        maxRequestsPerConnection: 10
+        maxRetries: 3
+    outlierDetection:
+      consecutive5xxErrors: 3
+      interval: 5s
+      baseEjectionTime: 30s
+      maxEjectionPercent: 50
+---
+apiVersion: networking.istio.io/v1
+kind: DestinationRule
+metadata:
+  name: reservas-dr 
+  namespace: default
+spec:
+  host: reservas-service.default.svc.cluster.local
+  trafficPolicy:
+    connectionPool:
+      tcp:
+        maxConnections: 800
+      http:
+        h2UpgradePolicy: DEFAULT
+        http1MaxPendingRequests: 500
+        http2MaxRequests: 1000
+        maxRequestsPerConnection: 10
+        maxRetries: 3
+    outlierDetection:
+      consecutive5xxErrors: 3
+      interval: 5s
+      baseEjectionTime: 30s
+      maxEjectionPercent: 50
+---
+apiVersion: networking.istio.io/v1
+kind: DestinationRule
+metadata:
+  name: users-dr
   namespace: default
 spec:
   host: users-service.default.svc.cluster.local
@@ -60,26 +152,3 @@ spec:
   - name: v1
     labels:
       version: v1
----
-apiVersion: networking.istio.io/v1
-kind: DestinationRule
-metadata:
-  name: public-service
-  namespace: default
-spec:
-  host: public-service.default.svc.cluster.local
-  trafficPolicy:
-    connectionPool:
-      tcp:
-        maxConnections: 800
-      http:
-        h2UpgradePolicy: DEFAULT
-        http1MaxPendingRequests: 500
-        http2MaxRequests: 1000
-        maxRequestsPerConnection: 10
-        maxRetries: 3
-    outlierDetection:
-      consecutive5xxErrors: 3
-      interval: 5s
-      baseEjectionTime: 30s
-      maxEjectionPercent: 50

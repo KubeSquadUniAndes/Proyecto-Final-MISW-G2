@@ -1,4 +1,25 @@
 ###################################
+# detector-anomalias service
+###################################
+apiVersion: v1
+kind: Service
+metadata:
+  name: detector-anomalias-service
+  namespace: default
+  labels:
+    app: detector-anomalias-app
+    istio.io/use-waypoint: waypoint-private
+spec:
+  type: ClusterIP
+  selector:
+    app: detector-anomalias-app
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: 8000
+---
+###################################
 # users service
 ###################################
 apiVersion: v1
@@ -13,6 +34,69 @@ spec:
   type: ClusterIP
   selector:
     app: users-app
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: 8000
+---
+###################################
+# login handler service
+###################################
+apiVersion: v1
+kind: Service
+metadata:
+  name: login-handler-service
+  namespace: default
+  labels:
+    app: login-handler-app
+    istio.io/use-waypoint: waypoint-private
+spec:
+  type: ClusterIP
+  selector:
+    app: login-handler-app
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: 8000
+---
+###################################
+# notificaciones service
+###################################
+apiVersion: v1
+kind: Service
+metadata:
+  name: notificaciones-service
+  namespace: default
+  labels:
+    app: notificaciones-app
+    istio.io/use-waypoint: waypoint-private
+spec:
+  type: ClusterIP
+  selector:
+    app: notificaciones-app
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: 8000
+---
+###################################
+# reservas service
+###################################
+apiVersion: v1
+kind: Service
+metadata:
+  name: reservas-service
+  namespace: default
+  labels:
+    app: reservas-app
+    istio.io/use-waypoint: waypoint-private
+spec:
+  type: ClusterIP
+  selector:
+    app: reservas-app
   ports:
   - name: http
     protocol: TCP
@@ -39,27 +123,6 @@ spec:
     protocol: TCP
     port: 80
     targetPort: 8000
----
-###################################
-# public service
-###################################
-apiVersion: v1
-kind: Service
-metadata:
-  name: public-service
-  namespace: default
-  labels:
-    app: public-app
-    istio.io/use-waypoint: waypoint-private
-spec:
-  type: ClusterIP
-  selector:
-    app: public-app
-  ports:
-  - name: http
-    protocol: TCP
-    port: 80
-    targetPort: 8080
 ---
 ###################################
 # postgres service

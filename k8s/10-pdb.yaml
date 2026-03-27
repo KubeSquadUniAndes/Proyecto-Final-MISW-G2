@@ -6,13 +6,13 @@
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
-  name: users-pdb
+  name: detector-anomalias-pdb
   namespace: default
 spec:
   minAvailable: 1
   selector:
     matchLabels:
-      app: users-app
+      app: detector-anomalias-app
 ---
 apiVersion: policy/v1
 kind: PodDisruptionBudget
@@ -28,10 +28,43 @@ spec:
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
-  name: public-pdb
+  name: login-handler-pdb
   namespace: default
 spec:
   minAvailable: 1
   selector:
     matchLabels:
-      app: public-app
+      app: login-handler-app
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: notificaciones-pdb
+  namespace: default
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: notificaciones-app
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: reservas-pdb
+  namespace: default
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: reservas-app
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: users-pdb
+  namespace: default
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: users-app

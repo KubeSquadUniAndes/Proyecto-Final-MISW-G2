@@ -1,0 +1,78 @@
+2026-03-06 20:09:39,546 INFO o.a.j.u.JMeterUtils: Setting Locale to en_EN
+2026-03-06 20:09:39,561 INFO o.a.j.JMeter: Loading user properties from: /opt/homebrew/Cellar/jmeter/5.6.3/libexec/bin/user.properties
+2026-03-06 20:09:39,562 INFO o.a.j.JMeter: Loading system properties from: /opt/homebrew/Cellar/jmeter/5.6.3/libexec/bin/system.properties
+2026-03-06 20:09:39,565 INFO o.a.j.JMeter: Copyright (c) 1998-2024 The Apache Software Foundation
+2026-03-06 20:09:39,565 INFO o.a.j.JMeter: Version 5.6.3
+2026-03-06 20:09:39,565 INFO o.a.j.JMeter: java.version=21.0.10
+2026-03-06 20:09:39,565 INFO o.a.j.JMeter: java.vm.name=OpenJDK 64-Bit Server VM
+2026-03-06 20:09:39,566 INFO o.a.j.JMeter: os.name=Mac OS X
+2026-03-06 20:09:39,566 INFO o.a.j.JMeter: os.arch=aarch64
+2026-03-06 20:09:39,566 INFO o.a.j.JMeter: os.version=26.3
+2026-03-06 20:09:39,566 INFO o.a.j.JMeter: file.encoding=UTF-8
+2026-03-06 20:09:39,566 INFO o.a.j.JMeter: java.awt.headless=null
+2026-03-06 20:09:39,566 INFO o.a.j.JMeter: Max memory     =1073741824
+2026-03-06 20:09:39,566 INFO o.a.j.JMeter: Available Processors =8
+2026-03-06 20:09:39,572 INFO o.a.j.JMeter: Default Locale=English (EN)
+2026-03-06 20:09:39,573 INFO o.a.j.JMeter: JMeter  Locale=English (EN)
+2026-03-06 20:09:39,573 INFO o.a.j.JMeter: JMeterHome=/opt/homebrew/Cellar/jmeter/5.6.3/libexec
+2026-03-06 20:09:39,573 INFO o.a.j.JMeter: user.dir  =/Users/david/iCloud Drive (archivo)/Documents/Maestría/013 - Proyecto 1/Proyecto-Final-MISW-G2/detector_anomalias_ms
+2026-03-06 20:09:39,573 INFO o.a.j.JMeter: PWD       =/Users/david/iCloud Drive (archivo)/Documents/Maestría/013 - Proyecto 1/Proyecto-Final-MISW-G2/detector_anomalias_ms
+2026-03-06 20:09:39,581 INFO o.a.j.JMeter: IP: 127.0.0.1 Name: MacBook-Air-de-David.local FullName: localhost
+2026-03-06 20:09:39,590 INFO o.a.j.JMeter: Loaded icon properties from org/apache/jmeter/images/icon.properties
+2026-03-06 20:09:41,958 INFO o.a.j.JMeterGuiLauncher: Setting LAF to: com.github.weisj.darklaf.DarkLaf:com.github.weisj.darklaf.theme.DarculaTheme
+2026-03-06 20:09:43,975 INFO o.a.j.r.ClassFinder: Will scan jar /opt/homebrew/Cellar/jmeter/5.6.3/libexec/lib/ext/jmeter-plugins-manager-1.9.jar with filter ExtendsClassFilter [parents=[interface org.apache.jmeter.gui.action.Command], inner=false, contains=null, notContains=null]. Consider exposing JMeter plugins via META-INF/services, and add JMeter-Skip-Class-Scanning=true manifest attribute so JMeter can skip classfile scanning
+2026-03-06 20:09:44,080 INFO o.a.j.r.ClassFinder: Will scan jar /opt/homebrew/Cellar/jmeter/5.6.3/libexec/lib/ext/jmeter-plugins-json-2.7.jar with filter ExtendsClassFilter [parents=[interface org.apache.jmeter.gui.action.Command], inner=false, contains=null, notContains=null]. Consider exposing JMeter plugins via META-INF/services, and add JMeter-Skip-Class-Scanning=true manifest attribute so JMeter can skip classfile scanning
+2026-03-06 20:09:44,158 INFO o.a.j.r.ClassFinder: Will scan jar /opt/homebrew/Cellar/jmeter/5.6.3/libexec/lib/ext/jmeter-plugins-manager-1.9.jar with filter ExtendsClassFilter [parents=[interface org.apache.jmeter.gui.plugin.MenuCreator], inner=false, contains=null, notContains=null]. Consider exposing JMeter plugins via META-INF/services, and add JMeter-Skip-Class-Scanning=true manifest attribute so JMeter can skip classfile scanning
+2026-03-06 20:09:44,161 INFO o.a.j.r.ClassFinder: Will scan jar /opt/homebrew/Cellar/jmeter/5.6.3/libexec/lib/ext/jmeter-plugins-json-2.7.jar with filter ExtendsClassFilter [parents=[interface org.apache.jmeter.gui.plugin.MenuCreator], inner=false, contains=null, notContains=null]. Consider exposing JMeter plugins via META-INF/services, and add JMeter-Skip-Class-Scanning=true manifest attribute so JMeter can skip classfile scanning
+2026-03-06 20:09:44,320 INFO o.j.r.JARSourceHTTP: Found cached repo
+2026-03-06 20:09:44,489 INFO o.j.r.PluginManager: Plugins Status: [jpgc-json=2.7, jpgc-plugins-manager=1.9, jmeter-core=5.6.3, jmeter-ftp=5.6.3, jmeter-http=5.6.3, jmeter-jdbc=5.6.3, jmeter-jms=5.6.3, jmeter-junit=5.6.3, jmeter-java=5.6.3, jmeter-ldap=5.6.3, jmeter-mail=5.6.3, jmeter-mongodb=5.6.3, jmeter-native=5.6.3, jmeter-tcp=5.6.3, jmeter-components=5.6.3]
+2026-03-06 20:09:44,489 INFO o.j.r.PluginManagerMenuItem: Plugins Manager has upgrades: [jpgc-plugins-manager]
+2026-03-06 20:09:45,641 INFO o.a.j.JMeterGuiLauncher: Loading file: experiment_test_plan_v4.jmx
+2026-03-06 20:09:45,643 INFO o.a.j.s.FileServer: Default base='/Users/david/iCloud Drive (archivo)/Documents/Maestría/013 - Proyecto 1/Proyecto-Final-MISW-G2/detector_anomalias_ms'
+2026-03-06 20:09:45,644 INFO o.a.j.s.FileServer: Set new base='/Users/david/iCloud Drive (archivo)/Documents/Maestría/013 - Proyecto 1/Proyecto-Final-MISW-G2/detector_anomalias_ms'
+2026-03-06 20:09:45,972 INFO o.a.j.s.SaveService: Testplan (JMX) version: 2.2. Testlog (JTL) version: 2.2
+2026-03-06 20:09:45,989 INFO o.a.j.s.SaveService: Using SaveService properties version 5.0
+2026-03-06 20:09:45,991 INFO o.a.j.s.SaveService: Using SaveService properties file encoding UTF-8
+2026-03-06 20:09:45,992 INFO o.a.j.s.SaveService: Loading file: experiment_test_plan_v4.jmx
+2026-03-06 20:09:46,131 INFO o.a.j.p.h.s.HTTPSamplerBase: Parser for text/html is org.apache.jmeter.protocol.http.parser.LagartoBasedHtmlParser
+2026-03-06 20:09:46,131 INFO o.a.j.p.h.s.HTTPSamplerBase: Parser for application/xhtml+xml is org.apache.jmeter.protocol.http.parser.LagartoBasedHtmlParser
+2026-03-06 20:09:46,131 INFO o.a.j.p.h.s.HTTPSamplerBase: Parser for application/xml is org.apache.jmeter.protocol.http.parser.LagartoBasedHtmlParser
+2026-03-06 20:09:46,131 INFO o.a.j.p.h.s.HTTPSamplerBase: Parser for text/xml is org.apache.jmeter.protocol.http.parser.LagartoBasedHtmlParser
+2026-03-06 20:09:46,132 INFO o.a.j.p.h.s.HTTPSamplerBase: Parser for text/vnd.wap.wml is org.apache.jmeter.protocol.http.parser.RegexpHTMLParser
+2026-03-06 20:09:46,132 INFO o.a.j.p.h.s.HTTPSamplerBase: Parser for text/css is org.apache.jmeter.protocol.http.parser.CssParser
+2026-03-06 20:09:46,197 INFO o.a.j.s.FileServer: Set new base='/Users/david/iCloud Drive (archivo)/Documents/Maestría/013 - Proyecto 1/Proyecto-Final-MISW-G2/detector_anomalias_ms'
+2026-03-06 20:09:46,427 INFO o.a.j.s.SampleResult: Note: Sample TimeStamps are START times
+2026-03-06 20:09:46,428 INFO o.a.j.s.SampleResult: sampleresult.default.encoding is set to UTF-8
+2026-03-06 20:09:46,428 INFO o.a.j.s.SampleResult: sampleresult.useNanoTime=true
+2026-03-06 20:09:46,428 INFO o.a.j.s.SampleResult: sampleresult.nanoThreadSleep=5000
+2026-03-06 20:09:46,557 INFO o.a.j.r.ClassFinder: Will scan jar /opt/homebrew/Cellar/jmeter/5.6.3/libexec/lib/ext/jmeter-plugins-manager-1.9.jar with filter ExtendsClassFilter [parents=[interface org.apache.jmeter.visualizers.ResultRenderer], inner=false, contains=null, notContains=null]. Consider exposing JMeter plugins via META-INF/services, and add JMeter-Skip-Class-Scanning=true manifest attribute so JMeter can skip classfile scanning
+2026-03-06 20:09:46,563 INFO o.a.j.r.ClassFinder: Will scan jar /opt/homebrew/Cellar/jmeter/5.6.3/libexec/lib/ext/jmeter-plugins-json-2.7.jar with filter ExtendsClassFilter [parents=[interface org.apache.jmeter.visualizers.ResultRenderer], inner=false, contains=null, notContains=null]. Consider exposing JMeter plugins via META-INF/services, and add JMeter-Skip-Class-Scanning=true manifest attribute so JMeter can skip classfile scanning
+2026-03-06 20:09:46,598 INFO o.a.j.r.ClassFinder: Will scan jar /opt/homebrew/Cellar/jmeter/5.6.3/libexec/lib/ext/jmeter-plugins-manager-1.9.jar with filter ExtendsClassFilter [parents=[interface org.apache.jmeter.visualizers.RequestView], inner=false, contains=null, notContains=null]. Consider exposing JMeter plugins via META-INF/services, and add JMeter-Skip-Class-Scanning=true manifest attribute so JMeter can skip classfile scanning
+2026-03-06 20:09:46,601 INFO o.a.j.r.ClassFinder: Will scan jar /opt/homebrew/Cellar/jmeter/5.6.3/libexec/lib/ext/jmeter-plugins-json-2.7.jar with filter ExtendsClassFilter [parents=[interface org.apache.jmeter.visualizers.RequestView], inner=false, contains=null, notContains=null]. Consider exposing JMeter plugins via META-INF/services, and add JMeter-Skip-Class-Scanning=true manifest attribute so JMeter can skip classfile scanning
+2026-03-06 20:10:05,329 INFO o.a.j.e.StandardJMeterEngine: Running the test!
+2026-03-06 20:10:05,331 INFO o.a.j.s.SampleEvent: List of sample_variables: []
+2026-03-06 20:10:05,331 INFO o.a.j.s.SampleEvent: List of sample_variables: []
+2026-03-06 20:10:05,332 INFO o.a.j.e.u.CompoundVariable: Note: Function class names must contain the string: '.functions.'
+2026-03-06 20:10:05,332 INFO o.a.j.e.u.CompoundVariable: Note: Function class names must not contain the string: '.gui.'
+2026-03-06 20:10:05,401 INFO o.a.j.r.ClassFinder: Will scan jar /opt/homebrew/Cellar/jmeter/5.6.3/libexec/lib/ext/jmeter-plugins-manager-1.9.jar with filter ExtendsClassFilter [parents=[interface org.apache.jmeter.functions.Function], inner=false, contains=null, notContains=null]. Consider exposing JMeter plugins via META-INF/services, and add JMeter-Skip-Class-Scanning=true manifest attribute so JMeter can skip classfile scanning
+2026-03-06 20:10:05,404 INFO o.a.j.r.ClassFinder: Will scan jar /opt/homebrew/Cellar/jmeter/5.6.3/libexec/lib/ext/jmeter-plugins-json-2.7.jar with filter ExtendsClassFilter [parents=[interface org.apache.jmeter.functions.Function], inner=false, contains=null, notContains=null]. Consider exposing JMeter plugins via META-INF/services, and add JMeter-Skip-Class-Scanning=true manifest attribute so JMeter can skip classfile scanning
+2026-03-06 20:10:05,413 INFO o.a.j.g.u.JMeterMenuBar: setRunning(true, *local*)
+2026-03-06 20:10:05,476 INFO o.a.j.e.StandardJMeterEngine: Starting ThreadGroup: 1 : Intento No Autorizado de Modificación
+2026-03-06 20:10:05,476 INFO o.a.j.e.StandardJMeterEngine: Starting 3 threads for group Intento No Autorizado de Modificación.
+2026-03-06 20:10:05,476 INFO o.a.j.e.StandardJMeterEngine: Thread will continue on error
+2026-03-06 20:10:05,477 INFO o.a.j.t.ThreadGroup: Starting thread group... number=1 threads=3 ramp-up=5 delayedStart=false
+2026-03-06 20:10:05,482 INFO o.a.j.t.JMeterThread: Thread started: Intento No Autorizado de Modificación 1-1
+2026-03-06 20:10:05,483 INFO o.a.j.t.ThreadGroup: Started thread group number 1
+2026-03-06 20:10:05,484 INFO o.a.j.e.StandardJMeterEngine: All thread groups have been started
+2026-03-06 20:10:05,498 INFO o.a.j.p.h.s.HTTPHCAbstractImpl: Local host = MacBook-Air-de-David.local
+2026-03-06 20:10:05,503 INFO o.a.j.p.h.s.HTTPHC4Impl: HTTP request retry count = 0
+2026-03-06 20:10:07,151 INFO o.a.j.t.JMeterThread: Thread started: Intento No Autorizado de Modificación 1-2
+2026-03-06 20:10:08,819 INFO o.a.j.t.JMeterThread: Thread started: Intento No Autorizado de Modificación 1-3
+2026-03-06 20:11:09,917 INFO o.a.j.t.JMeterThread: Thread is done: Intento No Autorizado de Modificación 1-3
+2026-03-06 20:11:09,924 INFO o.a.j.t.JMeterThread: Thread finished: Intento No Autorizado de Modificación 1-3
+2026-03-06 20:11:12,440 INFO o.a.j.t.JMeterThread: Thread is done: Intento No Autorizado de Modificación 1-2
+2026-03-06 20:11:12,441 INFO o.a.j.t.JMeterThread: Thread finished: Intento No Autorizado de Modificación 1-2
+2026-03-06 20:11:12,497 INFO o.a.j.t.JMeterThread: Thread is done: Intento No Autorizado de Modificación 1-1
+2026-03-06 20:11:12,498 INFO o.a.j.t.JMeterThread: Thread finished: Intento No Autorizado de Modificación 1-1
+2026-03-06 20:11:12,498 INFO o.a.j.e.StandardJMeterEngine: Notifying test listeners of end of test
+2026-03-06 20:11:12,501 INFO o.a.j.g.u.JMeterMenuBar: setRunning(false, *local*)

@@ -21,13 +21,13 @@
         </elementProp>
       </ThreadGroup>
       <hashTree>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request8">
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request2">
           <stringProp name="TestPlan.comments">ff</stringProp>
-          <stringProp name="HTTPSampler.domain">localhost</stringProp>
+          <stringProp name="HTTPSampler.domain">k8s-default-travelhu-2351a209ce-c87691a015859096.elb.us-east-1.amazonaws.com</stringProp>
           <stringProp name="HTTPSampler.port">80</stringProp>
           <stringProp name="HTTPSampler.protocol">http</stringProp>
           <stringProp name="HTTPSampler.contentEncoding">UTF-8</stringProp>
-          <stringProp name="HTTPSampler.path">/hospedajes/</stringProp>
+          <stringProp name="HTTPSampler.path">/hospedajes/users/</stringProp>
           <stringProp name="HTTPSampler.method">POST</stringProp>
           <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
           <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
@@ -36,9 +36,12 @@
               <elementProp name="" elementType="HTTPArgument">
                 <boolProp name="HTTPArgument.always_encode">false</boolProp>
                 <stringProp name="Argument.value">{&#xd;
-    &quot;numero_de_personas&quot;: 4,&#xd;
-    &quot;tipo&quot;: &quot;SUIT&quot;,&#xd;
-    &quot;secret_name&quot;: &quot;some secret name&quot;&#xd;
+    &quot;nombre&quot;: &quot;Juan Sebastianss&quot;,&#xd;
+    &quot;age&quot;: 35,&#xd;
+    &quot;identificacion&quot;: &quot;CC&quot;,&#xd;
+    &quot;numero_identificacion&quot;: 123455,&#xd;
+    &quot;email&quot;: &quot;juanser@gmail.com&quot;,&#xd;
+    &quot;tipo&quot;: &quot;VIAJERO&quot;&#xd;
 }</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>

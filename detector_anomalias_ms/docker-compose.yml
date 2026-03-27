@@ -1,0 +1,51 @@
+version: "3.9"
+
+services:
+  detector_anomalias_ms:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: detector_anomalias_ms
+    ports:
+      - "8002:8002"
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@db:5432/anomalies_db
+      - DEBUG=true
+      - INTERNAL_API_KEY=change-internal-key-in-production
+      - LOGIN_HANDLER_MS_URL=http://login_handler_ms:8001
+      - LOGIN_HANDLER_MS_INTERNAL_API_KEY=change-internal-key-in-production
+      - RANDOM_ANOMALY_RATE=0.30
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - .:/app
+    networks:
+      - experiment_net
+
+  db:
+    image: postgres:16-alpine
+    container_name: anomalies_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: anomalies_db
+    ports:
+      - "5434:5432"
+    volumes:
+      - anomalies_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - experiment_net
+
+volumes:
+  anomalies_postgres_data:
+
+networks:
+  experiment_net:
+    external: true
+    name: experiment_net

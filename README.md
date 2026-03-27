@@ -245,3 +245,49 @@ kubectl get events -n default --sort-by='.lastTimestamp' | grep -E "OOMKill|Evic
 
 # Check waypoint health specifically
 kubectl get pods -n default -l gateway.networking.k8s.io/gateway-name=waypoint-private
+
+
+__________
+
+# Add Docker Images to AWS ECR
+
+docker tag usersms:latest 780522923809.dkr.ecr.us-east-1.amazonaws.com/travelhub/usersms:latest
+
+docker tag hospedajesms:latest 780522923809.dkr.ecr.us-east-1.amazonaws.com/travelhub/hospedajes:latest
+
+
+
+???????????
+asdfasdf asdfad sasdf adsf
+
+
+aws eks update-kubeconfig --region us-east-1 --name travelhub-eks
+
+istioctl install --set profile=ambient  
+
+kubectl get crd gateways.gateway.networking.k8s.io &> /dev/null || \                           ─╯
+  kubectl apply --server-side -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.0/experimental-install.yaml
+
+kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.2.0/standard-install.yaml
+
+╰─❯ docker tag publicms:latest 780522923809.dkr.ecr.us-east-1.amazonaws.com/travelhub/publicms:latest
+
+╰─❯ docker tag usersms:latest 780522923809.dkr.ecr.us-east-1.amazonaws.com/travelhub/usersms:latest
+
+docker tag hospedajesms:latest 780522923809.dkr.ecr.us-east-1.amazonaws.com/travelhub/hospedajesms:latest
+
+
+╰─❯ docker push 780522923809.dkr.ecr.us-east-1.amazonaws.com/travelhub/publicms:latest             ─╯
+
+╰─❯ docker push 780522923809.dkr.ecr.us-east-1.amazonaws.com/travelhub/hospedajesms:latest         ─╯
+
+╰─❯ docker push 780522923809.dkr.ecr.us-east-1.amazonaws.com/travelhub/usersms:latest              ─╯
+
+
+kubectl get gateway   
+
+for ADDON in kiali jaeger prometheus grafana                                                   ─╯
+do
+    ADDON_URL="https://raw.githubusercontent.com/istio/istio/release-1.20/samples/addons/$ADDON.yaml"
+    kubectl apply --server-side -f $ADDON_URL
+done

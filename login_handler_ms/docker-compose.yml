@@ -1,0 +1,50 @@
+version: "3.9"
+
+services:
+  login_handler_ms:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: login_handler_ms
+    ports:
+      - "8001:8001"
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@db:5432/auth_db
+      - DEBUG=true
+      - JWT_SECRET_KEY=change-me-in-production
+      - INTERNAL_API_KEY=change-internal-key-in-production
+      - DETECTOR_ANOMALIAS_MS_URL=http://detector_anomalias_ms:8002
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - .:/app
+    networks:
+      - experiment_net
+
+  db:
+    image: postgres:16-alpine
+    container_name: auth_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: auth_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - auth_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - experiment_net
+
+volumes:
+  auth_postgres_data:
+
+networks:
+  experiment_net:
+    external: true  # Shared network — created by reservas_ms docker-compose
+    name: experiment_net
