@@ -32,6 +32,9 @@ jobs:
             src_path: src
             mypy_path: src/domain src/application
 
+    env:
+      PYTHONPATH: ${{ github.workspace }}/${{ matrix.service }}
+
     defaults:
       run:
         working-directory: ${{ matrix.service }}
@@ -70,6 +73,7 @@ jobs:
       - name: Unit tests
         env:
           DEBUG: "false"
+          PYTHONPATH: ${{ github.workspace }}/${{ matrix.service }}
         run: |
           pytest ${{ matrix.test_path }} \
             --cov=${{ matrix.src_path }} \
