@@ -40,7 +40,7 @@ spec:
         command: ["sh", "-c", "until pg_isready -h postgresdb-service -p 5432 -U postgres; do echo 'waiting for postgres...'; sleep 2; done"]
       containers:
       - name: detector-anomalias
-        image: 780522923809.dkr.ecr.us-east-1.amazonaws.com/travelhub/detector-anomalias:latest
+        image: 780522923809.dkr.ecr.us-east-1.amazonaws.com/travelhub/detectoranomaliasms:latest
         imagePullPolicy: Always
         env:
         - name: HOSPEDAJES_MS_URL
