@@ -6,12 +6,13 @@ from uuid import UUID
 @dataclass
 class BookingAnalysisRequest:
     """Represents an incoming booking that needs anomaly analysis."""
+
     user_id: UUID
     booking_id: UUID
     resource_id: UUID
     start_time: datetime
     end_time: datetime
-    requested_at: datetime = None
+    requested_at: datetime | None = None
 
     def __post_init__(self):
         if self.requested_at is None:

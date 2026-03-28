@@ -9,11 +9,13 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = "development"
 
     # Database
-    DATABASE_URL: str = "postgresql+asyncpg://postgres:postgres@localhost:5434/anomalies_db"
+    DATABASE_URL: str = (
+        "postgresql+asyncpg://postgres:postgres@localhost:5434/anomalies_db"
+    )
     DB_ECHO: bool = False
 
     # Server
-    HOST: str = "0.0.0.0"
+    HOST: str = "0.0.0.0"  # nosec B104
     PORT: int = 8002
     WORKERS: int = 1
 

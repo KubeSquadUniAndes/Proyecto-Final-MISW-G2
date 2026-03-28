@@ -39,7 +39,12 @@ class UpdateBookingRequest(BaseModel):
     @field_validator("end_time")
     @classmethod
     def end_after_start(cls, v, info):
-        if v and "start_time" in info.data and info.data["start_time"] and v <= info.data["start_time"]:
+        if (
+            v
+            and "start_time" in info.data
+            and info.data["start_time"]
+            and v <= info.data["start_time"]
+        ):
             raise ValueError("end_time must be after start_time")
         return v
 

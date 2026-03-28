@@ -1,6 +1,9 @@
 import logging
 
-from src.application.dtos.notification_dto import NotificationResultDTO, SendNotificationDTO
+from src.application.dtos.notification_dto import (
+    NotificationResultDTO,
+    SendNotificationDTO,
+)
 from src.infrastructure.channels.email_channel import send_email
 from src.infrastructure.channels.slack_channel import send_slack
 
@@ -15,7 +18,11 @@ class SendNotificationUseCase:
     async def execute(self, dto: SendNotificationDTO) -> NotificationResultDTO:
         logger.warning(
             "sending_alert user_id=%s booking_id=%s anomaly=%s severity=%s score=%.2f",
-            dto.user_id, dto.booking_id, dto.anomaly_type, dto.severity, dto.score,
+            dto.user_id,
+            dto.booking_id,
+            dto.anomaly_type,
+            dto.severity,
+            dto.score,
         )
 
         errors: list[str] = []

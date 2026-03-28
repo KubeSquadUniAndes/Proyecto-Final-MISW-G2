@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = "development"
 
     # Server
-    HOST: str = "0.0.0.0"
+    HOST: str = "0.0.0.0"  # nosec B104
     PORT: int = 8003
     WORKERS: int = 1
 

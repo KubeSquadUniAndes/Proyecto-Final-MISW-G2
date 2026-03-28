@@ -1,0 +1,10 @@
+[run]
+source = src
+omit =
+    src/infrastructure/*
+    src/main.py
+    src/tests/*
+
+[report]
+fail_under = 70
+show_missing = True

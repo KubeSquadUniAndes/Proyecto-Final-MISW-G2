@@ -11,3 +11,19 @@
 test-report**
 
 /k8sCopy*
+
+# Coverage
+.coverage
+coverage.xml
+
+# Mypy cache
+.mypy_cache/
+
+# Ruff cache
+.ruff_cache/
+
+# Pytest cache
+.pytest_cache/
+
+# Env files
+.env

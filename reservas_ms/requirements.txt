@@ -2,7 +2,7 @@
 greenlet>=3.0.0
 
 # Web framework
-fastapi==0.115.6
+fastapi==0.124.0
 uvicorn[standard]==0.32.1
 
 # Database
@@ -23,7 +23,9 @@ pytest-cov==6.0.0
 # Dev tools
 ruff==0.8.4
 mypy==1.13.0
+bandit==1.8.0
+pip-audit==2.8.0
 
 # HTTP client (for login_handler_ms + detector_anomalias_ms)
 httpx==0.28.1
-PyJWT==2.10.1
+PyJWT==2.12.0
