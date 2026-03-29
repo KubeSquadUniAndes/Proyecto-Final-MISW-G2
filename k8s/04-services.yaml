@@ -1,0 +1,145 @@
+###################################
+# detector-anomalias service
+###################################
+apiVersion: v1
+kind: Service
+metadata:
+  name: detector-anomalias-service
+  namespace: default
+  labels:
+    app: detector-anomalias-app
+    istio.io/use-waypoint: waypoint-private
+spec:
+  type: ClusterIP
+  selector:
+    app: detector-anomalias-app
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: 8000
+---
+###################################
+# users service
+###################################
+apiVersion: v1
+kind: Service
+metadata:
+  name: users-service
+  namespace: default
+  labels:
+    app: users-app
+    istio.io/use-waypoint: waypoint-private
+spec:
+  type: ClusterIP
+  selector:
+    app: users-app
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: 8000
+---
+###################################
+# login handler service
+###################################
+apiVersion: v1
+kind: Service
+metadata:
+  name: login-handler-service
+  namespace: default
+  labels:
+    app: login-handler-app
+    istio.io/use-waypoint: waypoint-private
+spec:
+  type: ClusterIP
+  selector:
+    app: login-handler-app
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: 8000
+---
+###################################
+# notificaciones service
+###################################
+apiVersion: v1
+kind: Service
+metadata:
+  name: notificaciones-service
+  namespace: default
+  labels:
+    app: notificaciones-app
+    istio.io/use-waypoint: waypoint-private
+spec:
+  type: ClusterIP
+  selector:
+    app: notificaciones-app
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: 8000
+---
+###################################
+# reservas service
+###################################
+apiVersion: v1
+kind: Service
+metadata:
+  name: reservas-service
+  namespace: default
+  labels:
+    app: reservas-app
+    istio.io/use-waypoint: waypoint-private
+spec:
+  type: ClusterIP
+  selector:
+    app: reservas-app
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: 8000
+---
+###################################
+# hospedajes service
+###################################
+apiVersion: v1
+kind: Service
+metadata:
+  name: hospedajes-service
+  namespace: default
+  labels:
+    app: hospedajes-app
+    istio.io/use-waypoint: waypoint-private
+spec:
+  type: ClusterIP
+  selector:
+    app: hospedajes-app
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: 8000
+---
+###################################
+# postgres service
+###################################
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgresdb-service
+  namespace: default
+  labels:
+    app: postgres-db
+spec:
+  type: ClusterIP
+  selector:
+    app: postgres-db
+  ports:
+  - name: tcp-postgres
+    protocol: TCP
+    port: 5432
+    targetPort: 5432

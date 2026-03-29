@@ -1,0 +1,169 @@
+###############################
+## Detector anomalias HTTPRoute
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: detector-anomalias-route
+  namespace: default
+spec:
+  parentRefs:
+  - name: travelhub-gateway
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /detector-anomalias
+    filters:
+    - type: URLRewrite
+      urlRewrite:
+        path:
+          type: ReplacePrefixMatch
+          replacePrefixMatch: /
+    backendRefs:
+    - name: detector-anomalias-service
+      port: 80
+---
+###############################
+## TravelHub hospedajes HTTPRoute
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: hospedajes-route
+  namespace: default
+spec:
+  parentRefs:
+  - name: travelhub-gateway
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /hospedajes
+    filters:
+    - type: URLRewrite
+      urlRewrite:
+        path:
+          type: ReplacePrefixMatch
+          replacePrefixMatch: /
+    backendRefs:
+    - name: hospedajes-service
+      port: 80
+---
+###############################
+## TravelHub users HTTPRoute
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: login-handler-route
+  namespace: default
+spec:
+  parentRefs:
+  - name: travelhub-gateway
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /login-handler
+    filters:
+    - type: URLRewrite
+      urlRewrite:
+        path:
+          type: ReplacePrefixMatch
+          replacePrefixMatch: /
+    - type: ResponseHeaderModifier
+      responseHeaderModifier:
+        add:
+        - name: x-travelhub-header
+          value: login-handler-service
+    backendRefs:
+    - name: login-handler-service
+      port: 80
+---
+###############################
+## notificaciones HTTPRoute
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: notificaciones-route
+  namespace: default
+spec:
+  parentRefs:
+  - name: travelhub-gateway
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /notificaciones
+    filters:
+    - type: URLRewrite
+      urlRewrite:
+        path:
+          type: ReplacePrefixMatch
+          replacePrefixMatch: /
+    - type: ResponseHeaderModifier
+      responseHeaderModifier:
+        add:
+        - name: x-travelhub-header
+          value: notificaciones-service
+    backendRefs:
+    - name: notificaciones-service
+      port: 80
+---
+###############################
+## notificaciones HTTPRoute
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: reservas-route
+  namespace: default
+spec:
+  parentRefs:
+  - name: travelhub-gateway
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /reservas
+    filters:
+    - type: URLRewrite
+      urlRewrite:
+        path:
+          type: ReplacePrefixMatch
+          replacePrefixMatch: /
+    - type: ResponseHeaderModifier
+      responseHeaderModifier:
+        add:
+        - name: x-travelhub-header
+          value: reservas-service
+    backendRefs:
+    - name: reservas-service
+      port: 80
+---
+###############################
+## TravelHub users HTTPRoute
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: users-route
+  namespace: default
+spec:
+  parentRefs:
+  - name: travelhub-gateway
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /users
+    filters:
+    - type: URLRewrite
+      urlRewrite:
+        path:
+          type: ReplacePrefixMatch
+          replacePrefixMatch: /
+    - type: ResponseHeaderModifier
+      responseHeaderModifier:
+        add:
+        - name: x-travelhub-header
+          value: users-service
+    backendRefs:
+    - name: users-service
+      port: 80
