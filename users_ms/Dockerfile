@@ -1,34 +1,15 @@
-# Imagen base
-FROM public.ecr.aws/docker/library/python:3.14-slim AS base
-
-# Variables de entorno
-# ENV PYTHONDONTWRITEBYTECODE=1
-# ENV PYTHONUNBUFFERED=1
-
-# Crear directorio de la app
-WORKDIR /
-
-# Copiar dependencias
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Imagen base
-FROM public.ecr.aws/docker/library/python:3.14-slim AS runner
+FROM python:3.12-slim
 
 WORKDIR /app
-COPY --from=base /usr/local/lib/python3.14/site-packages /usr/local/lib/python3.14/site-packages
-COPY --from=base /usr/local/bin /usr/local/bin
 
-COPY users_model.py .
-COPY main.py .
-COPY postgres_db.py .
+COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
-RUN groupadd -r noroot && useradd -r -g noroot noroot
-RUN chown -R noroot:noroot /app
-USER noroot
+COPY . .
 
-# Exponer el puerto Flask
-EXPOSE 8000
+EXPOSE 8004
 
-# Comando de ejecución
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+COPY run_migrations.py /app/run_migrations.py
+
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8004"]

@@ -1,0 +1,136 @@
+name: Build & Deploy to EKS
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      service:
+        description: 'Service to deploy (users-ms | login-handler-ms | all)'
+        required: true
+        default: 'all'
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
+  EKS_CLUSTER: travelhub-prod
+
+jobs:
+  # ── Build & Push users-ms ──────────────────────────────────────────────────
+  build-users-ms:
+    name: Build users-ms
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.service == 'users-ms' || github.event.inputs.service == 'all' || github.event_name == 'push' }}
+    outputs:
+      image: ${{ steps.build.outputs.image }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push users-ms
+        id: build
+        env:
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          IMAGE=$ECR_REGISTRY/travelhub/users-ms:$IMAGE_TAG
+          docker build -t $IMAGE ./users_ms
+          docker push $IMAGE
+          docker tag $IMAGE $ECR_REGISTRY/travelhub/users-ms:latest
+          docker push $ECR_REGISTRY/travelhub/users-ms:latest
+          echo "image=$IMAGE" >> $GITHUB_OUTPUT
+
+  # ── Build & Push login-handler-ms ─────────────────────────────────────────
+  build-login-handler-ms:
+    name: Build login-handler-ms
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.service == 'login-handler-ms' || github.event.inputs.service == 'all' || github.event_name == 'push' }}
+    outputs:
+      image: ${{ steps.build.outputs.image }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push login-handler-ms
+        id: build
+        env:
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          IMAGE=$ECR_REGISTRY/travelhub/login-handler-ms:$IMAGE_TAG
+          docker build -t $IMAGE ./login_handler_ms
+          docker push $IMAGE
+          docker tag $IMAGE $ECR_REGISTRY/travelhub/login-handler-ms:latest
+          docker push $ECR_REGISTRY/travelhub/login-handler-ms:latest
+          echo "image=$IMAGE" >> $GITHUB_OUTPUT
+
+  # ── Deploy to EKS ──────────────────────────────────────────────────────────
+  deploy:
+    name: Deploy to EKS
+    runs-on: ubuntu-latest
+    needs: [build-users-ms, build-login-handler-ms]
+    if: always() && (needs.build-users-ms.result == 'success' || needs.build-login-handler-ms.result == 'success')
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Configure kubectl
+        run: |
+          aws eks update-kubeconfig --region $AWS_REGION --name $EKS_CLUSTER
+
+      - name: Deploy shared resources
+        run: |
+          kubectl apply -f eks/k8s/shared/namespaces.yaml
+          kubectl apply -f eks/k8s/shared/ingress.yaml
+
+      - name: Deploy users-ms
+        if: needs.build-users-ms.result == 'success'
+        env:
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          kubectl apply -f eks/k8s/users-ms/users-ms.yaml
+          kubectl set image deployment/users-ms \
+            users-ms=$ECR_REGISTRY/travelhub/users-ms:$IMAGE_TAG \
+            -n users-ms
+          kubectl rollout status deployment/users-ms -n users-ms
+
+      - name: Deploy login-handler-ms
+        if: needs.build-login-handler-ms.result == 'success'
+        env:
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          kubectl apply -f eks/k8s/login-handler-ms/login-handler-ms.yaml
+          kubectl set image deployment/login-handler-ms \
+            login-handler-ms=$ECR_REGISTRY/travelhub/login-handler-ms:$IMAGE_TAG \
+            -n login-handler-ms
+          kubectl rollout status deployment/login-handler-ms -n login-handler-ms
+
+      - name: Run migrations
+        run: |
+          kubectl exec -n login-handler-ms deploy/login-handler-ms -- python /app/run_migrations.py
+          kubectl exec -n users-ms deploy/users-ms -- python /app/run_migrations.py
