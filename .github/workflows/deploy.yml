@@ -2,7 +2,7 @@ name: Build & Deploy to EKS
 
 on:
   push:
-    branches: [feature/SCRUM-111_add_endpoint_login]
+    branches: [main]
   workflow_dispatch:
     inputs:
       service:
