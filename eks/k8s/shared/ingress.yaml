@@ -11,7 +11,24 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: api.travelhub.com        # Replace with your domain or AWS NLB DNS
+    - host: api.travelhub.com
+      http:
+        paths:
+          - path: /auth(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: login-handler-ms-external
+                port:
+                  number: 8001
+          - path: /users(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: users-ms-external
+                port:
+                  number: 8004
+    - host: d1iioxb0yhodky.cloudfront.net
       http:
         paths:
           - path: /auth(/|$)(.*)
