@@ -132,15 +132,5 @@ jobs:
 
       - name: Run migrations
         run: |
-          kubectl exec -n login-handler-ms deploy/login-handler-ms -- sh -c             'python -c "
-          import sys; sys.path.insert(0,"/usr/local/lib/python3.12/site-packages")
-          from alembic.config import Config, command
-          cfg = Config("/app/alembic.ini")
-          cfg.set_main_option("script_location", "/app/alembic")
-          command.upgrade(cfg, "head")"'
-          kubectl exec -n users-ms deploy/users-ms -- sh -c             'python -c "
-          import sys; sys.path.insert(0,"/usr/local/lib/python3.12/site-packages")
-          from alembic.config import Config, command
-          cfg = Config("/app/alembic.ini")
-          cfg.set_main_option("script_location", "/app/alembic")
-          command.upgrade(cfg, "head")"'
+          kubectl exec -n login-handler-ms deploy/login-handler-ms -- python /app/run_migrations.py
+          kubectl exec -n users-ms deploy/users-ms -- python /app/run_migrations.py
