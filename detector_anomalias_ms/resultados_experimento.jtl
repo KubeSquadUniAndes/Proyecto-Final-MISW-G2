@@ -1,769 +1,769 @@
 timeStamp,elapsed,label,responseCode,responseMessage,threadName,dataType,success,failureMessage,bytes,sentBytes,grpThreads,allThreads,URL,Latency,IdleTime,Connect
-1772845807154,5013,1. Registrar Owner,201,Created,Intento No Autorizado de Modificación 1-2,text,true,,352,276,3,3,http://api.experiment.local/auth/api/v1/auth/register,5000,0,3396
-1772845812171,497,2. Registrar Attacker,201,Created,Intento No Autorizado de Modificación 1-2,text,true,,358,282,3,3,http://api.experiment.local/auth/api/v1/auth/register,497,0,1
-1772845805524,7196,1. Registrar Owner,201,Created,Intento No Autorizado de Modificación 1-1,text,true,,352,276,3,3,http://api.experiment.local/auth/api/v1/auth/register,7195,0,5026
-1772845808833,3887,1. Registrar Owner,201,Created,Intento No Autorizado de Modificación 1-3,text,true,,352,276,3,3,http://api.experiment.local/auth/api/v1/auth/register,3886,0,1717
-1772845812669,531,3. Login Owner,200,OK,Intento No Autorizado de Modificación 1-2,text,true,,608,251,3,3,http://api.experiment.local/auth/api/v1/auth/login,531,0,1
-1772845813202,550,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-2,text,true,,608,254,3,3,http://api.experiment.local/auth/api/v1/auth/login,550,0,1
-1772845812721,1115,2. Registrar Attacker,201,Created,Intento No Autorizado de Modificación 1-1,text,true,,358,282,3,3,http://api.experiment.local/auth/api/v1/auth/register,1115,0,0
-1772845812721,1187,2. Registrar Attacker,201,Created,Intento No Autorizado de Modificación 1-3,text,true,,358,282,3,3,http://api.experiment.local/auth/api/v1/auth/register,1187,0,0
-1772845813837,1017,3. Login Owner,200,OK,Intento No Autorizado de Modificación 1-1,text,true,,608,251,3,3,http://api.experiment.local/auth/api/v1/auth/login,1017,0,0
-1772845813908,956,3. Login Owner,200,OK,Intento No Autorizado de Modificación 1-3,text,true,,608,251,3,3,http://api.experiment.local/auth/api/v1/auth/login,956,0,2
-1772845813755,1571,5. Crear Reserva (Owner),201,Created,Intento No Autorizado de Modificación 1-2,text,true,,481,578,3,3,http://api.experiment.local/reservas/api/v1/bookings/,1571,0,1
-1772845814856,548,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-1,text,true,,608,254,3,3,http://api.experiment.local/auth/api/v1/auth/login,548,0,1
-1772845814866,690,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-3,text,true,,608,254,3,3,http://api.experiment.local/auth/api/v1/auth/login,690,0,0
-1772845815329,218,6. [ATAQUE] Modificar Reserva Ajena,403,Forbidden,Intento No Autorizado de Modificación 1-2,text,false,,196,503,3,3,http://api.experiment.local/reservas/api/v1/bookings/4322df21-b5a5-491e-8063-a870e360b6b5,218,0,1
-1772845815595,141,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
+1772850544726,4364,1. Registrar Owner,201,Created,Intento No Autorizado de Modificación 1-2,text,true,,352,276,3,3,http://api.experiment.local/auth/api/v1/auth/register,4359,0,3444
+1772850546390,3205,1. Registrar Owner,201,Created,Intento No Autorizado de Modificación 1-3,text,true,,352,276,3,3,http://api.experiment.local/auth/api/v1/auth/register,3205,0,1780
+1772850543118,6479,1. Registrar Owner,201,Created,Intento No Autorizado de Modificación 1-1,text,true,,352,276,3,3,http://api.experiment.local/auth/api/v1/auth/register,6478,0,5052
+1772850549103,962,2. Registrar Attacker,201,Created,Intento No Autorizado de Modificación 1-2,text,true,,358,282,3,3,http://api.experiment.local/auth/api/v1/auth/register,962,0,5
+1772850549599,1088,2. Registrar Attacker,201,Created,Intento No Autorizado de Modificación 1-3,text,true,,358,282,3,3,http://api.experiment.local/auth/api/v1/auth/register,1087,0,2
+1772850549599,1260,2. Registrar Attacker,201,Created,Intento No Autorizado de Modificación 1-1,text,true,,358,282,3,3,http://api.experiment.local/auth/api/v1/auth/register,1260,0,2
+1772850550688,871,3. Login Owner,200,OK,Intento No Autorizado de Modificación 1-3,text,true,,608,251,3,3,http://api.experiment.local/auth/api/v1/auth/login,871,0,1
+1772850550067,1489,3. Login Owner,200,OK,Intento No Autorizado de Modificación 1-2,text,true,,608,251,3,3,http://api.experiment.local/auth/api/v1/auth/login,1488,0,2
+1772850550859,1218,3. Login Owner,200,OK,Intento No Autorizado de Modificación 1-1,text,true,,608,251,3,3,http://api.experiment.local/auth/api/v1/auth/login,1218,0,1
+1772850551567,1214,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-2,text,true,,608,254,3,3,http://api.experiment.local/auth/api/v1/auth/login,1213,0,0
+1772850551566,1266,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-3,text,true,,608,254,3,3,http://api.experiment.local/auth/api/v1/auth/login,1266,0,1
+1772850552079,1399,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-1,text,true,,608,254,3,3,http://api.experiment.local/auth/api/v1/auth/login,1399,0,2
+1772850552834,790,5. Crear Reserva (Owner),201,Created,Intento No Autorizado de Modificación 1-3,text,true,,481,578,3,3,http://api.experiment.local/reservas/api/v1/bookings/,790,0,1
+1772850553485,143,5. Crear Reserva (Owner),201,Created,Intento No Autorizado de Modificación 1-1,text,true,,481,578,3,3,http://api.experiment.local/reservas/api/v1/bookings/,143,0,3
+1772850553630,122,6. [ATAQUE] Modificar Reserva Ajena,403,Forbidden,Intento No Autorizado de Modificación 1-1,text,false,,196,503,3,3,http://api.experiment.local/reservas/api/v1/bookings/d3c2401d-e762-4785-87ae-6eb0ed5b3c32,122,0,2
+1772850553626,135,6. [ATAQUE] Modificar Reserva Ajena,403,Forbidden,Intento No Autorizado de Modificación 1-3,text,false,,196,503,3,3,http://api.experiment.local/reservas/api/v1/bookings/9464916e-7c79-454f-9694-143359bf0553,133,0,1
+1772850553763,18,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-3,text,false,"Test failed: code expected to equal /
 
 ****** received  : [[[200]]]
 
 ****** comparison: [[[403]]]
 
-/",353,402,3,3,http://api.experiment.local/auth/api/v1/auth/me,141,0,1
-1772845815741,78,1. Registrar Owner,409,Conflict,Intento No Autorizado de Modificación 1-2,text,false,,192,276,3,3,http://api.experiment.local/auth/api/v1/auth/register,78,0,2
-1772845815821,17,2. Registrar Attacker,409,Conflict,Intento No Autorizado de Modificación 1-2,text,false,,195,282,3,3,http://api.experiment.local/auth/api/v1/auth/register,17,0,1
-1772845815839,519,3. Login Owner,200,OK,Intento No Autorizado de Modificación 1-2,text,true,,608,251,3,3,http://api.experiment.local/auth/api/v1/auth/login,519,0,0
-1772845815564,1238,5. Crear Reserva (Owner),201,Created,Intento No Autorizado de Modificación 1-3,text,true,,481,578,3,3,http://api.experiment.local/reservas/api/v1/bookings/,1237,0,13
-1772845816804,54,6. [ATAQUE] Modificar Reserva Ajena,403,Forbidden,Intento No Autorizado de Modificación 1-3,text,false,,196,503,3,3,http://api.experiment.local/reservas/api/v1/bookings/5b3b088e-8d17-4006-ae3f-3b5ebd02158b,53,0,0
-1772845816360,607,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-2,text,true,,608,254,3,3,http://api.experiment.local/auth/api/v1/auth/login,607,0,2
-1772845816859,112,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-3,text,false,"Test failed: code expected to equal /
+/",353,402,3,3,http://api.experiment.local/auth/api/v1/auth/me,18,0,2
+1772850553762,21,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
 
 ****** received  : [[[200]]]
 
 ****** comparison: [[[403]]]
 
-/",353,402,3,3,http://api.experiment.local/auth/api/v1/auth/me,112,0,1
-1772845816972,59,1. Registrar Owner,409,Conflict,Intento No Autorizado de Modificación 1-3,text,false,,192,276,3,3,http://api.experiment.local/auth/api/v1/auth/register,59,0,1
-1772845816968,110,5. Crear Reserva (Owner),409,Conflict,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
-
-****** received  : [[[409]]]
-
-****** comparison: [[[201]]]
-
-/",190,578,3,3,http://api.experiment.local/reservas/api/v1/bookings/,110,0,2
-1772845817033,61,2. Registrar Attacker,409,Conflict,Intento No Autorizado de Modificación 1-3,text,false,,195,282,3,3,http://api.experiment.local/auth/api/v1/auth/register,61,0,1
-1772845817095,1536,3. Login Owner,200,OK,Intento No Autorizado de Modificación 1-3,text,true,,608,251,3,3,http://api.experiment.local/auth/api/v1/auth/login,1534,0,0
-1772845817081,1824,6. [ATAQUE] Modificar Reserva Ajena,422,Unprocessable Entity,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
-
-****** received  : 4[[[22]]]
-
-****** comparison: 4[[[03]]]
-
-/",500,484,3,3,http://api.experiment.local/reservas/api/v1/bookings/BOOKING_NOT_FOUND,1824,0,2
-1772845818907,1339,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
+/",353,402,3,3,http://api.experiment.local/auth/api/v1/auth/me,21,0,3
+1772850553783,9,1. Registrar Owner,409,Conflict,Intento No Autorizado de Modificación 1-3,text,false,,192,276,3,3,http://api.experiment.local/auth/api/v1/auth/register,9,0,1
+1772850553783,11,1. Registrar Owner,409,Conflict,Intento No Autorizado de Modificación 1-1,text,false,,192,276,3,3,http://api.experiment.local/auth/api/v1/auth/register,10,0,2
+1772850553795,17,2. Registrar Attacker,409,Conflict,Intento No Autorizado de Modificación 1-1,text,false,,195,282,3,3,http://api.experiment.local/auth/api/v1/auth/register,17,0,3
+1772850553799,16,2. Registrar Attacker,409,Conflict,Intento No Autorizado de Modificación 1-3,text,false,,195,282,3,3,http://api.experiment.local/auth/api/v1/auth/register,16,0,2
+1772850552785,1315,5. Crear Reserva (Owner),201,Created,Intento No Autorizado de Modificación 1-2,text,true,,481,578,3,3,http://api.experiment.local/reservas/api/v1/bookings/,1315,0,2
+1772850554103,1820,6. [ATAQUE] Modificar Reserva Ajena,403,Forbidden,Intento No Autorizado de Modificación 1-2,text,false,,196,503,3,3,http://api.experiment.local/reservas/api/v1/bookings/85449004-2820-4626-94d7-1ceb60fcb00a,1819,0,2
+1772850555942,390,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
 
 ****** received  : [[[200]]]
 
 ****** comparison: [[[403]]]
 
-/",353,402,3,3,http://api.experiment.local/auth/api/v1/auth/me,1338,0,1
-1772845818634,1612,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-3,text,true,,608,254,3,3,http://api.experiment.local/auth/api/v1/auth/login,1611,0,1
-1772845820254,141,1. Registrar Owner,409,Conflict,Intento No Autorizado de Modificación 1-2,text,false,,192,276,3,3,http://api.experiment.local/auth/api/v1/auth/register,141,0,1
-1772845820255,185,5. Crear Reserva (Owner),409,Conflict,Intento No Autorizado de Modificación 1-3,text,false,"Test failed: code expected to equal /
-
-****** received  : [[[409]]]
-
-****** comparison: [[[201]]]
-
-/",190,578,3,3,http://api.experiment.local/reservas/api/v1/bookings/,184,0,1
-1772845820395,65,2. Registrar Attacker,409,Conflict,Intento No Autorizado de Modificación 1-2,text,false,,195,282,3,3,http://api.experiment.local/auth/api/v1/auth/register,60,0,1
-1772845820460,497,3. Login Owner,200,OK,Intento No Autorizado de Modificación 1-2,text,true,,608,251,3,3,http://api.experiment.local/auth/api/v1/auth/login,497,0,1
-1772845820441,531,6. [ATAQUE] Modificar Reserva Ajena,422,Unprocessable Entity,Intento No Autorizado de Modificación 1-3,text,false,"Test failed: code expected to equal /
-
-****** received  : 4[[[22]]]
-
-****** comparison: 4[[[03]]]
-
-/",500,484,3,3,http://api.experiment.local/reservas/api/v1/bookings/BOOKING_NOT_FOUND,530,0,1
-1772845820973,7,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-3,text,false,"Test failed: code expected to equal /
-
-****** received  : [[[200]]]
-
-****** comparison: [[[403]]]
-
-/",353,402,3,3,http://api.experiment.local/auth/api/v1/auth/me,7,0,1
-1772845820981,7,1. Registrar Owner,409,Conflict,Intento No Autorizado de Modificación 1-3,text,false,,192,276,3,3,http://api.experiment.local/auth/api/v1/auth/register,7,0,1
-1772845820989,6,2. Registrar Attacker,409,Conflict,Intento No Autorizado de Modificación 1-3,text,false,,195,282,3,3,http://api.experiment.local/auth/api/v1/auth/register,5,0,0
-1772845820959,1105,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-2,text,true,,608,254,3,3,http://api.experiment.local/auth/api/v1/auth/login,1104,0,1
-1772845820996,1069,3. Login Owner,200,OK,Intento No Autorizado de Modificación 1-3,text,true,,608,251,3,3,http://api.experiment.local/auth/api/v1/auth/login,1069,0,0
-1772845815405,7234,5. Crear Reserva (Owner),201,Created,Intento No Autorizado de Modificación 1-1,text,true,,481,578,3,3,http://api.experiment.local/reservas/api/v1/bookings/,7234,0,1
-1772845822068,664,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-3,text,true,,608,254,3,3,http://api.experiment.local/auth/api/v1/auth/login,663,0,3
-1772845822640,170,6. [ATAQUE] Modificar Reserva Ajena,403,Forbidden,Intento No Autorizado de Modificación 1-1,text,false,,196,503,3,3,http://api.experiment.local/reservas/api/v1/bookings/7e547f5c-4afe-412d-a5bc-acd058b27059,170,0,3
-1772845822068,787,5. Crear Reserva (Owner),409,Conflict,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
-
-****** received  : [[[409]]]
-
-****** comparison: [[[201]]]
-
-/",190,578,3,3,http://api.experiment.local/reservas/api/v1/bookings/,787,0,3
-1772845822733,122,5. Crear Reserva (Owner),409,Conflict,Intento No Autorizado de Modificación 1-3,text,false,"Test failed: code expected to equal /
-
-****** received  : [[[409]]]
-
-****** comparison: [[[201]]]
-
-/",190,578,3,3,http://api.experiment.local/reservas/api/v1/bookings/,122,0,1
-1772845822869,78,6. [ATAQUE] Modificar Reserva Ajena,422,Unprocessable Entity,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
-
-****** received  : 4[[[22]]]
-
-****** comparison: 4[[[03]]]
-
-/",500,484,3,3,http://api.experiment.local/reservas/api/v1/bookings/BOOKING_NOT_FOUND,78,0,1
-1772845822869,81,6. [ATAQUE] Modificar Reserva Ajena,422,Unprocessable Entity,Intento No Autorizado de Modificación 1-3,text,false,"Test failed: code expected to equal /
-
-****** received  : 4[[[22]]]
-
-****** comparison: 4[[[03]]]
-
-/",500,484,3,3,http://api.experiment.local/reservas/api/v1/bookings/BOOKING_NOT_FOUND,81,0,1
-1772845822811,145,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
-
-****** received  : [[[200]]]
-
-****** comparison: [[[403]]]
-
-/",353,402,3,3,http://api.experiment.local/auth/api/v1/auth/me,145,0,1
-1772845822948,21,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
-
-****** received  : [[[200]]]
-
-****** comparison: [[[403]]]
-
-/",353,402,3,3,http://api.experiment.local/auth/api/v1/auth/me,21,0,1
-1772845822951,20,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-3,text,false,"Test failed: code expected to equal /
-
-****** received  : [[[200]]]
-
-****** comparison: [[[403]]]
-
-/",353,402,3,3,http://api.experiment.local/auth/api/v1/auth/me,20,0,0
-1772845822957,23,1. Registrar Owner,409,Conflict,Intento No Autorizado de Modificación 1-1,text,false,,192,276,3,3,http://api.experiment.local/auth/api/v1/auth/register,23,0,2
-1772845822970,53,1. Registrar Owner,409,Conflict,Intento No Autorizado de Modificación 1-2,text,false,,192,276,3,3,http://api.experiment.local/auth/api/v1/auth/register,53,0,1
-1772845822971,52,1. Registrar Owner,409,Conflict,Intento No Autorizado de Modificación 1-3,text,false,,192,276,3,3,http://api.experiment.local/auth/api/v1/auth/register,52,0,1
-1772845822981,53,2. Registrar Attacker,409,Conflict,Intento No Autorizado de Modificación 1-1,text,false,,195,282,3,3,http://api.experiment.local/auth/api/v1/auth/register,53,0,0
-1772845823024,56,2. Registrar Attacker,409,Conflict,Intento No Autorizado de Modificación 1-3,text,false,,195,282,3,3,http://api.experiment.local/auth/api/v1/auth/register,55,0,2
-1772845823026,54,2. Registrar Attacker,409,Conflict,Intento No Autorizado de Modificación 1-2,text,false,,195,282,3,3,http://api.experiment.local/auth/api/v1/auth/register,54,0,2
-1772845823035,2296,3. Login Owner,403,Forbidden,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
+/",353,402,3,3,http://api.experiment.local/auth/api/v1/auth/me,390,0,19
+1772850556335,434,1. Registrar Owner,502,Bad Gateway,Intento No Autorizado de Modificación 1-2,text,false,,280,276,3,3,http://api.experiment.local/auth/api/v1/auth/register,434,0,3
+1772850556770,79,2. Registrar Attacker,409,Conflict,Intento No Autorizado de Modificación 1-2,text,false,,195,282,3,3,http://api.experiment.local/auth/api/v1/auth/register,79,0,3
+1772850553816,3121,3. Login Owner,200,OK,Intento No Autorizado de Modificación 1-3,text,true,,608,251,3,3,http://api.experiment.local/auth/api/v1/auth/login,3121,0,1
+1772850553814,3123,3. Login Owner,200,OK,Intento No Autorizado de Modificación 1-1,text,true,,608,251,3,3,http://api.experiment.local/auth/api/v1/auth/login,3123,0,2
+1772850556941,1133,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-3,text,true,,608,254,3,3,http://api.experiment.local/auth/api/v1/auth/login,1133,0,1
+1772850556941,1135,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-1,text,true,,608,254,3,3,http://api.experiment.local/auth/api/v1/auth/login,1134,0,2
+1772850556851,1811,3. Login Owner,403,Forbidden,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
 
 ****** received  : [[[403]]]
 
 ****** comparison: [[[200]]]
 
-/",170,251,3,3,http://api.experiment.local/auth/api/v1/auth/login,2294,0,1
-1772845823081,5664,3. Login Owner,200,OK,Intento No Autorizado de Modificación 1-2,text,true,,608,251,3,3,http://api.experiment.local/auth/api/v1/auth/login,5664,0,1
-1772845823082,5659,3. Login Owner,200,OK,Intento No Autorizado de Modificación 1-3,text,true,,608,251,3,3,http://api.experiment.local/auth/api/v1/auth/login,5657,0,1
-1772845825336,4192,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-1,text,true,,608,254,3,3,http://api.experiment.local/auth/api/v1/auth/login,4191,0,3
-1772845829536,693,5. Crear Reserva (Owner),401,Unauthorized,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
+/",170,251,3,3,http://api.experiment.local/auth/api/v1/auth/login,1811,0,3
+1772850558079,602,5. Crear Reserva (Owner),409,Conflict,Intento No Autorizado de Modificación 1-3,text,false,"Test failed: code expected to equal /
 
-****** received  : [[[4]]]01
+****** received  : [[[409]]]
 
-****** comparison: [[[2]]]01
+****** comparison: [[[201]]]
 
-/",210,384,3,3,http://api.experiment.local/reservas/api/v1/bookings/,692,0,2
-1772845828748,4491,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-2,text,true,,608,254,3,3,http://api.experiment.local/auth/api/v1/auth/login,4490,0,4
-1772845828753,4661,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-3,text,true,,608,254,3,3,http://api.experiment.local/auth/api/v1/auth/login,4661,0,2
-1772845830235,4697,6. [ATAQUE] Modificar Reserva Ajena,422,Unprocessable Entity,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
+/",190,578,3,3,http://api.experiment.local/reservas/api/v1/bookings/,602,0,2
+1772850558079,625,5. Crear Reserva (Owner),409,Conflict,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
+
+****** received  : [[[409]]]
+
+****** comparison: [[[201]]]
+
+/",190,578,3,3,http://api.experiment.local/reservas/api/v1/bookings/,624,0,2
+1772850558684,27,6. [ATAQUE] Modificar Reserva Ajena,422,Unprocessable Entity,Intento No Autorizado de Modificación 1-3,text,false,"Test failed: code expected to equal /
 
 ****** received  : 4[[[22]]]
 
 ****** comparison: 4[[[03]]]
 
-/",500,484,3,3,http://api.experiment.local/reservas/api/v1/bookings/BOOKING_NOT_FOUND,4696,0,2
-1772845834959,1978,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
+/",500,484,3,3,http://api.experiment.local/reservas/api/v1/bookings/BOOKING_NOT_FOUND,27,0,1
+1772850558706,28,6. [ATAQUE] Modificar Reserva Ajena,422,Unprocessable Entity,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
+
+****** received  : 4[[[22]]]
+
+****** comparison: 4[[[03]]]
+
+/",500,484,3,3,http://api.experiment.local/reservas/api/v1/bookings/BOOKING_NOT_FOUND,28,0,1
+1772850558713,562,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-3,text,false,"Test failed: code expected to equal /
 
 ****** received  : [[[200]]]
 
 ****** comparison: [[[403]]]
 
-/",353,402,3,3,http://api.experiment.local/auth/api/v1/auth/me,1975,0,1
-1772845833420,4298,5. Crear Reserva (Owner),409,Conflict,Intento No Autorizado de Modificación 1-3,text,false,"Test failed: code expected to equal /
+/",353,402,3,3,http://api.experiment.local/auth/api/v1/auth/me,562,0,0
+1772850558664,610,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-2,text,true,,608,254,3,3,http://api.experiment.local/auth/api/v1/auth/login,609,0,1
+1772850558736,540,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
 
-****** received  : [[[409]]]
+****** received  : [[[200]]]
 
-****** comparison: [[[201]]]
+****** comparison: [[[403]]]
 
-/",190,578,3,3,http://api.experiment.local/reservas/api/v1/bookings/,4297,0,1
-1772845836944,1271,1. Registrar Owner,409,Conflict,Intento No Autorizado de Modificación 1-1,text,false,,192,276,3,3,http://api.experiment.local/auth/api/v1/auth/register,1271,0,2
-1772845833251,4972,5. Crear Reserva (Owner),409,Conflict,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
+/",353,402,3,3,http://api.experiment.local/auth/api/v1/auth/me,540,0,2
+1772850559277,10,5. Crear Reserva (Owner),401,Unauthorized,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
 
-****** received  : [[[409]]]
+****** received  : [[[4]]]01
 
-****** comparison: [[[201]]]
+****** comparison: [[[2]]]01
 
-/",190,578,3,3,http://api.experiment.local/reservas/api/v1/bookings/,4972,0,3
-1772845838217,1413,2. Registrar Attacker,409,Conflict,Intento No Autorizado de Modificación 1-1,text,false,,195,282,3,3,http://api.experiment.local/auth/api/v1/auth/register,1412,0,6
-1772845837729,3003,6. [ATAQUE] Modificar Reserva Ajena,422,Unprocessable Entity,Intento No Autorizado de Modificación 1-3,text,false,"Test failed: code expected to equal /
+/",210,384,3,3,http://api.experiment.local/reservas/api/v1/bookings/,9,0,2
+1772850559277,15,1. Registrar Owner,409,Conflict,Intento No Autorizado de Modificación 1-1,text,false,,192,276,3,3,http://api.experiment.local/auth/api/v1/auth/register,15,0,2
+1772850559276,16,1. Registrar Owner,409,Conflict,Intento No Autorizado de Modificación 1-3,text,false,,192,276,3,3,http://api.experiment.local/auth/api/v1/auth/register,16,0,3
+1772850559294,27,2. Registrar Attacker,409,Conflict,Intento No Autorizado de Modificación 1-3,text,false,,195,282,3,3,http://api.experiment.local/auth/api/v1/auth/register,26,0,1
+1772850559294,29,2. Registrar Attacker,409,Conflict,Intento No Autorizado de Modificación 1-1,text,false,,195,282,3,3,http://api.experiment.local/auth/api/v1/auth/register,29,0,1
+1772850559290,33,6. [ATAQUE] Modificar Reserva Ajena,422,Unprocessable Entity,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
 
 ****** received  : 4[[[22]]]
 
 ****** comparison: 4[[[03]]]
 
-/",500,484,3,3,http://api.experiment.local/reservas/api/v1/bookings/BOOKING_NOT_FOUND,3002,0,7
-1772845839639,2274,3. Login Owner,403,Forbidden,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
+/",500,484,3,3,http://api.experiment.local/reservas/api/v1/bookings/BOOKING_NOT_FOUND,33,0,1
+1772850559325,550,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
+
+****** received  : [[[200]]]
+
+****** comparison: [[[403]]]
+
+/",353,402,3,3,http://api.experiment.local/auth/api/v1/auth/me,549,0,2
+1772850559324,552,3. Login Owner,200,OK,Intento No Autorizado de Modificación 1-3,text,true,,608,251,3,3,http://api.experiment.local/auth/api/v1/auth/login,552,0,1
+1772850559324,567,3. Login Owner,200,OK,Intento No Autorizado de Modificación 1-1,text,true,,608,251,3,3,http://api.experiment.local/auth/api/v1/auth/login,567,0,1
+1772850559877,692,1. Registrar Owner,409,Conflict,Intento No Autorizado de Modificación 1-2,text,false,,192,276,3,3,http://api.experiment.local/auth/api/v1/auth/register,691,0,6
+1772850560571,617,2. Registrar Attacker,409,Conflict,Intento No Autorizado de Modificación 1-2,text,false,,195,282,3,3,http://api.experiment.local/auth/api/v1/auth/register,617,0,1
+1772850559892,1316,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-1,text,true,,608,254,3,3,http://api.experiment.local/auth/api/v1/auth/login,1316,0,2
+1772850559881,1329,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-3,text,true,,608,254,3,3,http://api.experiment.local/auth/api/v1/auth/login,1329,0,2
+1772850561188,582,3. Login Owner,403,Forbidden,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
 
 ****** received  : [[[403]]]
 
 ****** comparison: [[[200]]]
 
-/",170,251,3,3,http://api.experiment.local/auth/api/v1/auth/login,2273,0,3
-1772845838226,3903,6. [ATAQUE] Modificar Reserva Ajena,422,Unprocessable Entity,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
+/",170,251,3,3,http://api.experiment.local/auth/api/v1/auth/login,582,0,1
+1772850561210,588,5. Crear Reserva (Owner),409,Conflict,Intento No Autorizado de Modificación 1-3,text,false,"Test failed: code expected to equal /
+
+****** received  : [[[409]]]
+
+****** comparison: [[[201]]]
+
+/",190,578,3,3,http://api.experiment.local/reservas/api/v1/bookings/,588,0,2
+1772850561802,20,6. [ATAQUE] Modificar Reserva Ajena,422,Unprocessable Entity,Intento No Autorizado de Modificación 1-3,text,false,"Test failed: code expected to equal /
 
 ****** received  : 4[[[22]]]
 
 ****** comparison: 4[[[03]]]
 
-/",500,484,3,3,http://api.experiment.local/reservas/api/v1/bookings/BOOKING_NOT_FOUND,3903,0,1
-1772845840735,5712,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-3,text,false,"Test failed: code expected to equal /
+/",500,484,3,3,http://api.experiment.local/reservas/api/v1/bookings/BOOKING_NOT_FOUND,20,0,1
+1772850561209,623,5. Crear Reserva (Owner),409,Conflict,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
+
+****** received  : [[[409]]]
+
+****** comparison: [[[201]]]
+
+/",190,578,3,3,http://api.experiment.local/reservas/api/v1/bookings/,622,0,3
+1772850561771,615,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-2,text,true,,608,254,3,3,http://api.experiment.local/auth/api/v1/auth/login,614,0,1
+1772850561833,554,6. [ATAQUE] Modificar Reserva Ajena,422,Unprocessable Entity,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
+
+****** received  : 4[[[22]]]
+
+****** comparison: 4[[[03]]]
+
+/",500,484,3,3,http://api.experiment.local/reservas/api/v1/bookings/BOOKING_NOT_FOUND,554,0,1
+1772850561824,562,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-3,text,false,"Test failed: code expected to equal /
 
 ****** received  : [[[200]]]
 
 ****** comparison: [[[403]]]
 
-/",353,402,3,3,http://api.experiment.local/auth/api/v1/auth/me,5710,0,5029
-1772845842138,4919,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
-
-****** received  : [[[200]]]
-
-****** comparison: [[[403]]]
-
-/",353,402,3,3,http://api.experiment.local/auth/api/v1/auth/me,4919,0,3628
-1772845841919,5141,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-1,text,true,,608,254,3,3,http://api.experiment.local/auth/api/v1/auth/login,5141,0,3847
-1772845846470,595,1. Registrar Owner,409,Conflict,Intento No Autorizado de Modificación 1-3,text,false,,192,276,3,3,http://api.experiment.local/auth/api/v1/auth/register,595,0,2
-1772845847073,15,2. Registrar Attacker,409,Conflict,Intento No Autorizado de Modificación 1-3,text,false,,195,282,3,3,http://api.experiment.local/auth/api/v1/auth/register,15,0,1
-1772845847064,30,5. Crear Reserva (Owner),401,Unauthorized,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
+/",353,402,3,3,http://api.experiment.local/auth/api/v1/auth/me,561,0,0
+1772850562390,10,5. Crear Reserva (Owner),401,Unauthorized,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
 
 ****** received  : [[[4]]]01
 
 ****** comparison: [[[2]]]01
 
-/",210,384,3,3,http://api.experiment.local/reservas/api/v1/bookings/,29,0,1
-1772845847061,37,1. Registrar Owner,409,Conflict,Intento No Autorizado de Modificación 1-2,text,false,,192,276,3,3,http://api.experiment.local/auth/api/v1/auth/register,37,0,1
-1772845847099,14,2. Registrar Attacker,409,Conflict,Intento No Autorizado de Modificación 1-2,text,false,,195,282,3,3,http://api.experiment.local/auth/api/v1/auth/register,14,0,4
-1772845847096,127,6. [ATAQUE] Modificar Reserva Ajena,422,Unprocessable Entity,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
-
-****** received  : 4[[[22]]]
-
-****** comparison: 4[[[03]]]
-
-/",500,484,3,3,http://api.experiment.local/reservas/api/v1/bookings/BOOKING_NOT_FOUND,126,0,1
-1772845847224,17,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
+/",210,384,3,3,http://api.experiment.local/reservas/api/v1/bookings/,10,0,4
+1772850562390,56,1. Registrar Owner,409,Conflict,Intento No Autorizado de Modificación 1-3,text,false,,192,276,3,3,http://api.experiment.local/auth/api/v1/auth/register,55,0,4
+1772850562390,74,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
 
 ****** received  : [[[200]]]
 
 ****** comparison: [[[403]]]
 
-/",353,402,3,3,http://api.experiment.local/auth/api/v1/auth/me,17,0,3
-1772845847089,587,3. Login Owner,200,OK,Intento No Autorizado de Modificación 1-3,text,true,,608,251,3,3,http://api.experiment.local/auth/api/v1/auth/login,586,0,1
-1772845847245,438,1. Registrar Owner,409,Conflict,Intento No Autorizado de Modificación 1-1,text,false,,192,276,3,3,http://api.experiment.local/auth/api/v1/auth/register,438,0,1
-1772845847679,2563,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-3,text,true,,608,254,3,3,http://api.experiment.local/auth/api/v1/auth/login,2561,0,1
-1772845847114,4229,3. Login Owner,200,OK,Intento No Autorizado de Modificación 1-2,text,true,,608,251,3,3,http://api.experiment.local/auth/api/v1/auth/login,4228,0,1
-1772845847684,3836,2. Registrar Attacker,409,Conflict,Intento No Autorizado de Modificación 1-1,text,false,,195,282,3,3,http://api.experiment.local/auth/api/v1/auth/register,3836,0,3
-1772845851524,3278,3. Login Owner,403,Forbidden,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
+/",353,402,3,3,http://api.experiment.local/auth/api/v1/auth/me,74,0,4
+1772850562447,22,2. Registrar Attacker,409,Conflict,Intento No Autorizado de Modificación 1-3,text,false,,195,282,3,3,http://api.experiment.local/auth/api/v1/auth/register,22,0,7
+1772850562466,28,1. Registrar Owner,409,Conflict,Intento No Autorizado de Modificación 1-1,text,false,,192,276,3,3,http://api.experiment.local/auth/api/v1/auth/register,28,0,0
+1772850562401,94,6. [ATAQUE] Modificar Reserva Ajena,422,Unprocessable Entity,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
+
+****** received  : 4[[[22]]]
+
+****** comparison: 4[[[03]]]
+
+/",500,484,3,3,http://api.experiment.local/reservas/api/v1/bookings/BOOKING_NOT_FOUND,94,0,3
+1772850562495,17,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
+
+****** received  : [[[200]]]
+
+****** comparison: [[[403]]]
+
+/",353,402,3,3,http://api.experiment.local/auth/api/v1/auth/me,17,0,1
+1772850562494,20,2. Registrar Attacker,409,Conflict,Intento No Autorizado de Modificación 1-1,text,false,,195,282,3,3,http://api.experiment.local/auth/api/v1/auth/register,19,0,2
+1772850562514,8,1. Registrar Owner,409,Conflict,Intento No Autorizado de Modificación 1-2,text,false,,192,276,3,3,http://api.experiment.local/auth/api/v1/auth/register,8,0,1
+1772850562523,6,2. Registrar Attacker,409,Conflict,Intento No Autorizado de Modificación 1-2,text,false,,195,282,3,3,http://api.experiment.local/auth/api/v1/auth/register,5,0,1
+1772850562530,644,3. Login Owner,403,Forbidden,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
 
 ****** received  : [[[403]]]
 
 ****** comparison: [[[200]]]
 
-/",170,251,3,3,http://api.experiment.local/auth/api/v1/auth/login,3277,0,2
-1772845851346,3454,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-2,text,true,,608,254,3,3,http://api.experiment.local/auth/api/v1/auth/login,3454,0,1
-1772845850250,4689,5. Crear Reserva (Owner),409,Conflict,Intento No Autorizado de Modificación 1-3,text,false,"Test failed: code expected to equal /
-
-****** received  : [[[409]]]
-
-****** comparison: [[[201]]]
-
-/",190,578,3,3,http://api.experiment.local/reservas/api/v1/bookings/,4689,0,2
-1772845854942,50,6. [ATAQUE] Modificar Reserva Ajena,422,Unprocessable Entity,Intento No Autorizado de Modificación 1-3,text,false,"Test failed: code expected to equal /
-
-****** received  : 4[[[22]]]
-
-****** comparison: 4[[[03]]]
-
-/",500,484,3,3,http://api.experiment.local/reservas/api/v1/bookings/BOOKING_NOT_FOUND,50,0,1
-1772845854806,639,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-1,text,true,,608,254,3,3,http://api.experiment.local/auth/api/v1/auth/login,639,0,1
-1772845854993,457,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-3,text,false,"Test failed: code expected to equal /
-
-****** received  : [[[200]]]
-
-****** comparison: [[[403]]]
-
-/",353,402,3,3,http://api.experiment.local/auth/api/v1/auth/me,457,0,1
-1772845854806,654,5. Crear Reserva (Owner),409,Conflict,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
-
-****** received  : [[[409]]]
-
-****** comparison: [[[201]]]
-
-/",190,578,3,3,http://api.experiment.local/reservas/api/v1/bookings/,654,0,1
-1772845855447,18,5. Crear Reserva (Owner),401,Unauthorized,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
+/",170,251,3,3,http://api.experiment.local/auth/api/v1/auth/login,644,0,1
+1772850562470,1920,3. Login Owner,200,OK,Intento No Autorizado de Modificación 1-3,text,true,,608,251,3,3,http://api.experiment.local/auth/api/v1/auth/login,1920,0,4
+1772850562514,1876,3. Login Owner,200,OK,Intento No Autorizado de Modificación 1-1,text,true,,608,251,3,3,http://api.experiment.local/auth/api/v1/auth/login,1876,0,1
+1772850563176,1217,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-2,text,true,,608,254,3,3,http://api.experiment.local/auth/api/v1/auth/login,1217,0,1
+1772850564394,8,5. Crear Reserva (Owner),401,Unauthorized,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
 
 ****** received  : [[[4]]]01
 
 ****** comparison: [[[2]]]01
 
-/",210,384,3,3,http://api.experiment.local/reservas/api/v1/bookings/,18,0,3
-1772845855453,20,1. Registrar Owner,409,Conflict,Intento No Autorizado de Modificación 1-3,text,false,,192,276,3,3,http://api.experiment.local/auth/api/v1/auth/register,20,0,1
-1772845855473,12,2. Registrar Attacker,409,Conflict,Intento No Autorizado de Modificación 1-3,text,false,,195,282,3,3,http://api.experiment.local/auth/api/v1/auth/register,12,0,1
-1772845855461,64,6. [ATAQUE] Modificar Reserva Ajena,422,Unprocessable Entity,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
+/",210,384,3,3,http://api.experiment.local/reservas/api/v1/bookings/,7,0,1
+1772850564391,575,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-1,text,true,,608,254,3,3,http://api.experiment.local/auth/api/v1/auth/login,575,0,1
+1772850564391,576,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-3,text,true,,608,254,3,3,http://api.experiment.local/auth/api/v1/auth/login,576,0,1
+1772850564407,567,6. [ATAQUE] Modificar Reserva Ajena,422,Unprocessable Entity,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
 
 ****** received  : 4[[[22]]]
 
 ****** comparison: 4[[[03]]]
 
-/",500,484,3,3,http://api.experiment.local/reservas/api/v1/bookings/BOOKING_NOT_FOUND,64,0,1
-1772845855485,650,3. Login Owner,200,OK,Intento No Autorizado de Modificación 1-3,text,true,,608,251,3,3,http://api.experiment.local/auth/api/v1/auth/login,650,0,1
-1772845855526,614,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
+/",500,484,3,3,http://api.experiment.local/reservas/api/v1/bookings/BOOKING_NOT_FOUND,566,0,1
+1772850564974,11,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
 
 ****** received  : [[[200]]]
 
 ****** comparison: [[[403]]]
 
-/",353,402,3,3,http://api.experiment.local/auth/api/v1/auth/me,614,0,1
-1772845855465,676,6. [ATAQUE] Modificar Reserva Ajena,422,Unprocessable Entity,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
+/",353,402,3,3,http://api.experiment.local/auth/api/v1/auth/me,11,0,1
+1772850564987,12,1. Registrar Owner,409,Conflict,Intento No Autorizado de Modificación 1-2,text,false,,192,276,3,3,http://api.experiment.local/auth/api/v1/auth/register,12,0,1
+1772850564999,11,2. Registrar Attacker,409,Conflict,Intento No Autorizado de Modificación 1-2,text,false,,195,282,3,3,http://api.experiment.local/auth/api/v1/auth/register,11,0,2
+1772850564968,45,5. Crear Reserva (Owner),409,Conflict,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
+
+****** received  : [[[409]]]
+
+****** comparison: [[[201]]]
+
+/",190,578,3,3,http://api.experiment.local/reservas/api/v1/bookings/,45,0,1
+1772850564970,45,5. Crear Reserva (Owner),409,Conflict,Intento No Autorizado de Modificación 1-3,text,false,"Test failed: code expected to equal /
+
+****** received  : [[[409]]]
+
+****** comparison: [[[201]]]
+
+/",190,578,3,3,http://api.experiment.local/reservas/api/v1/bookings/,44,0,1
+1772850565014,93,6. [ATAQUE] Modificar Reserva Ajena,422,Unprocessable Entity,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
 
 ****** received  : 4[[[22]]]
 
 ****** comparison: 4[[[03]]]
 
-/",500,484,3,3,http://api.experiment.local/reservas/api/v1/bookings/BOOKING_NOT_FOUND,676,0,1
-1772845856141,546,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
-
-****** received  : [[[200]]]
-
-****** comparison: [[[403]]]
-
-/",353,402,3,3,http://api.experiment.local/auth/api/v1/auth/me,545,0,1
-1772845856141,547,1. Registrar Owner,409,Conflict,Intento No Autorizado de Modificación 1-2,text,false,,192,276,3,3,http://api.experiment.local/auth/api/v1/auth/register,547,0,3
-1772845856137,551,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-3,text,true,,608,254,3,3,http://api.experiment.local/auth/api/v1/auth/login,551,0,3
-1772845856688,18,1. Registrar Owner,409,Conflict,Intento No Autorizado de Modificación 1-1,text,false,,192,276,3,3,http://api.experiment.local/auth/api/v1/auth/register,18,0,2
-1772845856707,20,2. Registrar Attacker,409,Conflict,Intento No Autorizado de Modificación 1-1,text,false,,195,282,3,3,http://api.experiment.local/auth/api/v1/auth/register,20,0,1
-1772845856688,40,2. Registrar Attacker,409,Conflict,Intento No Autorizado de Modificación 1-2,text,false,,195,282,3,3,http://api.experiment.local/auth/api/v1/auth/register,39,0,2
-1772845856728,534,3. Login Owner,403,Forbidden,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
+/",500,484,3,3,http://api.experiment.local/reservas/api/v1/bookings/BOOKING_NOT_FOUND,93,0,1
+1772850565011,535,3. Login Owner,403,Forbidden,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
 
 ****** received  : [[[403]]]
 
 ****** comparison: [[[200]]]
 
 /",170,251,3,3,http://api.experiment.local/auth/api/v1/auth/login,534,0,1
-1772845856689,592,5. Crear Reserva (Owner),409,Conflict,Intento No Autorizado de Modificación 1-3,text,false,"Test failed: code expected to equal /
-
-****** received  : [[[409]]]
-
-****** comparison: [[[201]]]
-
-/",190,578,3,3,http://api.experiment.local/reservas/api/v1/bookings/,592,0,1
-1772845857264,604,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-1,text,true,,608,254,3,3,http://api.experiment.local/auth/api/v1/auth/login,604,0,0
-1772845857283,588,6. [ATAQUE] Modificar Reserva Ajena,422,Unprocessable Entity,Intento No Autorizado de Modificación 1-3,text,false,"Test failed: code expected to equal /
-
-****** received  : 4[[[22]]]
-
-****** comparison: 4[[[03]]]
-
-/",500,484,3,3,http://api.experiment.local/reservas/api/v1/bookings/BOOKING_NOT_FOUND,588,0,2
-1772845856728,1147,3. Login Owner,200,OK,Intento No Autorizado de Modificación 1-2,text,true,,608,251,3,3,http://api.experiment.local/auth/api/v1/auth/login,1147,0,1
-1772845857871,24,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-3,text,false,"Test failed: code expected to equal /
+1772850565108,442,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
 
 ****** received  : [[[200]]]
 
 ****** comparison: [[[403]]]
 
-/",353,402,3,3,http://api.experiment.local/auth/api/v1/auth/me,24,0,1
-1772845857869,33,5. Crear Reserva (Owner),401,Unauthorized,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
+/",353,402,3,3,http://api.experiment.local/auth/api/v1/auth/me,442,0,0
+1772850565015,537,6. [ATAQUE] Modificar Reserva Ajena,422,Unprocessable Entity,Intento No Autorizado de Modificación 1-3,text,false,"Test failed: code expected to equal /
+
+****** received  : 4[[[22]]]
+
+****** comparison: 4[[[03]]]
+
+/",500,484,3,3,http://api.experiment.local/reservas/api/v1/bookings/BOOKING_NOT_FOUND,537,0,2
+1772850565553,8,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-3,text,false,"Test failed: code expected to equal /
+
+****** received  : [[[200]]]
+
+****** comparison: [[[403]]]
+
+/",353,402,3,3,http://api.experiment.local/auth/api/v1/auth/me,8,0,2
+1772850565551,523,1. Registrar Owner,409,Conflict,Intento No Autorizado de Modificación 1-1,text,false,,192,276,3,3,http://api.experiment.local/auth/api/v1/auth/register,522,0,2
+1772850565546,528,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-2,text,true,,608,254,3,3,http://api.experiment.local/auth/api/v1/auth/login,528,0,2
+1772850565562,516,1. Registrar Owner,409,Conflict,Intento No Autorizado de Modificación 1-3,text,false,,192,276,3,3,http://api.experiment.local/auth/api/v1/auth/register,516,0,0
+1772850566076,7,5. Crear Reserva (Owner),401,Unauthorized,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
 
 ****** received  : [[[4]]]01
 
 ****** comparison: [[[2]]]01
 
-/",210,384,3,3,http://api.experiment.local/reservas/api/v1/bookings/,33,0,1
-1772845857897,11,1. Registrar Owner,409,Conflict,Intento No Autorizado de Modificación 1-3,text,false,,192,276,3,3,http://api.experiment.local/auth/api/v1/auth/register,11,0,1
-1772845857903,19,6. [ATAQUE] Modificar Reserva Ajena,422,Unprocessable Entity,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
+/",210,384,3,3,http://api.experiment.local/reservas/api/v1/bookings/,6,0,0
+1772850566080,13,2. Registrar Attacker,409,Conflict,Intento No Autorizado de Modificación 1-3,text,false,,195,282,3,3,http://api.experiment.local/auth/api/v1/auth/register,12,0,1
+1772850566075,25,2. Registrar Attacker,409,Conflict,Intento No Autorizado de Modificación 1-1,text,false,,195,282,3,3,http://api.experiment.local/auth/api/v1/auth/register,17,0,1
+1772850566087,57,6. [ATAQUE] Modificar Reserva Ajena,422,Unprocessable Entity,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
 
 ****** received  : 4[[[22]]]
 
 ****** comparison: 4[[[03]]]
 
-/",500,484,3,3,http://api.experiment.local/reservas/api/v1/bookings/BOOKING_NOT_FOUND,19,0,0
-1772845857877,590,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-2,text,true,,608,254,3,3,http://api.experiment.local/auth/api/v1/auth/login,589,0,1
-1772845857909,559,2. Registrar Attacker,409,Conflict,Intento No Autorizado de Modificación 1-3,text,false,,195,282,3,3,http://api.experiment.local/auth/api/v1/auth/register,559,0,0
-1772845857922,550,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
+/",500,484,3,3,http://api.experiment.local/reservas/api/v1/bookings/BOOKING_NOT_FOUND,57,0,4
+1772850566099,1151,3. Login Owner,200,OK,Intento No Autorizado de Modificación 1-3,text,true,,608,251,3,3,http://api.experiment.local/auth/api/v1/auth/login,1151,0,4
+1772850566146,1106,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
 
 ****** received  : [[[200]]]
 
 ****** comparison: [[[403]]]
 
-/",353,402,3,3,http://api.experiment.local/auth/api/v1/auth/me,550,0,1
-1772845858472,15,1. Registrar Owner,409,Conflict,Intento No Autorizado de Modificación 1-1,text,false,,192,276,3,3,http://api.experiment.local/auth/api/v1/auth/register,15,0,1
-1772845858469,91,5. Crear Reserva (Owner),409,Conflict,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
+/",353,402,3,3,http://api.experiment.local/auth/api/v1/auth/me,1106,0,0
+1772850566103,1149,3. Login Owner,200,OK,Intento No Autorizado de Modificación 1-1,text,true,,608,251,3,3,http://api.experiment.local/auth/api/v1/auth/login,1149,0,1
+1772850567253,500,1. Registrar Owner,409,Conflict,Intento No Autorizado de Modificación 1-2,text,false,,192,276,3,3,http://api.experiment.local/auth/api/v1/auth/register,500,0,2
+1772850567253,506,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-1,text,true,,608,254,3,3,http://api.experiment.local/auth/api/v1/auth/login,506,0,1
+1772850567754,11,2. Registrar Attacker,409,Conflict,Intento No Autorizado de Modificación 1-2,text,false,,195,282,3,3,http://api.experiment.local/auth/api/v1/auth/register,11,0,3
+1772850567767,5,3. Login Owner,502,Bad Gateway,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
 
-****** received  : [[[409]]]
-
-****** comparison: [[[201]]]
-
-/",190,578,3,3,http://api.experiment.local/reservas/api/v1/bookings/,91,0,1
-1772845858561,21,6. [ATAQUE] Modificar Reserva Ajena,422,Unprocessable Entity,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
-
-****** received  : 4[[[22]]]
-
-****** comparison: 4[[[03]]]
-
-/",500,484,3,3,http://api.experiment.local/reservas/api/v1/bookings/BOOKING_NOT_FOUND,21,0,1
-1772845858468,526,3. Login Owner,200,OK,Intento No Autorizado de Modificación 1-3,text,true,,608,251,3,3,http://api.experiment.local/auth/api/v1/auth/login,526,0,4
-1772845858488,507,2. Registrar Attacker,409,Conflict,Intento No Autorizado de Modificación 1-1,text,false,,195,282,3,3,http://api.experiment.local/auth/api/v1/auth/register,507,0,1
-1772845858583,468,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
-
-****** received  : [[[200]]]
-
-****** comparison: [[[403]]]
-
-/",353,402,3,3,http://api.experiment.local/auth/api/v1/auth/me,468,0,1
-1772845858995,546,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-3,text,true,,608,254,3,3,http://api.experiment.local/auth/api/v1/auth/login,545,0,1
-1772845858995,579,3. Login Owner,403,Forbidden,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
-
-****** received  : [[[403]]]
+****** received  : [[[502]]]
 
 ****** comparison: [[[200]]]
 
-/",170,251,3,3,http://api.experiment.local/auth/api/v1/auth/login,574,0,0
-1772845859051,529,1. Registrar Owner,409,Conflict,Intento No Autorizado de Modificación 1-2,text,false,,192,276,3,3,http://api.experiment.local/auth/api/v1/auth/register,529,0,2
-1772845859542,47,5. Crear Reserva (Owner),409,Conflict,Intento No Autorizado de Modificación 1-3,text,false,"Test failed: code expected to equal /
+/",280,251,3,3,http://api.experiment.local/auth/api/v1/auth/login,5,0,1
+1772850567253,523,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-3,text,true,,608,254,3,3,http://api.experiment.local/auth/api/v1/auth/login,523,0,2
+1772850567760,38,5. Crear Reserva (Owner),409,Conflict,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
 
 ****** received  : [[[409]]]
 
 ****** comparison: [[[201]]]
 
-/",190,578,3,3,http://api.experiment.local/reservas/api/v1/bookings/,47,0,1
-1772845859590,19,6. [ATAQUE] Modificar Reserva Ajena,422,Unprocessable Entity,Intento No Autorizado de Modificación 1-3,text,false,"Test failed: code expected to equal /
-
-****** received  : 4[[[22]]]
-
-****** comparison: 4[[[03]]]
-
-/",500,484,3,3,http://api.experiment.local/reservas/api/v1/bookings/BOOKING_NOT_FOUND,19,0,0
-1772845859611,6,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-3,text,false,"Test failed: code expected to equal /
-
-****** received  : [[[200]]]
-
-****** comparison: [[[403]]]
-
-/",353,402,3,3,http://api.experiment.local/auth/api/v1/auth/me,6,0,0
-1772845859617,8,1. Registrar Owner,409,Conflict,Intento No Autorizado de Modificación 1-3,text,false,,192,276,3,3,http://api.experiment.local/auth/api/v1/auth/register,8,0,1
-1772845859576,616,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-1,text,true,,608,254,3,3,http://api.experiment.local/auth/api/v1/auth/login,616,0,3
-1772845859582,613,2. Registrar Attacker,409,Conflict,Intento No Autorizado de Modificación 1-2,text,false,,195,282,3,3,http://api.experiment.local/auth/api/v1/auth/register,612,0,0
-1772845859633,562,2. Registrar Attacker,409,Conflict,Intento No Autorizado de Modificación 1-3,text,false,,195,282,3,3,http://api.experiment.local/auth/api/v1/auth/register,561,0,0
-1772845860194,16,5. Crear Reserva (Owner),401,Unauthorized,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
-
-****** received  : [[[4]]]01
-
-****** comparison: [[[2]]]01
-
-/",210,384,3,3,http://api.experiment.local/reservas/api/v1/bookings/,16,0,0
-1772845860211,106,6. [ATAQUE] Modificar Reserva Ajena,422,Unprocessable Entity,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
-
-****** received  : 4[[[22]]]
-
-****** comparison: 4[[[03]]]
-
-/",500,484,3,3,http://api.experiment.local/reservas/api/v1/bookings/BOOKING_NOT_FOUND,106,0,2
-1772845860195,1347,3. Login Owner,200,OK,Intento No Autorizado de Modificación 1-2,text,true,,608,251,3,3,http://api.experiment.local/auth/api/v1/auth/login,1346,0,0
-1772845860195,1349,3. Login Owner,200,OK,Intento No Autorizado de Modificación 1-3,text,true,,608,251,3,3,http://api.experiment.local/auth/api/v1/auth/login,1349,0,1
-1772845860321,1223,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
-
-****** received  : [[[200]]]
-
-****** comparison: [[[403]]]
-
-/",353,402,3,3,http://api.experiment.local/auth/api/v1/auth/me,1223,0,0
-1772845861545,537,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-3,text,true,,608,254,3,3,http://api.experiment.local/auth/api/v1/auth/login,537,0,1
-1772845861546,584,1. Registrar Owner,409,Conflict,Intento No Autorizado de Modificación 1-1,text,false,,192,276,3,3,http://api.experiment.local/auth/api/v1/auth/register,583,0,0
-1772845861545,585,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-2,text,true,,608,254,3,3,http://api.experiment.local/auth/api/v1/auth/login,585,0,1
-1772845862130,10,2. Registrar Attacker,409,Conflict,Intento No Autorizado de Modificación 1-1,text,false,,195,282,3,3,http://api.experiment.local/auth/api/v1/auth/register,10,0,2
-1772845862084,74,5. Crear Reserva (Owner),409,Conflict,Intento No Autorizado de Modificación 1-3,text,false,"Test failed: code expected to equal /
+/",190,578,3,3,http://api.experiment.local/reservas/api/v1/bookings/,38,0,2
+1772850567777,26,5. Crear Reserva (Owner),409,Conflict,Intento No Autorizado de Modificación 1-3,text,false,"Test failed: code expected to equal /
 
 ****** received  : [[[409]]]
 
 ****** comparison: [[[201]]]
 
-/",190,578,3,3,http://api.experiment.local/reservas/api/v1/bookings/,74,0,1
-1772845862131,38,5. Crear Reserva (Owner),409,Conflict,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
-
-****** received  : [[[409]]]
-
-****** comparison: [[[201]]]
-
-/",190,578,3,3,http://api.experiment.local/reservas/api/v1/bookings/,38,0,1
-1772845862170,47,6. [ATAQUE] Modificar Reserva Ajena,422,Unprocessable Entity,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
+/",190,578,3,3,http://api.experiment.local/reservas/api/v1/bookings/,25,0,2
+1772850567804,30,6. [ATAQUE] Modificar Reserva Ajena,422,Unprocessable Entity,Intento No Autorizado de Modificación 1-3,text,false,"Test failed: code expected to equal /
 
 ****** received  : 4[[[22]]]
 
 ****** comparison: 4[[[03]]]
 
-/",500,484,3,3,http://api.experiment.local/reservas/api/v1/bookings/BOOKING_NOT_FOUND,47,0,0
-1772845862159,59,6. [ATAQUE] Modificar Reserva Ajena,422,Unprocessable Entity,Intento No Autorizado de Modificación 1-3,text,false,"Test failed: code expected to equal /
-
-****** received  : 4[[[22]]]
-
-****** comparison: 4[[[03]]]
-
-/",500,484,3,3,http://api.experiment.local/reservas/api/v1/bookings/BOOKING_NOT_FOUND,59,0,1
-1772845862155,510,3. Login Owner,403,Forbidden,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
-
-****** received  : [[[403]]]
-
-****** comparison: [[[200]]]
-
-/",170,251,3,3,http://api.experiment.local/auth/api/v1/auth/login,510,0,1
-1772845862218,458,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
+/",500,484,3,3,http://api.experiment.local/reservas/api/v1/bookings/BOOKING_NOT_FOUND,30,0,1
+1772850567836,18,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-3,text,false,"Test failed: code expected to equal /
 
 ****** received  : [[[200]]]
 
 ****** comparison: [[[403]]]
 
-/",353,402,3,3,http://api.experiment.local/auth/api/v1/auth/me,458,0,1
-1772845862219,460,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-3,text,false,"Test failed: code expected to equal /
-
-****** received  : [[[200]]]
-
-****** comparison: [[[403]]]
-
-/",353,402,3,3,http://api.experiment.local/auth/api/v1/auth/me,459,0,0
-1772845862676,49,1. Registrar Owner,409,Conflict,Intento No Autorizado de Modificación 1-2,text,false,,192,276,3,3,http://api.experiment.local/auth/api/v1/auth/register,49,0,1
-1772845862666,605,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-1,text,true,,608,254,3,3,http://api.experiment.local/auth/api/v1/auth/login,605,0,1
-1772845862726,548,2. Registrar Attacker,409,Conflict,Intento No Autorizado de Modificación 1-2,text,false,,195,282,3,3,http://api.experiment.local/auth/api/v1/auth/register,548,0,0
-1772845862679,595,1. Registrar Owner,409,Conflict,Intento No Autorizado de Modificación 1-3,text,false,,192,276,3,3,http://api.experiment.local/auth/api/v1/auth/register,595,0,1
-1772845863272,10,5. Crear Reserva (Owner),401,Unauthorized,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
+/",353,402,3,3,http://api.experiment.local/auth/api/v1/auth/me,18,0,2
+1772850567774,615,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-2,text,true,,608,254,3,3,http://api.experiment.local/auth/api/v1/auth/login,615,0,0
+1772850567855,536,1. Registrar Owner,409,Conflict,Intento No Autorizado de Modificación 1-3,text,false,,192,276,3,3,http://api.experiment.local/auth/api/v1/auth/register,536,0,1
+1772850568390,11,5. Crear Reserva (Owner),401,Unauthorized,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
 
 ****** received  : [[[4]]]01
 
 ****** comparison: [[[2]]]01
 
 /",210,384,3,3,http://api.experiment.local/reservas/api/v1/bookings/,10,0,1
-1772845863274,617,2. Registrar Attacker,409,Conflict,Intento No Autorizado de Modificación 1-3,text,false,,195,282,3,3,http://api.experiment.local/auth/api/v1/auth/register,616,0,1
-1772845863274,619,3. Login Owner,200,OK,Intento No Autorizado de Modificación 1-2,text,true,,608,251,3,3,http://api.experiment.local/auth/api/v1/auth/login,619,0,0
-1772845863283,627,6. [ATAQUE] Modificar Reserva Ajena,422,Unprocessable Entity,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
+1772850567800,602,6. [ATAQUE] Modificar Reserva Ajena,422,Unprocessable Entity,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
 
 ****** received  : 4[[[22]]]
 
 ****** comparison: 4[[[03]]]
 
-/",500,484,3,3,http://api.experiment.local/reservas/api/v1/bookings/BOOKING_NOT_FOUND,627,0,0
-1772845863911,561,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
-
-****** received  : [[[200]]]
-
-****** comparison: [[[403]]]
-
-/",353,402,3,3,http://api.experiment.local/auth/api/v1/auth/me,561,0,1
-1772845863894,582,3. Login Owner,200,OK,Intento No Autorizado de Modificación 1-3,text,true,,608,251,3,3,http://api.experiment.local/auth/api/v1/auth/login,582,0,2
-1772845863894,602,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-2,text,true,,608,254,3,3,http://api.experiment.local/auth/api/v1/auth/login,602,0,2
-1772845864474,73,1. Registrar Owner,409,Conflict,Intento No Autorizado de Modificación 1-1,text,false,,192,276,3,3,http://api.experiment.local/auth/api/v1/auth/register,73,0,1
-1772845864548,1217,2. Registrar Attacker,409,Conflict,Intento No Autorizado de Modificación 1-1,text,false,,195,282,3,3,http://api.experiment.local/auth/api/v1/auth/register,1217,0,1
-1772845864477,1288,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-3,text,true,,608,254,3,3,http://api.experiment.local/auth/api/v1/auth/login,1288,0,1
-1772845864498,1310,5. Crear Reserva (Owner),409,Conflict,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
-
-****** received  : [[[409]]]
-
-****** comparison: [[[201]]]
-
-/",190,578,3,3,http://api.experiment.local/reservas/api/v1/bookings/,1310,0,0
-1772845865809,36,6. [ATAQUE] Modificar Reserva Ajena,422,Unprocessable Entity,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
-
-****** received  : 4[[[22]]]
-
-****** comparison: 4[[[03]]]
-
-/",500,484,3,3,http://api.experiment.local/reservas/api/v1/bookings/BOOKING_NOT_FOUND,36,0,1
-1772845865771,79,5. Crear Reserva (Owner),409,Conflict,Intento No Autorizado de Modificación 1-3,text,false,"Test failed: code expected to equal /
-
-****** received  : [[[409]]]
-
-****** comparison: [[[201]]]
-
-/",190,578,3,3,http://api.experiment.local/reservas/api/v1/bookings/,79,0,2
-1772845865771,585,3. Login Owner,403,Forbidden,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
-
-****** received  : [[[403]]]
-
-****** comparison: [[[200]]]
-
-/",170,251,3,3,http://api.experiment.local/auth/api/v1/auth/login,585,0,2
-1772845865852,549,6. [ATAQUE] Modificar Reserva Ajena,422,Unprocessable Entity,Intento No Autorizado de Modificación 1-3,text,false,"Test failed: code expected to equal /
-
-****** received  : 4[[[22]]]
-
-****** comparison: 4[[[03]]]
-
-/",500,484,3,3,http://api.experiment.local/reservas/api/v1/bookings/BOOKING_NOT_FOUND,549,0,1
-1772845865847,554,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
-
-****** received  : [[[200]]]
-
-****** comparison: [[[403]]]
-
-/",353,402,3,3,http://api.experiment.local/auth/api/v1/auth/me,554,0,0
-1772845866402,10,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-3,text,false,"Test failed: code expected to equal /
+/",500,484,3,3,http://api.experiment.local/reservas/api/v1/bookings/BOOKING_NOT_FOUND,602,0,0
+1772850568392,18,2. Registrar Attacker,409,Conflict,Intento No Autorizado de Modificación 1-3,text,false,,195,282,3,3,http://api.experiment.local/auth/api/v1/auth/register,18,0,1
+1772850568404,10,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
 
 ****** received  : [[[200]]]
 
 ****** comparison: [[[403]]]
 
 /",353,402,3,3,http://api.experiment.local/auth/api/v1/auth/me,10,0,1
-1772845866402,12,1. Registrar Owner,409,Conflict,Intento No Autorizado de Modificación 1-2,text,false,,192,276,3,3,http://api.experiment.local/auth/api/v1/auth/register,12,0,0
-1772845866414,564,2. Registrar Attacker,409,Conflict,Intento No Autorizado de Modificación 1-2,text,false,,195,282,3,3,http://api.experiment.local/auth/api/v1/auth/register,563,0,0
-1772845866412,566,1. Registrar Owner,409,Conflict,Intento No Autorizado de Modificación 1-3,text,false,,192,276,3,3,http://api.experiment.local/auth/api/v1/auth/register,565,0,1
-1772845866357,621,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-1,text,true,,608,254,3,3,http://api.experiment.local/auth/api/v1/auth/login,620,0,0
-1772845866979,16,5. Crear Reserva (Owner),401,Unauthorized,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
-
-****** received  : [[[4]]]01
-
-****** comparison: [[[2]]]01
-
-/",210,384,3,3,http://api.experiment.local/reservas/api/v1/bookings/,16,0,1
-1772845866979,19,2. Registrar Attacker,409,Conflict,Intento No Autorizado de Modificación 1-3,text,false,,195,282,3,3,http://api.experiment.local/auth/api/v1/auth/register,19,0,1
-1772845866996,35,6. [ATAQUE] Modificar Reserva Ajena,422,Unprocessable Entity,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
+1772850568415,10,1. Registrar Owner,409,Conflict,Intento No Autorizado de Modificación 1-1,text,false,,192,276,3,3,http://api.experiment.local/auth/api/v1/auth/register,10,0,2
+1772850568412,579,3. Login Owner,200,OK,Intento No Autorizado de Modificación 1-3,text,true,,608,251,3,3,http://api.experiment.local/auth/api/v1/auth/login,579,0,1
+1772850568425,570,2. Registrar Attacker,409,Conflict,Intento No Autorizado de Modificación 1-1,text,false,,195,282,3,3,http://api.experiment.local/auth/api/v1/auth/register,570,0,1
+1772850568402,598,6. [ATAQUE] Modificar Reserva Ajena,422,Unprocessable Entity,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
 
 ****** received  : 4[[[22]]]
 
 ****** comparison: 4[[[03]]]
 
-/",500,484,3,3,http://api.experiment.local/reservas/api/v1/bookings/BOOKING_NOT_FOUND,35,0,1
-1772845867033,6,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
+/",500,484,3,3,http://api.experiment.local/reservas/api/v1/bookings/BOOKING_NOT_FOUND,598,0,1
+1772850568992,639,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-3,text,true,,608,254,3,3,http://api.experiment.local/auth/api/v1/auth/login,639,0,1
+1772850569001,647,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
 
 ****** received  : [[[200]]]
 
 ****** comparison: [[[403]]]
 
-/",353,402,3,3,http://api.experiment.local/auth/api/v1/auth/me,6,0,0
-1772845866979,1164,3. Login Owner,200,OK,Intento No Autorizado de Modificación 1-2,text,true,,608,251,3,3,http://api.experiment.local/auth/api/v1/auth/login,1164,0,1
-1772845867040,1104,1. Registrar Owner,409,Conflict,Intento No Autorizado de Modificación 1-1,text,false,,192,276,3,3,http://api.experiment.local/auth/api/v1/auth/register,1104,0,0
-1772845866998,1146,3. Login Owner,200,OK,Intento No Autorizado de Modificación 1-3,text,true,,608,251,3,3,http://api.experiment.local/auth/api/v1/auth/login,1146,0,1
-1772845868144,640,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-2,text,true,,608,254,3,3,http://api.experiment.local/auth/api/v1/auth/login,639,0,1
-1772845868144,722,2. Registrar Attacker,409,Conflict,Intento No Autorizado de Modificación 1-1,text,false,,195,282,3,3,http://api.experiment.local/auth/api/v1/auth/register,722,0,1
-1772845868145,722,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-3,text,true,,608,254,3,3,http://api.experiment.local/auth/api/v1/auth/login,722,0,0
-1772845868868,586,5. Crear Reserva (Owner),409,Conflict,Intento No Autorizado de Modificación 1-3,text,false,"Test failed: code expected to equal /
-
-****** received  : [[[409]]]
-
-****** comparison: [[[201]]]
-
-/",190,578,3,3,http://api.experiment.local/reservas/api/v1/bookings/,586,0,0
-1772845869456,186,6. [ATAQUE] Modificar Reserva Ajena,422,Unprocessable Entity,Intento No Autorizado de Modificación 1-3,text,false,"Test failed: code expected to equal /
-
-****** received  : 4[[[22]]]
-
-****** comparison: 4[[[03]]]
-
-/",500,484,3,3,http://api.experiment.local/reservas/api/v1/bookings/BOOKING_NOT_FOUND,186,0,0
-1772845868867,1010,3. Login Owner,403,Forbidden,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
+/",353,402,3,3,http://api.experiment.local/auth/api/v1/auth/me,647,0,1
+1772850568996,654,3. Login Owner,200,OK,Intento No Autorizado de Modificación 1-1,text,true,,608,251,3,3,http://api.experiment.local/auth/api/v1/auth/login,654,0,1
+1772850569649,9,1. Registrar Owner,409,Conflict,Intento No Autorizado de Modificación 1-2,text,false,,192,276,3,3,http://api.experiment.local/auth/api/v1/auth/register,8,0,1
+1772850569658,15,2. Registrar Attacker,409,Conflict,Intento No Autorizado de Modificación 1-2,text,false,,195,282,3,3,http://api.experiment.local/auth/api/v1/auth/register,15,0,1
+1772850569650,546,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-1,text,true,,608,254,3,3,http://api.experiment.local/auth/api/v1/auth/login,546,0,1
+1772850569674,1103,3. Login Owner,403,Forbidden,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
 
 ****** received  : [[[403]]]
 
 ****** comparison: [[[200]]]
 
-/",170,251,3,3,http://api.experiment.local/auth/api/v1/auth/login,1010,0,1
-1772845869643,269,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-3,text,false,"Test failed: code expected to equal /
-
-****** received  : [[[200]]]
-
-****** comparison: [[[403]]]
-
-/",353,402,3,3,http://api.experiment.local/auth/api/v1/auth/me,268,0,1
-1772845868791,1166,5. Crear Reserva (Owner),409,Conflict,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
+/",170,251,3,3,http://api.experiment.local/auth/api/v1/auth/login,1103,0,1
+1772850570197,606,5. Crear Reserva (Owner),409,Conflict,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
 
 ****** received  : [[[409]]]
 
 ****** comparison: [[[201]]]
 
-/",190,578,2,2,http://api.experiment.local/reservas/api/v1/bookings/,1166,0,1
-1772845869959,597,6. [ATAQUE] Modificar Reserva Ajena,422,Unprocessable Entity,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
+/",190,578,3,3,http://api.experiment.local/reservas/api/v1/bookings/,606,0,1
+1772850569633,1171,5. Crear Reserva (Owner),409,Conflict,Intento No Autorizado de Modificación 1-3,text,false,"Test failed: code expected to equal /
+
+****** received  : [[[409]]]
+
+****** comparison: [[[201]]]
+
+/",190,578,3,3,http://api.experiment.local/reservas/api/v1/bookings/,1171,0,1
+1772850570804,53,6. [ATAQUE] Modificar Reserva Ajena,422,Unprocessable Entity,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
 
 ****** received  : 4[[[22]]]
 
 ****** comparison: 4[[[03]]]
 
-/",500,484,2,2,http://api.experiment.local/reservas/api/v1/bookings/BOOKING_NOT_FOUND,597,0,1
-1772845869879,676,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-1,text,true,,608,254,2,2,http://api.experiment.local/auth/api/v1/auth/login,675,0,3
-1772845870562,11,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
+/",500,484,3,3,http://api.experiment.local/reservas/api/v1/bookings/BOOKING_NOT_FOUND,53,0,1
+1772850570858,5,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
 
 ****** received  : [[[200]]]
 
 ****** comparison: [[[403]]]
 
-/",353,402,2,2,http://api.experiment.local/auth/api/v1/auth/me,11,0,1
-1772845870562,54,5. Crear Reserva (Owner),401,Unauthorized,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
+/",353,402,3,3,http://api.experiment.local/auth/api/v1/auth/me,5,0,1
+1772850570778,556,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-2,text,true,,608,254,3,3,http://api.experiment.local/auth/api/v1/auth/login,556,0,1
+1772850570864,515,1. Registrar Owner,409,Conflict,Intento No Autorizado de Modificación 1-1,text,false,,192,276,3,3,http://api.experiment.local/auth/api/v1/auth/register,515,0,1
+1772850570804,576,6. [ATAQUE] Modificar Reserva Ajena,422,Unprocessable Entity,Intento No Autorizado de Modificación 1-3,text,false,"Test failed: code expected to equal /
+
+****** received  : 4[[[22]]]
+
+****** comparison: 4[[[03]]]
+
+/",500,484,3,3,http://api.experiment.local/reservas/api/v1/bookings/BOOKING_NOT_FOUND,576,0,1
+1772850571335,88,5. Crear Reserva (Owner),401,Unauthorized,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
 
 ****** received  : [[[4]]]01
 
 ****** comparison: [[[2]]]01
 
-/",210,384,2,2,http://api.experiment.local/reservas/api/v1/bookings/,54,0,1
-1772845870574,86,1. Registrar Owner,409,Conflict,Intento No Autorizado de Modificación 1-2,text,false,,192,276,2,2,http://api.experiment.local/auth/api/v1/auth/register,86,0,0
-1772845870617,53,6. [ATAQUE] Modificar Reserva Ajena,422,Unprocessable Entity,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
-
-****** received  : 4[[[22]]]
-
-****** comparison: 4[[[03]]]
-
-/",500,484,2,2,http://api.experiment.local/reservas/api/v1/bookings/BOOKING_NOT_FOUND,53,0,1
-1772845870661,18,2. Registrar Attacker,409,Conflict,Intento No Autorizado de Modificación 1-2,text,false,,195,282,2,2,http://api.experiment.local/auth/api/v1/auth/register,18,0,6
-1772845870670,14,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
+/",210,384,3,3,http://api.experiment.local/reservas/api/v1/bookings/,88,0,1
+1772850571380,65,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-3,text,false,"Test failed: code expected to equal /
 
 ****** received  : [[[200]]]
 
 ****** comparison: [[[403]]]
 
-/",353,402,2,2,http://api.experiment.local/auth/api/v1/auth/me,14,0,1
-1772845870697,22,1. Registrar Owner,409,Conflict,Intento No Autorizado de Modificación 1-1,text,false,,192,276,2,2,http://api.experiment.local/auth/api/v1/auth/register,22,0,0
-1772845870720,6,2. Registrar Attacker,409,Conflict,Intento No Autorizado de Modificación 1-1,text,false,,195,282,2,2,http://api.experiment.local/auth/api/v1/auth/register,6,0,0
-1772845870679,503,3. Login Owner,200,OK,Intento No Autorizado de Modificación 1-2,text,true,,608,251,2,2,http://api.experiment.local/auth/api/v1/auth/login,503,0,1
-1772845870726,520,3. Login Owner,403,Forbidden,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
+/",353,402,3,3,http://api.experiment.local/auth/api/v1/auth/me,64,0,1
+1772850571380,68,2. Registrar Attacker,409,Conflict,Intento No Autorizado de Modificación 1-1,text,false,,195,282,3,3,http://api.experiment.local/auth/api/v1/auth/register,68,0,1
+1772850571447,13,1. Registrar Owner,409,Conflict,Intento No Autorizado de Modificación 1-3,text,false,,192,276,3,3,http://api.experiment.local/auth/api/v1/auth/register,12,0,2
+1772850571452,585,3. Login Owner,200,OK,Intento No Autorizado de Modificación 1-1,text,true,,608,251,3,3,http://api.experiment.local/auth/api/v1/auth/login,585,0,2
+1772850571461,578,2. Registrar Attacker,409,Conflict,Intento No Autorizado de Modificación 1-3,text,false,,195,282,3,3,http://api.experiment.local/auth/api/v1/auth/register,578,0,1
+1772850571424,617,6. [ATAQUE] Modificar Reserva Ajena,422,Unprocessable Entity,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
+
+****** received  : 4[[[22]]]
+
+****** comparison: 4[[[03]]]
+
+/",500,484,3,3,http://api.experiment.local/reservas/api/v1/bookings/BOOKING_NOT_FOUND,617,0,6
+1772850572043,1142,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
+
+****** received  : [[[200]]]
+
+****** comparison: [[[403]]]
+
+/",353,402,3,3,http://api.experiment.local/auth/api/v1/auth/me,1141,0,1
+1772850572040,1147,3. Login Owner,200,OK,Intento No Autorizado de Modificación 1-3,text,true,,608,251,3,3,http://api.experiment.local/auth/api/v1/auth/login,1146,0,1
+1772850572038,1151,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-1,text,true,,608,254,3,3,http://api.experiment.local/auth/api/v1/auth/login,1150,0,1
+1772850573187,18,1. Registrar Owner,409,Conflict,Intento No Autorizado de Modificación 1-2,text,false,,192,276,3,3,http://api.experiment.local/auth/api/v1/auth/register,18,0,2
+1772850573206,535,2. Registrar Attacker,409,Conflict,Intento No Autorizado de Modificación 1-2,text,false,,195,282,3,3,http://api.experiment.local/auth/api/v1/auth/register,535,0,2
+1772850573190,552,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-3,text,true,,608,254,3,3,http://api.experiment.local/auth/api/v1/auth/login,552,0,1
+1772850573191,583,5. Crear Reserva (Owner),409,Conflict,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
+
+****** received  : [[[409]]]
+
+****** comparison: [[[201]]]
+
+/",190,578,3,3,http://api.experiment.local/reservas/api/v1/bookings/,583,0,1
+1772850573743,56,5. Crear Reserva (Owner),409,Conflict,Intento No Autorizado de Modificación 1-3,text,false,"Test failed: code expected to equal /
+
+****** received  : [[[409]]]
+
+****** comparison: [[[201]]]
+
+/",190,578,3,3,http://api.experiment.local/reservas/api/v1/bookings/,56,0,6
+1772850573742,529,3. Login Owner,403,Forbidden,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
 
 ****** received  : [[[403]]]
 
 ****** comparison: [[[200]]]
 
-/",170,251,2,2,http://api.experiment.local/auth/api/v1/auth/login,520,0,0
-1772845871183,584,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-2,text,true,,608,254,2,2,http://api.experiment.local/auth/api/v1/auth/login,584,0,0
-1772845871770,101,5. Crear Reserva (Owner),409,Conflict,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
+/",170,251,3,3,http://api.experiment.local/auth/api/v1/auth/login,529,0,1
+1772850573776,502,6. [ATAQUE] Modificar Reserva Ajena,422,Unprocessable Entity,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
 
-****** received  : [[[409]]]
+****** received  : 4[[[22]]]
 
-****** comparison: [[[201]]]
+****** comparison: 4[[[03]]]
 
-/",190,578,2,2,http://api.experiment.local/reservas/api/v1/bookings/,101,0,1
-1772845871247,1142,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-1,text,true,,608,254,2,2,http://api.experiment.local/auth/api/v1/auth/login,1142,0,1
-1772845872391,14,5. Crear Reserva (Owner),401,Unauthorized,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
+/",500,484,3,3,http://api.experiment.local/reservas/api/v1/bookings/BOOKING_NOT_FOUND,502,0,1
+1772850573800,479,6. [ATAQUE] Modificar Reserva Ajena,422,Unprocessable Entity,Intento No Autorizado de Modificación 1-3,text,false,"Test failed: code expected to equal /
+
+****** received  : 4[[[22]]]
+
+****** comparison: 4[[[03]]]
+
+/",500,484,3,3,http://api.experiment.local/reservas/api/v1/bookings/BOOKING_NOT_FOUND,479,0,0
+1772850574279,8,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
+
+****** received  : [[[200]]]
+
+****** comparison: [[[403]]]
+
+/",353,402,3,3,http://api.experiment.local/auth/api/v1/auth/me,7,0,1
+1772850574280,7,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-3,text,false,"Test failed: code expected to equal /
+
+****** received  : [[[200]]]
+
+****** comparison: [[[403]]]
+
+/",353,402,3,3,http://api.experiment.local/auth/api/v1/auth/me,7,0,1
+1772850574272,509,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-2,text,true,,608,254,3,3,http://api.experiment.local/auth/api/v1/auth/login,509,0,1
+1772850574287,499,1. Registrar Owner,409,Conflict,Intento No Autorizado de Modificación 1-3,text,false,,192,276,3,3,http://api.experiment.local/auth/api/v1/auth/register,499,0,1
+1772850574782,6,5. Crear Reserva (Owner),401,Unauthorized,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
 
 ****** received  : [[[4]]]01
 
 ****** comparison: [[[2]]]01
 
-/",210,384,2,2,http://api.experiment.local/reservas/api/v1/bookings/,14,0,1
-1772845871873,537,6. [ATAQUE] Modificar Reserva Ajena,422,Unprocessable Entity,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
+/",210,384,3,3,http://api.experiment.local/reservas/api/v1/bookings/,6,0,2
+1772850574787,11,2. Registrar Attacker,409,Conflict,Intento No Autorizado de Modificación 1-3,text,false,,195,282,3,3,http://api.experiment.local/auth/api/v1/auth/register,11,0,2
+1772850574789,22,6. [ATAQUE] Modificar Reserva Ajena,422,Unprocessable Entity,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
 
 ****** received  : 4[[[22]]]
 
 ****** comparison: 4[[[03]]]
 
-/",500,484,2,2,http://api.experiment.local/reservas/api/v1/bookings/BOOKING_NOT_FOUND,536,0,1
-1772845872411,29,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
+/",500,484,3,3,http://api.experiment.local/reservas/api/v1/bookings/BOOKING_NOT_FOUND,22,0,2
+1772850574287,530,1. Registrar Owner,409,Conflict,Intento No Autorizado de Modificación 1-1,text,false,,192,276,3,3,http://api.experiment.local/auth/api/v1/auth/register,530,0,2
+1772850574814,7,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
 
 ****** received  : [[[200]]]
 
 ****** comparison: [[[403]]]
 
-/",353,402,2,2,http://api.experiment.local/auth/api/v1/auth/me,29,0,1
-1772845872406,77,6. [ATAQUE] Modificar Reserva Ajena,422,Unprocessable Entity,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
+/",353,402,3,3,http://api.experiment.local/auth/api/v1/auth/me,7,0,1
+1772850574817,7,2. Registrar Attacker,409,Conflict,Intento No Autorizado de Modificación 1-1,text,false,,195,282,3,3,http://api.experiment.local/auth/api/v1/auth/register,7,0,1
+1772850574822,7,1. Registrar Owner,409,Conflict,Intento No Autorizado de Modificación 1-2,text,false,,192,276,3,3,http://api.experiment.local/auth/api/v1/auth/register,7,0,1
+1772850574799,662,3. Login Owner,200,OK,Intento No Autorizado de Modificación 1-3,text,true,,608,251,3,3,http://api.experiment.local/auth/api/v1/auth/login,661,0,1
+1772850574830,1220,2. Registrar Attacker,409,Conflict,Intento No Autorizado de Modificación 1-2,text,false,,195,282,3,3,http://api.experiment.local/auth/api/v1/auth/register,1220,0,2
+1772850574824,1227,3. Login Owner,200,OK,Intento No Autorizado de Modificación 1-1,text,true,,608,251,3,3,http://api.experiment.local/auth/api/v1/auth/login,1227,0,2
+1772850575470,1286,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-3,text,true,,608,254,3,3,http://api.experiment.local/auth/api/v1/auth/login,1286,0,5
+1772850576053,737,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-1,text,true,,608,254,3,3,http://api.experiment.local/auth/api/v1/auth/login,737,0,1
+1772850576764,259,5. Crear Reserva (Owner),409,Conflict,Intento No Autorizado de Modificación 1-3,text,false,"Test failed: code expected to equal /
+
+****** received  : [[[409]]]
+
+****** comparison: [[[201]]]
+
+/",190,578,3,3,http://api.experiment.local/reservas/api/v1/bookings/,259,0,3
+1772850577024,61,6. [ATAQUE] Modificar Reserva Ajena,422,Unprocessable Entity,Intento No Autorizado de Modificación 1-3,text,false,"Test failed: code expected to equal /
 
 ****** received  : 4[[[22]]]
 
 ****** comparison: 4[[[03]]]
 
-/",500,484,1,1,http://api.experiment.local/reservas/api/v1/bookings/BOOKING_NOT_FOUND,77,0,1
-1772845872484,13,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
+/",500,484,3,3,http://api.experiment.local/reservas/api/v1/bookings/BOOKING_NOT_FOUND,61,0,0
+1772850577086,6,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-3,text,false,"Test failed: code expected to equal /
 
 ****** received  : [[[200]]]
 
 ****** comparison: [[[403]]]
 
-/",353,402,1,1,http://api.experiment.local/auth/api/v1/auth/me,13,0,0
+/",353,402,3,3,http://api.experiment.local/auth/api/v1/auth/me,6,0,1
+1772850577094,11,1. Registrar Owner,409,Conflict,Intento No Autorizado de Modificación 1-3,text,false,,192,276,3,3,http://api.experiment.local/auth/api/v1/auth/register,11,0,1
+1772850576052,1780,3. Login Owner,403,Forbidden,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
+
+****** received  : [[[403]]]
+
+****** comparison: [[[200]]]
+
+/",170,251,3,3,http://api.experiment.local/auth/api/v1/auth/login,1779,0,1
+1772850577106,776,2. Registrar Attacker,409,Conflict,Intento No Autorizado de Modificación 1-3,text,false,,195,282,3,3,http://api.experiment.local/auth/api/v1/auth/register,776,0,0
+1772850576791,1166,5. Crear Reserva (Owner),409,Conflict,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
+
+****** received  : [[[409]]]
+
+****** comparison: [[[201]]]
+
+/",190,578,3,3,http://api.experiment.local/reservas/api/v1/bookings/,1166,0,1
+1772850577926,1634,3. Login Owner,200,OK,Intento No Autorizado de Modificación 1-3,text,true,,608,251,3,3,http://api.experiment.local/auth/api/v1/auth/login,1633,0,3
+1772850577958,1645,6. [ATAQUE] Modificar Reserva Ajena,422,Unprocessable Entity,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
+
+****** received  : 4[[[22]]]
+
+****** comparison: 4[[[03]]]
+
+/",500,484,3,3,http://api.experiment.local/reservas/api/v1/bookings/BOOKING_NOT_FOUND,1645,0,1
+1772850577836,1767,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-2,text,true,,608,254,3,3,http://api.experiment.local/auth/api/v1/auth/login,1767,0,10
+1772850579604,2112,5. Crear Reserva (Owner),401,Unauthorized,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
+
+****** received  : [[[4]]]01
+
+****** comparison: [[[2]]]01
+
+/",210,384,3,3,http://api.experiment.local/reservas/api/v1/bookings/,2112,0,2078
+1772850579565,2807,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-3,text,true,,608,254,3,3,http://api.experiment.local/auth/api/v1/auth/login,2807,0,2117
+1772850579604,2767,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
+
+****** received  : [[[200]]]
+
+****** comparison: [[[403]]]
+
+/",353,402,3,3,http://api.experiment.local/auth/api/v1/auth/me,2766,0,2079
+1772850581724,654,6. [ATAQUE] Modificar Reserva Ajena,422,Unprocessable Entity,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
+
+****** received  : 4[[[22]]]
+
+****** comparison: 4[[[03]]]
+
+/",500,484,3,3,http://api.experiment.local/reservas/api/v1/bookings/BOOKING_NOT_FOUND,654,0,2
+1772850582379,73,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
+
+****** received  : [[[200]]]
+
+****** comparison: [[[403]]]
+
+/",353,402,3,3,http://api.experiment.local/auth/api/v1/auth/me,72,0,1
+1772850582375,77,1. Registrar Owner,409,Conflict,Intento No Autorizado de Modificación 1-1,text,false,,192,276,3,3,http://api.experiment.local/auth/api/v1/auth/register,76,0,1
+1772850582455,10,1. Registrar Owner,409,Conflict,Intento No Autorizado de Modificación 1-2,text,false,,192,276,3,3,http://api.experiment.local/auth/api/v1/auth/register,10,0,1
+1772850582373,93,5. Crear Reserva (Owner),409,Conflict,Intento No Autorizado de Modificación 1-3,text,false,"Test failed: code expected to equal /
+
+****** received  : [[[409]]]
+
+****** comparison: [[[201]]]
+
+/",190,578,3,3,http://api.experiment.local/reservas/api/v1/bookings/,93,0,3
+1772850582455,15,2. Registrar Attacker,409,Conflict,Intento No Autorizado de Modificación 1-1,text,false,,195,282,3,3,http://api.experiment.local/auth/api/v1/auth/register,15,0,1
+1772850582466,10,2. Registrar Attacker,409,Conflict,Intento No Autorizado de Modificación 1-2,text,false,,195,282,3,3,http://api.experiment.local/auth/api/v1/auth/register,10,0,0
+1772850582468,38,6. [ATAQUE] Modificar Reserva Ajena,422,Unprocessable Entity,Intento No Autorizado de Modificación 1-3,text,false,"Test failed: code expected to equal /
+
+****** received  : 4[[[22]]]
+
+****** comparison: 4[[[03]]]
+
+/",500,484,3,3,http://api.experiment.local/reservas/api/v1/bookings/BOOKING_NOT_FOUND,38,0,1
+1772850582507,7,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-3,text,false,"Test failed: code expected to equal /
+
+****** received  : [[[200]]]
+
+****** comparison: [[[403]]]
+
+/",353,402,3,3,http://api.experiment.local/auth/api/v1/auth/me,7,0,1
+1772850582471,588,3. Login Owner,200,OK,Intento No Autorizado de Modificación 1-1,text,true,,608,251,3,3,http://api.experiment.local/auth/api/v1/auth/login,588,0,1
+1772850582515,1169,1. Registrar Owner,409,Conflict,Intento No Autorizado de Modificación 1-3,text,false,,192,276,3,3,http://api.experiment.local/auth/api/v1/auth/register,1168,0,16
+1772850583060,629,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-1,text,true,,608,254,3,3,http://api.experiment.local/auth/api/v1/auth/login,629,0,1
+1772850582476,1208,3. Login Owner,403,Forbidden,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
+
+****** received  : [[[403]]]
+
+****** comparison: [[[200]]]
+
+/",170,251,3,3,http://api.experiment.local/auth/api/v1/auth/login,1207,0,1
+1772850583694,65,2. Registrar Attacker,409,Conflict,Intento No Autorizado de Modificación 1-3,text,false,,195,282,3,3,http://api.experiment.local/auth/api/v1/auth/register,64,0,2
+1772850583766,1796,3. Login Owner,200,OK,Intento No Autorizado de Modificación 1-3,text,true,,608,251,3,3,http://api.experiment.local/auth/api/v1/auth/login,1796,0,1
+1772850583693,1866,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-2,text,true,,608,254,3,3,http://api.experiment.local/auth/api/v1/auth/login,1862,0,2
+1772850585570,149,5. Crear Reserva (Owner),401,Unauthorized,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
+
+****** received  : [[[4]]]01
+
+****** comparison: [[[2]]]01
+
+/",210,384,3,3,http://api.experiment.local/reservas/api/v1/bookings/,149,0,5
+1772850583693,2192,5. Crear Reserva (Owner),409,Conflict,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
+
+****** received  : [[[409]]]
+
+****** comparison: [[[201]]]
+
+/",190,578,3,3,http://api.experiment.local/reservas/api/v1/bookings/,2192,0,2
+1772850585889,1759,6. [ATAQUE] Modificar Reserva Ajena,422,Unprocessable Entity,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
+
+****** received  : 4[[[22]]]
+
+****** comparison: 4[[[03]]]
+
+/",500,484,3,3,http://api.experiment.local/reservas/api/v1/bookings/BOOKING_NOT_FOUND,1758,0,2
+1772850585721,2301,6. [ATAQUE] Modificar Reserva Ajena,422,Unprocessable Entity,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
+
+****** received  : 4[[[22]]]
+
+****** comparison: 4[[[03]]]
+
+/",500,484,3,3,http://api.experiment.local/reservas/api/v1/bookings/BOOKING_NOT_FOUND,2300,0,4
+1772850585570,2947,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-3,text,true,,608,254,3,3,http://api.experiment.local/auth/api/v1/auth/login,2947,0,6
+1772850587651,892,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
+
+****** received  : [[[200]]]
+
+****** comparison: [[[403]]]
+
+/",353,402,3,3,http://api.experiment.local/auth/api/v1/auth/me,892,0,2
+1772850588045,782,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-2,text,false,"Test failed: code expected to equal /
+
+****** received  : [[[200]]]
+
+****** comparison: [[[403]]]
+
+/",353,402,3,3,http://api.experiment.local/auth/api/v1/auth/me,782,0,2
+1772850588548,283,1. Registrar Owner,409,Conflict,Intento No Autorizado de Modificación 1-1,text,false,,192,276,3,3,http://api.experiment.local/auth/api/v1/auth/register,283,0,1
+1772850588833,296,2. Registrar Attacker,409,Conflict,Intento No Autorizado de Modificación 1-1,text,false,,195,282,2,2,http://api.experiment.local/auth/api/v1/auth/register,296,0,3
+1772850589130,2179,3. Login Owner,200,OK,Intento No Autorizado de Modificación 1-1,text,true,,608,251,2,2,http://api.experiment.local/auth/api/v1/auth/login,2170,0,1
+1772850588525,3114,5. Crear Reserva (Owner),409,Conflict,Intento No Autorizado de Modificación 1-3,text,false,"Test failed: code expected to equal /
+
+****** received  : [[[409]]]
+
+****** comparison: [[[201]]]
+
+/",190,578,2,2,http://api.experiment.local/reservas/api/v1/bookings/,3113,0,5
+1772850591321,915,4. Login Attacker,200,OK,Intento No Autorizado de Modificación 1-1,text,true,,608,254,2,2,http://api.experiment.local/auth/api/v1/auth/login,912,0,4
+1772850591640,614,6. [ATAQUE] Modificar Reserva Ajena,422,Unprocessable Entity,Intento No Autorizado de Modificación 1-3,text,false,"Test failed: code expected to equal /
+
+****** received  : 4[[[22]]]
+
+****** comparison: 4[[[03]]]
+
+/",500,484,2,2,http://api.experiment.local/reservas/api/v1/bookings/BOOKING_NOT_FOUND,614,0,1
+1772850592255,65,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-3,text,false,"Test failed: code expected to equal /
+
+****** received  : [[[200]]]
+
+****** comparison: [[[403]]]
+
+/",353,402,2,2,http://api.experiment.local/auth/api/v1/auth/me,65,0,1
+1772850592248,121,5. Crear Reserva (Owner),409,Conflict,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
+
+****** received  : [[[409]]]
+
+****** comparison: [[[201]]]
+
+/",190,578,1,1,http://api.experiment.local/reservas/api/v1/bookings/,121,0,4
+1772850592370,34,6. [ATAQUE] Modificar Reserva Ajena,422,Unprocessable Entity,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
+
+****** received  : 4[[[22]]]
+
+****** comparison: 4[[[03]]]
+
+/",500,484,1,1,http://api.experiment.local/reservas/api/v1/bookings/BOOKING_NOT_FOUND,34,0,1
+1772850592406,19,7. Verificar Bloqueo Attacker,200,OK,Intento No Autorizado de Modificación 1-1,text,false,"Test failed: code expected to equal /
+
+****** received  : [[[200]]]
+
+****** comparison: [[[403]]]
+
+/",353,402,1,1,http://api.experiment.local/auth/api/v1/auth/me,19,0,1

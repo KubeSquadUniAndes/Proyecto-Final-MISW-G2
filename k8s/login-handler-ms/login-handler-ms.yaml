@@ -12,7 +12,7 @@ metadata:
   namespace: login-handler-ms
 type: Opaque
 stringData:
-  DATABASE_URL: "postgresql+asyncpg://postgres:yulilinda@192.168.1.6:5432/login_handler_db"
+  DATABASE_URL: "postgresql+asyncpg://postgres:yulilinda@192.168.58.127:5432/login_handler_db"
   JWT_SECRET_KEY: "change-me-in-production"
   INTERNAL_API_KEY: "change-internal-key-in-production"
 ---
@@ -57,7 +57,7 @@ spec:
             - -c
             - |
               echo "Waiting for PostgreSQL to be ready..."
-              until pg_isready -h 192.168.1.6 -p 5432 -U postgres; do
+              until pg_isready -h 192.168.58.127 -p 5432 -U postgres; do
                 echo "DB not ready yet, retrying in 2s..."
                 sleep 2
               done

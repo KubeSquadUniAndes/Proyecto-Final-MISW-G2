@@ -13,7 +13,7 @@ metadata:
   namespace: detector-anomalias-ms
 type: Opaque
 stringData:
-  DATABASE_URL: "postgresql+asyncpg://postgres:yulilinda@192.168.1.6:5432/detector_anomalias_db"
+  DATABASE_URL: "postgresql+asyncpg://postgres:yulilinda@192.168.58.127:5432/detector_anomalias_db"
   INTERNAL_API_KEY: "change-internal-key-in-production"
   LOGIN_HANDLER_MS_INTERNAL_API_KEY: "change-internal-key-in-production"
   NOTIFICACIONES_MS_API_KEY: "change-internal-key-in-production"
@@ -64,7 +64,7 @@ spec:
             - sh
             - -c
             - |
-              until pg_isready -h 192.168.1.6 -p 5432 -U postgres; do
+              until pg_isready -h 192.168.58.127 -p 5432 -U postgres; do
                 echo "DB not ready, retrying..."; sleep 2
               done
               echo "DB ready!"
