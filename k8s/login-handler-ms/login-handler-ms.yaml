@@ -1,0 +1,128 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: login-handler-ms
+  labels:
+    app.kubernetes.io/part-of: experiment
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: login-handler-ms-secret
+  namespace: login-handler-ms
+type: Opaque
+stringData:
+  DATABASE_URL: "postgresql+asyncpg://postgres:yulilinda@192.168.58.127:5432/login_handler_db"
+  JWT_SECRET_KEY: "change-me-in-production"
+  INTERNAL_API_KEY: "change-internal-key-in-production"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: login-handler-ms-config
+  namespace: login-handler-ms
+data:
+  APP_NAME: "login_handler_ms"
+  APP_VERSION: "0.1.0"
+  DEBUG: "false"
+  HOST: "0.0.0.0"
+  PORT: "8001"
+  JWT_ALGORITHM: "HS256"
+  JWT_ACCESS_TOKEN_EXPIRE_MINUTES: "60"
+  JWT_REFRESH_TOKEN_EXPIRE_DAYS: "7"
+  DETECTOR_ANOMALIAS_MS_URL: "http://detector-anomalias-ms.detector-anomalias-ms.svc.cluster.local:8002"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: login-handler-ms
+  namespace: login-handler-ms
+  labels:
+    app: login-handler-ms
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: login-handler-ms
+  template:
+    metadata:
+      labels:
+        app: login-handler-ms
+    spec:
+      initContainers:
+        - name: wait-for-db
+          image: postgres:16-alpine
+          command:
+            - sh
+            - -c
+            - |
+              echo "Waiting for PostgreSQL to be ready..."
+              until pg_isready -h 192.168.58.127 -p 5432 -U postgres; do
+                echo "DB not ready yet, retrying in 2s..."
+                sleep 2
+              done
+              echo "PostgreSQL is ready!"
+      containers:
+        - name: login-handler-ms
+          image: login_handler_ms:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8001
+          envFrom:
+            - configMapRef:
+                name: login-handler-ms-config
+            - secretRef:
+                name: login-handler-ms-secret
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8001
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8001
+            initialDelaySeconds: 20
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: login-handler-ms
+  namespace: login-handler-ms
+spec:
+  selector:
+    app: login-handler-ms
+  ports:
+    - port: 8001
+      targetPort: 8001
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: login-handler-ms-ingress
+  namespace: login-handler-ms
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/use-regex: "true"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: api.experiment.local
+      http:
+        paths:
+          - path: /auth(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: login-handler-ms
+                port:
+                  number: 8001
