@@ -8,8 +8,8 @@ RUN pip install --no-cache-dir --upgrade pip && \
 
 COPY . .
 
-EXPOSE 8004
+EXPOSE 8000
 
 COPY run_migrations.py /app/run_migrations.py
 
-CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8004"]
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]

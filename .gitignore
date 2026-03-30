@@ -11,3 +11,7 @@
 test-report**
 
 /k8sCopy*
+*.terraform
+*.terraform.lock.hcl
+*terraform.tfstate
+*terraform.tfstate.backup
