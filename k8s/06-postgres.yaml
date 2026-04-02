@@ -20,6 +20,8 @@ spec:
       labels:
         app: postgres-db
     spec:
+      nodeSelector:
+        role: workloads
       terminationGracePeriodSeconds: 60
       containers:
       - name: postgres

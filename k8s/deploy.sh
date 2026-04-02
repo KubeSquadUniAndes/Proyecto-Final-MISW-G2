@@ -1,36 +1,45 @@
-#!/bin/bash
-# deploy.sh — applies all k8s manifests in dependency order
-# Usage: ./deploy.sh [apply|delete]
+#!/usr/bin/env bash
+# deploy.sh - applies all top-level k8s manifests in dependency order.
+# Usage: ./k8s/deploy.sh [apply|delete]
 
-set -e
+set -euo pipefail
 
-ACTION=${1:-apply}
-DOMAIN="api.experiment.local"   # Change to your actual domain
+ACTION="${1:-apply}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-echo "🚀 Action: kubectl $ACTION"
-echo ""
+FILES=(
+  "00-namespace.yaml"
+  "00b-service-accounts.yaml"
+  "01b-secrets-configmaps.yaml"
+  "02-waypoint.yaml"
+  "03-gateway.yaml"
+  "04-services.yaml"
+  "05-destination-rules.yaml"
+  "07-http-routes.yaml"
+  "08-deployments.yaml"
+  "09-hpa.yaml"
+  "10-pdb.yaml"
+  "11-authorization-policies.yaml"
+)
 
-# 1. Namespaces first
-echo "── Namespaces ──────────────────────────────"
-kubectl $ACTION -f login-handler-ms/login-handler-ms.yaml
-kubectl $ACTION -f reservas-ms/reservas-ms.yaml
-kubectl $ACTION -f detector-anomalias-ms/detector-anomalias-ms.yaml
-kubectl $ACTION -f notificaciones-ms/notificaciones-ms.yaml
+if [[ "${ACTION}" != "apply" && "${ACTION}" != "delete" ]]; then
+  echo "Usage: $0 [apply|delete]"
+  exit 1
+fi
 
-if [ "$ACTION" = "apply" ]; then
-  echo ""
-  echo "✅ All manifests applied."
-  echo ""
-  echo "── Wait for rollouts ───────────────────────"
-  kubectl rollout status deployment/login-handler-ms  -n login-handler-ms
-  kubectl rollout status deployment/reservas-ms       -n reservas-ms
-  kubectl rollout status deployment/detector-anomalias-ms -n detector-anomalias-ms
-  kubectl rollout status deployment/notificaciones-ms -n notificaciones-ms
+echo "Action: kubectl ${ACTION}"
 
-  echo ""
-  echo "── Ingress routes ──────────────────────────"
-  echo "  http://$DOMAIN/auth/docs          → login_handler_ms"
-  echo "  http://$DOMAIN/reservas/docs      → reservas_ms"
-  echo "  http://$DOMAIN/detector/docs      → detector_anomalias_ms"
-  echo "  http://$DOMAIN/notifications/docs → notificaciones_ms"
+if [[ "${ACTION}" == "apply" ]]; then
+  for file in "${FILES[@]}"; do
+    echo "Applying ${file}"
+    kubectl apply -f "${SCRIPT_DIR}/${file}"
+  done
+  echo "All manifests applied."
+else
+  for ((idx=${#FILES[@]}-1; idx>=0; idx--)); do
+    file="${FILES[$idx]}"
+    echo "Deleting ${file}"
+    kubectl delete -f "${SCRIPT_DIR}/${file}" --ignore-not-found
+  done
+  echo "All manifests deleted."
 fi

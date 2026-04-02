@@ -1,0 +1,70 @@
+###################################
+# Authorization Policies
+# Restricts login-handler to only access users-service
+###################################
+
+# DENY login-handler from accessing detector-anomalias
+---
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: deny-login-handler-to-detector-anomalias
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: detector-anomalias-app
+  action: DENY
+  rules:
+  - from:
+    - source:
+        principals: ["cluster.local/ns/default/sa/login-handler-sa"]
+---
+# DENY login-handler from accessing notificaciones
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: deny-login-handler-to-notificaciones
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: notificaciones-app
+  action: DENY
+  rules:
+  - from:
+    - source:
+        principals: ["cluster.local/ns/default/sa/login-handler-sa"]
+---
+# DENY login-handler from accessing reservas
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: deny-login-handler-to-reservas
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: reservas-app
+  action: DENY
+  rules:
+  - from:
+    - source:
+        principals: ["cluster.local/ns/default/sa/login-handler-sa"]
+---
+# DENY login-handler from accessing hospedajes
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: deny-login-handler-to-hospedajes
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: hospedajes-app
+  action: DENY
+  rules:
+  - from:
+    - source:
+        principals: ["cluster.local/ns/default/sa/login-handler-sa"]
+

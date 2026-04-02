@@ -85,28 +85,90 @@ resource "aws_eks_cluster" "main" {
   }
 }
 
-# ── Node Group ────────────────────────────────────────────────────────────────
-resource "aws_eks_node_group" "main" {
+# ── VPC CNI Addon — enable prefix delegation for more pods per node ───────────
+resource "aws_eks_addon" "vpc_cni" {
+  cluster_name                = aws_eks_cluster.main.name
+  addon_name                  = "vpc-cni"
+  resolve_conflicts_on_update = "OVERWRITE"
+
+  configuration_values = jsonencode({
+    env = {
+      ENABLE_PREFIX_DELEGATION = "true"
+      WARM_PREFIX_TARGET       = "1"
+    }
+  })
+
+  depends_on = [aws_eks_cluster.main]
+}
+
+# ── Node Group: Workloads (microservices + istio) ─────────────────────────────
+resource "aws_eks_node_group" "workloads" {
   cluster_name    = aws_eks_cluster.main.name
-  node_group_name = "${var.project}-${var.environment}-nodes"
+  node_group_name = "${var.project}-${var.environment}-workloads"
   node_role_arn   = aws_iam_role.eks_nodes.arn
   subnet_ids      = var.private_subnets
-  instance_types  = ["t3.medium"]
+  instance_types  = ["t3.large"]
 
   scaling_config {
-    desired_size = 2
+    desired_size = 1
     min_size     = 1
-    max_size     = 4
+    max_size     = 3
   }
 
   update_config {
     max_unavailable = 1
   }
 
+  labels = {
+    role = "workloads"
+  }
+
   depends_on = [
     aws_iam_role_policy_attachment.eks_worker_node,
     aws_iam_role_policy_attachment.eks_cni,
     aws_iam_role_policy_attachment.eks_ecr,
+    aws_eks_addon.vpc_cni,
+  ]
+
+  tags = {
+    Project     = var.project
+    Environment = var.environment
+  }
+}
+
+# ── Node Group: Observability (Prometheus, Grafana, Kiali, Jaeger) ────────────
+resource "aws_eks_node_group" "observability" {
+  cluster_name    = aws_eks_cluster.main.name
+  node_group_name = "${var.project}-${var.environment}-observability"
+  node_role_arn   = aws_iam_role.eks_nodes.arn
+  subnet_ids      = var.private_subnets
+  instance_types  = ["t3.medium"]
+
+  scaling_config {
+    desired_size = 1
+    min_size     = 1
+    max_size     = 2
+  }
+
+  update_config {
+    max_unavailable = 1
+  }
+
+  labels = {
+    role = "observability"
+  }
+
+  taint {
+    key    = "dedicated"
+    value  = "observability"
+    effect = "NO_SCHEDULE"
+  }
+
+  depends_on = [
+    aws_iam_role_policy_attachment.eks_worker_node,
+    aws_iam_role_policy_attachment.eks_cni,
+    aws_iam_role_policy_attachment.eks_ecr,
+    aws_eks_addon.vpc_cni,
   ]
 
   tags = {

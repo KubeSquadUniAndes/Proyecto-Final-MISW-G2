@@ -2,7 +2,14 @@ variable "project" { type = string }
 variable "environment" { type = string }
 variable "vpc_id" { type = string }
 variable "private_subnets" { type = list(string) }
-variable "eks_security_group" { type = string }
+variable "eks_security_group" {
+  type        = string
+  description = "Custom EKS node security group"
+}
+variable "eks_cluster_security_group" {
+  type        = string
+  description = "EKS auto-created cluster security group (used by managed node groups)"
+}
 variable "db_password" {
   type      = string
   sensitive = true
@@ -25,7 +32,7 @@ resource "aws_security_group" "rds" {
     from_port       = 5432
     to_port         = 5432
     protocol        = "tcp"
-    security_groups = [var.eks_security_group]
+    security_groups = [var.eks_security_group, var.eks_cluster_security_group]
   }
 
   egress {

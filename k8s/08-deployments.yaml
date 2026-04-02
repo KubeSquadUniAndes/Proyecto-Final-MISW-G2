@@ -21,6 +21,8 @@ spec:
         app: detector-anomalias-app
         version: v1
     spec:
+      nodeSelector:
+        role: workloads
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -37,39 +39,27 @@ spec:
       initContainers:
       - name: wait-for-postgres
         image: postgres:alpine3.22
-        command: ["sh", "-c", "until pg_isready -h postgresdb-service -p 5432 -U postgres; do echo 'waiting for postgres...'; sleep 2; done"]
+        env:
+        - name: RDS_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: rds-config
+              key: RDS_HOST
+        - name: RDS_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: rds-config
+              key: RDS_PORT
+        command: ["sh", "-c", "until pg_isready -h $RDS_HOST -p $RDS_PORT -U postgres; do echo 'waiting for RDS...'; sleep 2; done"]
       containers:
       - name: detector-anomalias
         image: 780522923809.dkr.ecr.us-east-1.amazonaws.com/travelhub/detectoranomaliasms:latest
         imagePullPolicy: Always
-        env:
-        - name: HOSPEDAJES_MS_URL
-          value: "http://hospedajes-service"
-        - name: POSTGRES_HOST
-          valueFrom:
-            secretKeyRef:
-              name: postgres-credentials
-              key: POSTGRES_HOST
-        - name: POSTGRES_PORT
-          valueFrom:
-            secretKeyRef:
-              name: postgres-credentials
-              key: POSTGRES_PORT
-        - name: POSTGRES_USER
-          valueFrom:
-            secretKeyRef:
-              name: postgres-credentials
-              key: POSTGRES_USER
-        - name: POSTGRES_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: postgres-credentials
-              key: POSTGRES_PASSWORD
-        - name: POSTGRES_DB
-          valueFrom:
-            secretKeyRef:
-              name: postgres-credentials
-              key: POSTGRES_DB
+        envFrom:
+          - configMapRef:
+              name: detector-anomalias-ms-config
+          - secretRef:
+              name: detector-anomalias-ms-secret
         ports:
         - containerPort: 8000
           name: http
@@ -118,6 +108,8 @@ spec:
         app: hospedajes-app
         version: v1
     spec:
+      nodeSelector:
+        role: workloads
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -134,39 +126,27 @@ spec:
       initContainers:
       - name: wait-for-postgres
         image: postgres:alpine3.22
-        command: ["sh", "-c", "until pg_isready -h postgresdb-service -p 5432 -U postgres; do echo 'waiting for postgres...'; sleep 2; done"]
+        env:
+        - name: RDS_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: rds-config
+              key: RDS_HOST
+        - name: RDS_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: rds-config
+              key: RDS_PORT
+        command: ["sh", "-c", "until pg_isready -h $RDS_HOST -p $RDS_PORT -U postgres; do echo 'waiting for RDS...'; sleep 2; done"]
       containers:
       - name: hospedajesms
         image: 780522923809.dkr.ecr.us-east-1.amazonaws.com/travelhub/hospedajesms:latest
         imagePullPolicy: Always
-        env:
-        - name: USERS_MS_URL
-          value: "http://users-service"
-        - name: POSTGRES_HOST
-          valueFrom:
-            secretKeyRef:
-              name: postgres-credentials
-              key: POSTGRES_HOST
-        - name: POSTGRES_PORT
-          valueFrom:
-            secretKeyRef:
-              name: postgres-credentials
-              key: POSTGRES_PORT
-        - name: POSTGRES_USER
-          valueFrom:
-            secretKeyRef:
-              name: postgres-credentials
-              key: POSTGRES_USER
-        - name: POSTGRES_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: postgres-credentials
-              key: POSTGRES_PASSWORD
-        - name: POSTGRES_DB
-          valueFrom:
-            secretKeyRef:
-              name: postgres-credentials
-              key: POSTGRES_DB
+        envFrom:
+          - configMapRef:
+              name: hospedajes-ms-config
+          - secretRef:
+              name: hospedajes-ms-secret
         ports:
         - containerPort: 8000
           name: http
@@ -215,6 +195,9 @@ spec:
         app: login-handler-app
         version: v1
     spec:
+      nodeSelector:
+        role: workloads
+      serviceAccountName: login-handler-sa
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -231,39 +214,27 @@ spec:
       initContainers:
       - name: wait-for-postgres
         image: postgres:alpine3.22
-        command: ["sh", "-c", "until pg_isready -h postgresdb-service -p 5432 -U postgres; do echo 'waiting for postgres...'; sleep 2; done"]
+        env:
+        - name: RDS_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: rds-config
+              key: RDS_HOST
+        - name: RDS_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: rds-config
+              key: RDS_PORT
+        command: ["sh", "-c", "until pg_isready -h $RDS_HOST -p $RDS_PORT -U postgres; do echo 'waiting for RDS...'; sleep 2; done"]
       containers:
       - name: loginhandlerms
-        image: 780522923809.dkr.ecr.us-east-1.amazonaws.com/travelhub/loginhandlerms:latest
+        image: 780522923809.dkr.ecr.us-east-1.amazonaws.com/travelhub/login-handler-ms:latest
         imagePullPolicy: Always
-        env:
-        - name: HOSPEDAJES_MS_URL
-          value: "http://hospedajes-service"
-        - name: POSTGRES_HOST
-          valueFrom:
-            secretKeyRef:
-              name: postgres-credentials
-              key: POSTGRES_HOST
-        - name: POSTGRES_PORT
-          valueFrom:
-            secretKeyRef:
-              name: postgres-credentials
-              key: POSTGRES_PORT
-        - name: POSTGRES_USER
-          valueFrom:
-            secretKeyRef:
-              name: postgres-credentials
-              key: POSTGRES_USER
-        - name: POSTGRES_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: postgres-credentials
-              key: POSTGRES_PASSWORD
-        - name: POSTGRES_DB
-          valueFrom:
-            secretKeyRef:
-              name: postgres-credentials
-              key: POSTGRES_DB
+        envFrom:
+          - configMapRef:
+              name: login-handler-ms-config
+          - secretRef:
+              name: login-handler-ms-secret
         ports:
         - containerPort: 8000
           name: http
@@ -312,6 +283,8 @@ spec:
         app: notificaciones-app
         version: v1
     spec:
+      nodeSelector:
+        role: workloads
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -325,42 +298,16 @@ spec:
                   - notificaciones-app
               topologyKey: kubernetes.io/hostname
       terminationGracePeriodSeconds: 30
-      initContainers:
-      - name: wait-for-postgres
-        image: postgres:alpine3.22
-        command: ["sh", "-c", "until pg_isready -h postgresdb-service -p 5432 -U postgres; do echo 'waiting for postgres...'; sleep 2; done"]
+      # notificaciones-ms has no database — remove init container
       containers:
       - name: notificacionesms
         image: 780522923809.dkr.ecr.us-east-1.amazonaws.com/travelhub/notificacionesms:latest
         imagePullPolicy: Always
-        env:
-        - name: HOSPEDAJES_MS_URL
-          value: "http://hospedajes-service"
-        - name: POSTGRES_HOST
-          valueFrom:
-            secretKeyRef:
-              name: postgres-credentials
-              key: POSTGRES_HOST
-        - name: POSTGRES_PORT
-          valueFrom:
-            secretKeyRef:
-              name: postgres-credentials
-              key: POSTGRES_PORT
-        - name: POSTGRES_USER
-          valueFrom:
-            secretKeyRef:
-              name: postgres-credentials
-              key: POSTGRES_USER
-        - name: POSTGRES_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: postgres-credentials
-              key: POSTGRES_PASSWORD
-        - name: POSTGRES_DB
-          valueFrom:
-            secretKeyRef:
-              name: postgres-credentials
-              key: POSTGRES_DB
+        envFrom:
+          - configMapRef:
+              name: notificaciones-ms-config
+          - secretRef:
+              name: notificaciones-ms-secret
         ports:
         - containerPort: 8000
           name: http
@@ -409,6 +356,8 @@ spec:
         app: reservas-app
         version: v1
     spec:
+      nodeSelector:
+        role: workloads
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -425,39 +374,27 @@ spec:
       initContainers:
       - name: wait-for-postgres
         image: postgres:alpine3.22
-        command: ["sh", "-c", "until pg_isready -h postgresdb-service -p 5432 -U postgres; do echo 'waiting for postgres...'; sleep 2; done"]
+        env:
+        - name: RDS_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: rds-config
+              key: RDS_HOST
+        - name: RDS_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: rds-config
+              key: RDS_PORT
+        command: ["sh", "-c", "until pg_isready -h $RDS_HOST -p $RDS_PORT -U postgres; do echo 'waiting for RDS...'; sleep 2; done"]
       containers:
       - name: reservasms
         image: 780522923809.dkr.ecr.us-east-1.amazonaws.com/travelhub/reservasms:latest
         imagePullPolicy: Always
-        env:
-        - name: HOSPEDAJES_MS_URL
-          value: "http://hospedajes-service"
-        - name: POSTGRES_HOST
-          valueFrom:
-            secretKeyRef:
-              name: postgres-credentials
-              key: POSTGRES_HOST
-        - name: POSTGRES_PORT
-          valueFrom:
-            secretKeyRef:
-              name: postgres-credentials
-              key: POSTGRES_PORT
-        - name: POSTGRES_USER
-          valueFrom:
-            secretKeyRef:
-              name: postgres-credentials
-              key: POSTGRES_USER
-        - name: POSTGRES_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: postgres-credentials
-              key: POSTGRES_PASSWORD
-        - name: POSTGRES_DB
-          valueFrom:
-            secretKeyRef:
-              name: postgres-credentials
-              key: POSTGRES_DB
+        envFrom:
+          - configMapRef:
+              name: reservas-ms-config
+          - secretRef:
+              name: reservas-ms-secret
         ports:
         - containerPort: 8000
           name: http
@@ -506,6 +443,8 @@ spec:
         app: users-app
         version: v1
     spec:
+      nodeSelector:
+        role: workloads
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -522,39 +461,27 @@ spec:
       initContainers:
       - name: wait-for-postgres
         image: postgres:alpine3.22
-        command: ["sh", "-c", "until pg_isready -h postgresdb-service -p 5432 -U postgres; do echo 'waiting for postgres...'; sleep 2; done"]
-      containers:
-      - name: usersms
-        image: 780522923809.dkr.ecr.us-east-1.amazonaws.com/travelhub/usersms:latest
-        imagePullPolicy: Always
         env:
-        - name: HOSPEDAJES_MS_URL
-          value: "http://hospedajes-service"
-        - name: POSTGRES_HOST
+        - name: RDS_HOST
           valueFrom:
-            secretKeyRef:
-              name: postgres-credentials
-              key: POSTGRES_HOST
-        - name: POSTGRES_PORT
+            configMapKeyRef:
+              name: rds-config
+              key: RDS_HOST
+        - name: RDS_PORT
           valueFrom:
-            secretKeyRef:
-              name: postgres-credentials
-              key: POSTGRES_PORT
-        - name: POSTGRES_USER
-          valueFrom:
-            secretKeyRef:
-              name: postgres-credentials
-              key: POSTGRES_USER
-        - name: POSTGRES_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: postgres-credentials
-              key: POSTGRES_PASSWORD
-        - name: POSTGRES_DB
-          valueFrom:
-            secretKeyRef:
-              name: postgres-credentials
-              key: POSTGRES_DB
+            configMapKeyRef:
+              name: rds-config
+              key: RDS_PORT
+        command: ["sh", "-c", "until pg_isready -h $RDS_HOST -p $RDS_PORT -U postgres; do echo 'waiting for RDS...'; sleep 2; done"]
+      containers:
+      - name: users-ms
+        image: 780522923809.dkr.ecr.us-east-1.amazonaws.com/travelhub/users-ms:latest
+        imagePullPolicy: Always
+        envFrom:
+            - configMapRef:
+                name: users-ms-config
+            - secretRef:
+                name: users-ms-secret
         ports:
         - containerPort: 8000
           name: http

@@ -28,7 +28,7 @@ provider "aws" {
 
 # ── VPC ───────────────────────────────────────────────────────────────────────
 module "vpc" {
-  source = "../modules/vpc"
+  source = "../../modules/vpc"
 
   project     = var.project
   environment = var.environment
@@ -37,16 +37,16 @@ module "vpc" {
 
 # ── ECR Repositories ──────────────────────────────────────────────────────────
 module "ecr" {
-  source = "../modules/ecr"
+  source = "../../modules/ecr"
 
   project     = var.project
   environment = var.environment
-  services    = ["users-ms", "login-handler-ms"]
+  services    = ["users-ms", "login-handler-ms", "reservasms", "notificacionesms", "hospedajesms", "detectoranomaliasms"]
 }
 
 # ── EKS Cluster ───────────────────────────────────────────────────────────────
 module "eks" {
-  source = "../modules/eks"
+  source = "../../modules/eks"
 
   project          = var.project
   environment      = var.environment
@@ -58,12 +58,13 @@ module "eks" {
 
 # ── RDS PostgreSQL ────────────────────────────────────────────────────────────
 module "rds" {
-  source = "../modules/rds"
+  source = "../../modules/rds"
 
-  project            = var.project
-  environment        = var.environment
-  vpc_id             = module.vpc.vpc_id
-  private_subnets    = module.vpc.private_subnet_ids
-  eks_security_group = module.eks.node_security_group_id
-  db_password        = var.db_password
+  project                    = var.project
+  environment                = var.environment
+  vpc_id                     = module.vpc.vpc_id
+  private_subnets            = module.vpc.private_subnet_ids
+  eks_security_group         = module.eks.node_security_group_id
+  eks_cluster_security_group = module.eks.cluster_security_group_id
+  db_password                = var.db_password
 }

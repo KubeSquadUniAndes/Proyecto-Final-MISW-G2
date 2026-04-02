@@ -3,12 +3,24 @@ name: Build & Deploy to EKS
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
+    types: [closed]
   workflow_dispatch:
     inputs:
       service:
-        description: 'Service to deploy (users-ms | login-handler-ms | all)'
+        description: 'Service to build & deploy'
         required: true
         default: 'all'
+        type: choice
+        options:
+          - all
+          - users-ms
+          - login-handler-ms
+          - reservasms
+          - detectoranomaliasms
+          - hospedajesms
+          - notificacionesms
 
 env:
   AWS_REGION: us-east-1
@@ -16,13 +28,11 @@ env:
   EKS_CLUSTER: travelhub-prod
 
 jobs:
-  # ── Build & Push users-ms ──────────────────────────────────────────────────
-  build-users-ms:
-    name: Build users-ms
+  # ── Apply k8s manifests on every push/merge to main ───────────────────────
+  apply-k8s-on-main:
+    name: Apply all k8s on main changes
     runs-on: ubuntu-latest
-    if: ${{ github.event.inputs.service == 'users-ms' || github.event.inputs.service == 'all' || github.event_name == 'push' }}
-    outputs:
-      image: ${{ steps.build.outputs.image }}
+    if: ${{ github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true) }}
 
     steps:
       - uses: actions/checkout@v4
@@ -34,9 +44,49 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
+      - name: Configure kubectl
+        run: aws eks update-kubeconfig --region $AWS_REGION --name $EKS_CLUSTER
+
+      - name: Apply k8s manifests in order
+        run: |
+          chmod +x k8s/deploy.sh
+          ./k8s/deploy.sh apply
+
+      - name: Wait for deployments to be ready
+        run: |
+          for deploy in detector-anomalias-deployment hospedajes-deployment login-handler-deployment notificaciones-deployment reservas-deployment users-deployment; do
+            echo "Waiting for $deploy..."
+            kubectl rollout status deployment/$deploy -n default --timeout=180s
+          done
+
+      - name: Run migrations
+        run: |
+          kubectl wait --for=condition=ready pod -l app=login-handler-app -n default --timeout=120s
+          kubectl exec -n default deploy/login-handler-deployment -- python /app/run_migrations.py
+          kubectl wait --for=condition=ready pod -l app=users-app -n default --timeout=120s
+          kubectl exec -n default deploy/users-deployment -- python /app/run_migrations.py
+          kubectl wait --for=condition=ready pod -l app=detector-anomalias-app -n default --timeout=120s
+          kubectl exec -n default deploy/detector-anomalias-deployment -- python /app/run_migrations.py
+          kubectl wait --for=condition=ready pod -l app=reservas-app -n default --timeout=120s
+          kubectl exec -n default deploy/reservas-deployment -- python /app/run_migrations.py
+
+  # ── Build & Push users-ms ─────────────────────────────────────────────────
+  build-users-ms:
+    name: Build users-ms
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' && (github.event.inputs.service == 'users-ms' || github.event.inputs.service == 'all') }}
+    outputs:
+      image: ${{ steps.build.outputs.image }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
       - name: Login to ECR
         uses: aws-actions/amazon-ecr-login@v2
-
       - name: Build and push users-ms
         id: build
         env:
@@ -53,23 +103,19 @@ jobs:
   build-login-handler-ms:
     name: Build login-handler-ms
     runs-on: ubuntu-latest
-    if: ${{ github.event.inputs.service == 'login-handler-ms' || github.event.inputs.service == 'all' || github.event_name == 'push' }}
+    if: ${{ github.event_name == 'workflow_dispatch' && (github.event.inputs.service == 'login-handler-ms' || github.event.inputs.service == 'all') }}
     outputs:
       image: ${{ steps.build.outputs.image }}
-
     steps:
       - uses: actions/checkout@v4
-
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
-
       - name: Login to ECR
         uses: aws-actions/amazon-ecr-login@v2
-
       - name: Build and push login-handler-ms
         id: build
         env:
@@ -82,13 +128,144 @@ jobs:
           docker push $ECR_REGISTRY/travelhub/login-handler-ms:latest
           echo "image=$IMAGE" >> $GITHUB_OUTPUT
 
-  # ── Deploy to EKS ──────────────────────────────────────────────────────────
+  # ── Build & Push reservasms ───────────────────────────────────────────────
+  build-reservasms:
+    name: Build reservasms
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' && (github.event.inputs.service == 'reservasms' || github.event.inputs.service == 'all') }}
+    outputs:
+      image: ${{ steps.build.outputs.image }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Login to ECR
+        uses: aws-actions/amazon-ecr-login@v2
+      - name: Build and push reservasms
+        id: build
+        env:
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          IMAGE=$ECR_REGISTRY/travelhub/reservasms:$IMAGE_TAG
+          docker build -t $IMAGE ./reservas_ms
+          docker push $IMAGE
+          docker tag $IMAGE $ECR_REGISTRY/travelhub/reservasms:latest
+          docker push $ECR_REGISTRY/travelhub/reservasms:latest
+          echo "image=$IMAGE" >> $GITHUB_OUTPUT
+
+  # ── Build & Push detectoranomaliasms ──────────────────────────────────────
+  build-detectoranomaliasms:
+    name: Build detectoranomaliasms
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' && (github.event.inputs.service == 'detectoranomaliasms' || github.event.inputs.service == 'all') }}
+    outputs:
+      image: ${{ steps.build.outputs.image }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Login to ECR
+        uses: aws-actions/amazon-ecr-login@v2
+      - name: Build and push detectoranomaliasms
+        id: build
+        env:
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          IMAGE=$ECR_REGISTRY/travelhub/detectoranomaliasms:$IMAGE_TAG
+          docker build -t $IMAGE ./detector_anomalias_ms
+          docker push $IMAGE
+          docker tag $IMAGE $ECR_REGISTRY/travelhub/detectoranomaliasms:latest
+          docker push $ECR_REGISTRY/travelhub/detectoranomaliasms:latest
+          echo "image=$IMAGE" >> $GITHUB_OUTPUT
+
+  # ── Build & Push hospedajesms ─────────────────────────────────────────────
+  build-hospedajesms:
+    name: Build hospedajesms
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' && (github.event.inputs.service == 'hospedajesms' || github.event.inputs.service == 'all') }}
+    outputs:
+      image: ${{ steps.build.outputs.image }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Login to ECR
+        uses: aws-actions/amazon-ecr-login@v2
+      - name: Build and push hospedajesms
+        id: build
+        env:
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          IMAGE=$ECR_REGISTRY/travelhub/hospedajesms:$IMAGE_TAG
+          docker build -t $IMAGE ./hospedajes_ms
+          docker push $IMAGE
+          docker tag $IMAGE $ECR_REGISTRY/travelhub/hospedajesms:latest
+          docker push $ECR_REGISTRY/travelhub/hospedajesms:latest
+          echo "image=$IMAGE" >> $GITHUB_OUTPUT
+
+  # ── Build & Push notificacionesms ─────────────────────────────────────────
+  build-notificacionesms:
+    name: Build notificacionesms
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' && (github.event.inputs.service == 'notificacionesms' || github.event.inputs.service == 'all') }}
+    outputs:
+      image: ${{ steps.build.outputs.image }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Login to ECR
+        uses: aws-actions/amazon-ecr-login@v2
+      - name: Build and push notificacionesms
+        id: build
+        env:
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          IMAGE=$ECR_REGISTRY/travelhub/notificacionesms:$IMAGE_TAG
+          docker build -t $IMAGE ./notificaciones_ms
+          docker push $IMAGE
+          docker tag $IMAGE $ECR_REGISTRY/travelhub/notificacionesms:latest
+          docker push $ECR_REGISTRY/travelhub/notificacionesms:latest
+          echo "image=$IMAGE" >> $GITHUB_OUTPUT
+
+  # ── Deploy to EKS (after any build completes) ─────────────────────────────
   deploy:
     name: Deploy to EKS
     runs-on: ubuntu-latest
-    needs: [build-users-ms, build-login-handler-ms]
-    if: always() && (needs.build-users-ms.result == 'success' || needs.build-login-handler-ms.result == 'success')
-
+    needs:
+      - build-users-ms
+      - build-login-handler-ms
+      - build-reservasms
+      - build-detectoranomaliasms
+      - build-hospedajesms
+      - build-notificacionesms
+    if: |
+      always() &&
+      github.event_name == 'workflow_dispatch' &&
+      (
+        needs.build-users-ms.result == 'success' ||
+        needs.build-login-handler-ms.result == 'success' ||
+        needs.build-reservasms.result == 'success' ||
+        needs.build-detectoranomaliasms.result == 'success' ||
+        needs.build-hospedajesms.result == 'success' ||
+        needs.build-notificacionesms.result == 'success'
+      )
     steps:
       - uses: actions/checkout@v4
 
@@ -100,37 +277,53 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Configure kubectl
-        run: |
-          aws eks update-kubeconfig --region $AWS_REGION --name $EKS_CLUSTER
+        run: aws eks update-kubeconfig --region $AWS_REGION --name $EKS_CLUSTER
 
-      - name: Deploy shared resources
+      - name: Apply k8s manifests in order
         run: |
-          kubectl apply -f eks/k8s/shared/namespaces.yaml
-          kubectl apply -f eks/k8s/shared/ingress.yaml
+          chmod +x k8s/deploy.sh
+          ./k8s/deploy.sh apply
 
-      - name: Deploy users-ms
-        if: needs.build-users-ms.result == 'success'
-        env:
-          IMAGE_TAG: ${{ github.sha }}
+      - name: Restart deployments to pull new images
         run: |
-          kubectl apply -f eks/k8s/users-ms/users-ms.yaml
-          kubectl set image deployment/users-ms \
-            users-ms=$ECR_REGISTRY/travelhub/users-ms:$IMAGE_TAG \
-            -n users-ms
-          kubectl rollout status deployment/users-ms -n users-ms
+          SERVICES=""
+          if [[ "${{ needs.build-users-ms.result }}" == "success" ]]; then
+            SERVICES="$SERVICES users-deployment"
+          fi
+          if [[ "${{ needs.build-login-handler-ms.result }}" == "success" ]]; then
+            SERVICES="$SERVICES login-handler-deployment"
+          fi
+          if [[ "${{ needs.build-reservasms.result }}" == "success" ]]; then
+            SERVICES="$SERVICES reservas-deployment"
+          fi
+          if [[ "${{ needs.build-detectoranomaliasms.result }}" == "success" ]]; then
+            SERVICES="$SERVICES detector-anomalias-deployment"
+          fi
+          if [[ "${{ needs.build-hospedajesms.result }}" == "success" ]]; then
+            SERVICES="$SERVICES hospedajes-deployment"
+          fi
+          if [[ "${{ needs.build-notificacionesms.result }}" == "success" ]]; then
+            SERVICES="$SERVICES notificaciones-deployment"
+          fi
+          for deploy in $SERVICES; do
+            echo "Restarting $deploy..."
+            kubectl rollout restart deployment/$deploy -n default
+          done
 
-      - name: Deploy login-handler-ms
-        if: needs.build-login-handler-ms.result == 'success'
-        env:
-          IMAGE_TAG: ${{ github.sha }}
+      - name: Wait for deployments to be ready
         run: |
-          kubectl apply -f eks/k8s/login-handler-ms/login-handler-ms.yaml
-          kubectl set image deployment/login-handler-ms \
-            login-handler-ms=$ECR_REGISTRY/travelhub/login-handler-ms:$IMAGE_TAG \
-            -n login-handler-ms
-          kubectl rollout status deployment/login-handler-ms -n login-handler-ms
+          for deploy in detector-anomalias-deployment hospedajes-deployment login-handler-deployment notificaciones-deployment reservas-deployment users-deployment; do
+            echo "Waiting for $deploy..."
+            kubectl rollout status deployment/$deploy -n default --timeout=180s
+          done
 
       - name: Run migrations
         run: |
-          kubectl exec -n login-handler-ms deploy/login-handler-ms -- python /app/run_migrations.py
-          kubectl exec -n users-ms deploy/users-ms -- python /app/run_migrations.py
+          kubectl wait --for=condition=ready pod -l app=login-handler-app -n default --timeout=120s
+          kubectl exec -n default deploy/login-handler-deployment -- python /app/run_migrations.py
+          kubectl wait --for=condition=ready pod -l app=users-app -n default --timeout=120s
+          kubectl exec -n default deploy/users-deployment -- python /app/run_migrations.py
+          kubectl wait --for=condition=ready pod -l app=detector-anomalias-app -n default --timeout=120s
+          kubectl exec -n default deploy/detector-anomalias-deployment -- python /app/run_migrations.py
+          kubectl wait --for=condition=ready pod -l app=reservas-app -n default --timeout=120s
+          kubectl exec -n default deploy/reservas-deployment -- python /app/run_migrations.py
