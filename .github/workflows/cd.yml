@@ -28,57 +28,6 @@ env:
   EKS_CLUSTER: travelhub-prod
 
 jobs:
-  # ── Apply k8s manifests on every push/merge to main (after builds) ────────
-  apply-k8s-on-main:
-    name: Apply all k8s on main changes
-    runs-on: ubuntu-latest
-    needs:
-      - build-users-ms
-      - build-login-handler-ms
-      - build-reservasms
-      - build-detectoranomaliasms
-      - build-hospedajesms
-      - build-notificacionesms
-    if: |
-      always() &&
-      (github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true))
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
-
-      - name: Configure kubectl
-        run: aws eks update-kubeconfig --region $AWS_REGION --name $EKS_CLUSTER
-
-      - name: Apply k8s manifests in order
-        run: |
-          chmod +x k8s/deploy.sh
-          ./k8s/deploy.sh apply
-
-      - name: Wait for deployments to be ready
-        run: |
-          for deploy in detector-anomalias-deployment hospedajes-deployment login-handler-deployment notificaciones-deployment reservas-deployment users-deployment; do
-            echo "Waiting for $deploy..."
-            kubectl rollout status deployment/$deploy -n default --timeout=180s
-          done
-
-      - name: Run migrations
-        run: |
-          kubectl wait --for=condition=ready pod -l app=login-handler-app -n default --timeout=120s
-          kubectl exec -n default deploy/login-handler-deployment -- python /app/run_migrations.py
-          kubectl wait --for=condition=ready pod -l app=users-app -n default --timeout=120s
-          kubectl exec -n default deploy/users-deployment -- python /app/run_migrations.py
-          kubectl wait --for=condition=ready pod -l app=detector-anomalias-app -n default --timeout=120s
-          kubectl exec -n default deploy/detector-anomalias-deployment -- python /app/run_migrations.py
-          kubectl wait --for=condition=ready pod -l app=reservas-app -n default --timeout=120s
-          kubectl exec -n default deploy/reservas-deployment -- python /app/run_migrations.py
-
   # ── Build & Push users-ms ─────────────────────────────────────────────────
   build-users-ms:
     name: Build users-ms
@@ -253,7 +202,7 @@ jobs:
           docker push $ECR_REGISTRY/travelhub/notificacionesms:latest
           echo "image=$IMAGE" >> $GITHUB_OUTPUT
 
-  # ── Deploy to EKS (after any build completes) ─────────────────────────────
+  # ── Deploy to EKS (after builds complete) ─────────────────────────────────
   deploy:
     name: Deploy to EKS
     runs-on: ubuntu-latest
@@ -266,7 +215,6 @@ jobs:
       - build-notificacionesms
     if: |
       always() &&
-      github.event_name == 'workflow_dispatch' &&
       (
         needs.build-users-ms.result == 'success' ||
         needs.build-login-handler-ms.result == 'success' ||
