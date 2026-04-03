@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = "development"
 
     # Database (dedicated DB for this service)
-    DATABASE_URL: str = "postgresql+asyncpg://postgres:postgres@localhost:5433/auth_db"
+    DATABASE_URL: str = "postgresql+asyncpg://postgres:postgres@travelhub-prod-postgres.ci3w0yecas02.us-east-1.rds.amazonaws.com:5433/auth_db"
     DB_ECHO: bool = False
 
     # Server
