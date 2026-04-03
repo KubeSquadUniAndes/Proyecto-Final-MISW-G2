@@ -28,11 +28,20 @@ env:
   EKS_CLUSTER: travelhub-prod
 
 jobs:
-  # ── Apply k8s manifests on every push/merge to main ───────────────────────
+  # ── Apply k8s manifests on every push/merge to main (after builds) ────────
   apply-k8s-on-main:
     name: Apply all k8s on main changes
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true) }}
+    needs:
+      - build-users-ms
+      - build-login-handler-ms
+      - build-reservasms
+      - build-detectoranomaliasms
+      - build-hospedajesms
+      - build-notificacionesms
+    if: |
+      always() &&
+      (github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true))
 
     steps:
       - uses: actions/checkout@v4
@@ -74,7 +83,7 @@ jobs:
   build-users-ms:
     name: Build users-ms
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'workflow_dispatch' && (github.event.inputs.service == 'users-ms' || github.event.inputs.service == 'all') }}
+    if: ${{ github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true) || (github.event_name == 'workflow_dispatch' && (github.event.inputs.service == 'users-ms' || github.event.inputs.service == 'all')) }}
     outputs:
       image: ${{ steps.build.outputs.image }}
     steps:
@@ -103,7 +112,7 @@ jobs:
   build-login-handler-ms:
     name: Build login-handler-ms
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'workflow_dispatch' && (github.event.inputs.service == 'login-handler-ms' || github.event.inputs.service == 'all') }}
+    if: ${{ github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true) || (github.event_name == 'workflow_dispatch' && (github.event.inputs.service == 'login-handler-ms' || github.event.inputs.service == 'all')) }}
     outputs:
       image: ${{ steps.build.outputs.image }}
     steps:
@@ -132,7 +141,7 @@ jobs:
   build-reservasms:
     name: Build reservasms
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'workflow_dispatch' && (github.event.inputs.service == 'reservasms' || github.event.inputs.service == 'all') }}
+    if: ${{ github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true) || (github.event_name == 'workflow_dispatch' && (github.event.inputs.service == 'reservasms' || github.event.inputs.service == 'all')) }}
     outputs:
       image: ${{ steps.build.outputs.image }}
     steps:
@@ -161,7 +170,7 @@ jobs:
   build-detectoranomaliasms:
     name: Build detectoranomaliasms
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'workflow_dispatch' && (github.event.inputs.service == 'detectoranomaliasms' || github.event.inputs.service == 'all') }}
+    if: ${{ github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true) || (github.event_name == 'workflow_dispatch' && (github.event.inputs.service == 'detectoranomaliasms' || github.event.inputs.service == 'all')) }}
     outputs:
       image: ${{ steps.build.outputs.image }}
     steps:
@@ -190,7 +199,7 @@ jobs:
   build-hospedajesms:
     name: Build hospedajesms
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'workflow_dispatch' && (github.event.inputs.service == 'hospedajesms' || github.event.inputs.service == 'all') }}
+    if: ${{ github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true) || (github.event_name == 'workflow_dispatch' && (github.event.inputs.service == 'hospedajesms' || github.event.inputs.service == 'all')) }}
     outputs:
       image: ${{ steps.build.outputs.image }}
     steps:
@@ -219,7 +228,7 @@ jobs:
   build-notificacionesms:
     name: Build notificacionesms
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'workflow_dispatch' && (github.event.inputs.service == 'notificacionesms' || github.event.inputs.service == 'all') }}
+    if: ${{ github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true) || (github.event_name == 'workflow_dispatch' && (github.event.inputs.service == 'notificacionesms' || github.event.inputs.service == 'all')) }}
     outputs:
       image: ${{ steps.build.outputs.image }}
     steps:
