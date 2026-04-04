@@ -327,7 +327,7 @@ terraform init
 terraform plan
 
 # Aplicar (~15 min por el RDS y EKS)
-terraform apply
+./tf-apply.sh
 ```
 
 Guarda los outputs — los necesitas en el siguiente paso:
@@ -340,10 +340,21 @@ terraform output configure_kubectl   # comando para configurar kubectl
 
 ---
 
-## Paso 2 — Instalar Istio Service mmesh - Ambient mode
+## Paso 2 — Configurar kubectl
+
+```bash
+cd ../../../
+aws eks update-kubeconfig --region us-east-1 --name travelhub-prod
+kubectl get nodes  # debe mostrar los nodos
+```
+
+---
+
+## Paso 3 — Instalar Istio Service mmesh - Ambient mode
 
 ```bash
 # Run the Istio installation script
+
 cd ./k8s
 ./install-istio-ambient.sh
 ```
@@ -362,7 +373,6 @@ Reemplaza estos placeholders en `k8s/users-ms/users-ms.yaml` y `k8s/login-handle
 | `CHANGE_ME_USE_LONG_RANDOM_STRING` | JWT secret key seguro |
 | `CHANGE_ME_INTERNAL_KEY` | internal API key |
 
-```bash
 
 ---
 

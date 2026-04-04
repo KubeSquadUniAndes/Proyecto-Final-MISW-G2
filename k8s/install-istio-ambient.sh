@@ -31,7 +31,19 @@ echo "==> Waiting for istiod and ztunnel to become Ready"
 kubectl -n istio-system rollout status deployment/istiod --timeout=10m
 kubectl -n istio-system rollout status daemonset/ztunnel --timeout=10m
 
-echo "==> Step 4/4: Apply standard Gateway API"
+sleep 60
+echo "==> Step 4/5: Apply standard Gateway API"
 kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.2.0/standard-install.yaml
+
+echo "==> Step 5/5: Install observability addons (Kiali, Jaeger, Prometheus, Grafana) into istio-system namespace"
+for ADDON in kiali jaeger prometheus grafana; do
+  ADDON_URL="https://raw.githubusercontent.com/istio/istio/release-1.29.1/samples/addons/${ADDON}.yaml"
+  kubectl apply --server-side -f "${ADDON_URL}"
+done
+
+OBSERVABILITY_PATCH='{"spec":{"template":{"spec":{"nodeSelector":{"role":"observability"},"tolerations":[{"key":"dedicated","operator":"Equal","value":"observability","effect":"NoSchedule"}]}}}}'
+for DEPLOY in kiali jaeger prometheus grafana; do
+  kubectl patch deployment "${DEPLOY}" -n istio-system --type=merge -p "${OBSERVABILITY_PATCH}"
+done
 
 echo "==> Done. Executed README Section 3.2 steps exactly."
