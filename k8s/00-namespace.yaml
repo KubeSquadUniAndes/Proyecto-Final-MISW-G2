@@ -1,8 +1,15 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: default
+  name: workloads
   labels:
-    kubernetes.io/metadata.name: default
+    kubernetes.io/metadata.name: workloads
     istio.io/dataplane-mode: ambient
     istio.io/use-waypoint: waypoint-private
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: observability
+  labels:
+    kubernetes.io/metadata.name: observability

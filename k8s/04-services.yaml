@@ -5,7 +5,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: detector-anomalias-service
-  namespace: default
+  namespace: workloads
   labels:
     app: detector-anomalias-app
     istio.io/use-waypoint: waypoint-private
@@ -26,7 +26,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: users-service
-  namespace: default
+  namespace: workloads
   labels:
     app: users-app
     istio.io/use-waypoint: waypoint-private
@@ -47,7 +47,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: login-handler-service
-  namespace: default
+  namespace: workloads
   labels:
     app: login-handler-app
     istio.io/use-waypoint: waypoint-private
@@ -68,7 +68,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: notificaciones-service
-  namespace: default
+  namespace: workloads
   labels:
     app: notificaciones-app
     istio.io/use-waypoint: waypoint-private
@@ -89,7 +89,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: reservas-service
-  namespace: default
+  namespace: workloads
   labels:
     app: reservas-app
     istio.io/use-waypoint: waypoint-private
@@ -110,7 +110,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: hospedajes-service
-  namespace: default
+  namespace: workloads
   labels:
     app: hospedajes-app
     istio.io/use-waypoint: waypoint-private
@@ -131,7 +131,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: postgresdb-service
-  namespace: default
+  namespace: workloads
   labels:
     app: postgres-db
 spec:

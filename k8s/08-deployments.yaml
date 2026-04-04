@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: detector-anomalias-deployment
-  namespace: default
+  namespace: workloads
   labels:
     app: detector-anomalias-app
 spec:
@@ -89,7 +89,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: hospedajes-deployment
-  namespace: default
+  namespace: workloads
   labels:
     app: hospedajes-app
 spec:
@@ -176,7 +176,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: login-handler-deployment
-  namespace: default
+  namespace: workloads
   labels:
     app: login-handler-app
 spec:
@@ -264,7 +264,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: notificaciones-deployment
-  namespace: default
+  namespace: workloads
   labels:
     app: notificaciones-app
 spec:
@@ -337,7 +337,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: reservas-deployment
-  namespace: default
+  namespace: workloads
   labels:
     app: reservas-app
 spec:
@@ -424,7 +424,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: users-deployment
-  namespace: default
+  namespace: workloads
   labels:
     app: users-app
 spec:

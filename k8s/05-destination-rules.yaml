@@ -11,9 +11,9 @@ apiVersion: networking.istio.io/v1
 kind: DestinationRule
 metadata:
   name: detector-anomalias-dr
-  namespace: default
+  namespace: workloads
 spec:
-  host: detector-anomalias-service.default.svc.cluster.local
+  host: detector-anomalias-service.workloads.svc.cluster.local
   trafficPolicy:
     connectionPool:
       tcp:
@@ -34,9 +34,9 @@ apiVersion: networking.istio.io/v1
 kind: DestinationRule
 metadata:
   name: hospedajes-dr
-  namespace: default
+  namespace: workloads
 spec:
-  host: hospedajes-service.default.svc.cluster.local
+  host: hospedajes-service.workloads.svc.cluster.local
   trafficPolicy:
     connectionPool:
       tcp:
@@ -61,9 +61,9 @@ apiVersion: networking.istio.io/v1
 kind: DestinationRule
 metadata:
   name: login-handler-dr
-  namespace: default
+  namespace: workloads
 spec:
-  host: login-handler-service.default.svc.cluster.local
+  host: login-handler-service.workloads.svc.cluster.local
   trafficPolicy:
     connectionPool:
       tcp:
@@ -84,9 +84,9 @@ apiVersion: networking.istio.io/v1
 kind: DestinationRule
 metadata:
   name: notificaciones-dr
-  namespace: default
+  namespace: workloads
 spec:
-  host: notificaciones-service.default.svc.cluster.local
+  host: notificaciones-service.workloads.svc.cluster.local
   trafficPolicy:
     connectionPool:
       tcp:
@@ -107,9 +107,9 @@ apiVersion: networking.istio.io/v1
 kind: DestinationRule
 metadata:
   name: reservas-dr 
-  namespace: default
+  namespace: workloads
 spec:
-  host: reservas-service.default.svc.cluster.local
+  host: reservas-service.workloads.svc.cluster.local
   trafficPolicy:
     connectionPool:
       tcp:
@@ -130,9 +130,9 @@ apiVersion: networking.istio.io/v1
 kind: DestinationRule
 metadata:
   name: users-dr
-  namespace: default
+  namespace: workloads
 spec:
-  host: users-service.default.svc.cluster.local
+  host: users-service.workloads.svc.cluster.local
   trafficPolicy:
     connectionPool:
       tcp:

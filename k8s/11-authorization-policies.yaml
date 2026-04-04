@@ -9,7 +9,7 @@ apiVersion: security.istio.io/v1
 kind: AuthorizationPolicy
 metadata:
   name: deny-login-handler-to-detector-anomalias
-  namespace: default
+  namespace: workloads
 spec:
   selector:
     matchLabels:
@@ -18,14 +18,14 @@ spec:
   rules:
   - from:
     - source:
-        principals: ["cluster.local/ns/default/sa/login-handler-sa"]
+        principals: ["cluster.local/ns/workloads/sa/login-handler-sa"]
 ---
 # DENY login-handler from accessing notificaciones
 apiVersion: security.istio.io/v1
 kind: AuthorizationPolicy
 metadata:
   name: deny-login-handler-to-notificaciones
-  namespace: default
+  namespace: workloads
 spec:
   selector:
     matchLabels:
@@ -34,14 +34,14 @@ spec:
   rules:
   - from:
     - source:
-        principals: ["cluster.local/ns/default/sa/login-handler-sa"]
+        principals: ["cluster.local/ns/workloads/sa/login-handler-sa"]
 ---
 # DENY login-handler from accessing reservas
 apiVersion: security.istio.io/v1
 kind: AuthorizationPolicy
 metadata:
   name: deny-login-handler-to-reservas
-  namespace: default
+  namespace: workloads
 spec:
   selector:
     matchLabels:
@@ -50,14 +50,14 @@ spec:
   rules:
   - from:
     - source:
-        principals: ["cluster.local/ns/default/sa/login-handler-sa"]
+        principals: ["cluster.local/ns/workloads/sa/login-handler-sa"]
 ---
 # DENY login-handler from accessing hospedajes
 apiVersion: security.istio.io/v1
 kind: AuthorizationPolicy
 metadata:
   name: deny-login-handler-to-hospedajes
-  namespace: default
+  namespace: workloads
 spec:
   selector:
     matchLabels:
@@ -66,5 +66,5 @@ spec:
   rules:
   - from:
     - source:
-        principals: ["cluster.local/ns/default/sa/login-handler-sa"]
+        principals: ["cluster.local/ns/workloads/sa/login-handler-sa"]
 

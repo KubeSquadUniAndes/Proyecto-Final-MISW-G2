@@ -7,7 +7,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: postgres-deployment
-  namespace: default
+  namespace: workloads
   labels:
     app: postgres-db
 spec:

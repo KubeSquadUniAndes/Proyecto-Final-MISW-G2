@@ -7,7 +7,7 @@ apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   name: detector-anomalias-pdb
-  namespace: default
+  namespace: workloads
 spec:
   minAvailable: 1
   selector:
@@ -18,7 +18,7 @@ apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   name: hospedajes-pdb
-  namespace: default
+  namespace: workloads
 spec:
   minAvailable: 1
   selector:
@@ -29,7 +29,7 @@ apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   name: login-handler-pdb
-  namespace: default
+  namespace: workloads
 spec:
   minAvailable: 1
   selector:
@@ -40,7 +40,7 @@ apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   name: notificaciones-pdb
-  namespace: default
+  namespace: workloads
 spec:
   minAvailable: 1
   selector:
@@ -51,7 +51,7 @@ apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   name: reservas-pdb
-  namespace: default
+  namespace: workloads
 spec:
   minAvailable: 1
   selector:
@@ -62,7 +62,7 @@ apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   name: users-pdb
-  namespace: default
+  namespace: workloads
 spec:
   minAvailable: 1
   selector:

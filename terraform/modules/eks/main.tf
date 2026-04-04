@@ -112,7 +112,7 @@ resource "aws_eks_node_group" "workloads" {
   scaling_config {
     desired_size = 1
     min_size     = 1
-    max_size     = 3
+    max_size     = 2
   }
 
   update_config {

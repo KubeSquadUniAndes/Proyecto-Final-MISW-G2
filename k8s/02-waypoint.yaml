@@ -7,7 +7,7 @@ apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
   name: waypoint-private
-  namespace: default
+  namespace: workloads
   labels:
     istio.io/waypoint-for: all
 spec:
