@@ -295,7 +295,7 @@ docker push 780522923809.dkr.ecr.us-east-1.amazonaws.com/travelhub/hospedajesms:
 ```bash
 for ADDON in kiali jaeger prometheus grafana
 do
-    ADDON_URL="https://raw.githubusercontent.com/istio/istio/release-1.20/samples/addons/$ADDON.yaml"
+ADDON_URL="https://raw.githubusercontent.com/istio/istio/release-1.29.1/samples/addons/$ADDON.yaml"
     kubectl apply --server-side -f $ADDON_URL
 done
 ```
@@ -306,4 +306,132 @@ done
 
 ```bash
 kubectl get gateway
+```
+
+# Start the project from scratch
+
+
+## Paso 1 — Crear infraestructura con Terraform
+
+```bash
+cd terraform/envs/prod
+
+# Copiar y editar variables
+cp terraform.tfvars.example terraform.tfvars
+# Edita terraform.tfvars con tu db_password
+
+# Inicializar
+terraform init
+
+# Ver plan
+terraform plan
+
+# Aplicar (~15 min por el RDS y EKS)
+terraform apply
+```
+
+Guarda los outputs — los necesitas en el siguiente paso:
+```bash
+terraform output cluster_name        # travelhub-prod
+terraform output ecr_urls            # URLs de ECR
+terraform output rds_endpoint        # endpoint de RDS (sensitive)
+terraform output configure_kubectl   # comando para configurar kubectl
+```
+
+---
+
+## Paso 2 — Instalar Istio Service mmesh - Ambient mode
+
+```bash
+# Run the Istio installation script
+cd ./k8s
+./install-istio-ambient.sh
+```
+
+
+
+## Paso 4 — Actualizar los manifiestos K8s
+
+Reemplaza estos placeholders en `k8s/users-ms/users-ms.yaml` y `k8s/login-handler-ms/login-handler-ms.yaml`:
+
+| Placeholder | Valor |
+|-------------|-------|
+| `CHANGE_RDS_ENDPOINT` | endpoint de RDS sin el puerto (ej: `travelhub-prod-postgres.xxxx.us-east-1.rds.amazonaws.com`) |
+| `CHANGE_ME` (password) | tu db_password |
+| `CHANGE_AWS_ACCOUNT_ID` | tu AWS Account ID (12 dígitos) |
+| `CHANGE_ME_USE_LONG_RANDOM_STRING` | JWT secret key seguro |
+| `CHANGE_ME_INTERNAL_KEY` | internal API key |
+
+```bash
+
+---
+
+
+## Paso 5 — Crear las bases de datos en RDS
+
+```bash
+# Conectar al RDS (desde dentro del cluster o via bastion)
+kubectl run psql-client --rm -it --image=postgres:16-alpine -- \
+  psql -h CHANGE_RDS_ENDPOINT -U postgres -c "CREATE DATABASE users_db;"
+
+kubectl run psql-client --rm -it --image=postgres:16-alpine -- \
+  psql -h travelhub-prod-postgres.ci3w0yecas02.us-east-1.rds.amazonaws.com -U postgres -c "CREATE DATABASE auth_db;"
+```
+
+---
+## Paso 3 - Apply /k8s files. 
+
+```
+git commit -m 'anything'
+git push
+```
+---
+
+# Obtener Account ID
+aws sts get-caller-identity --query Account --output text
+
+# Obtener RDS endpoint
+cd terraform/envs/prod
+terraform output rds_endpoint
+```
+
+
+
+---
+
+## Paso 8 — CI/CD automático con GitHub Actions
+
+Agrega estos secrets en tu repositorio (Settings → Secrets):
+
+| Secret | Valor |
+|--------|-------|
+| `AWS_ACCESS_KEY_ID` | Access key de un IAM user con permisos EKS + ECR |
+| `AWS_SECRET_ACCESS_KEY` | Secret key |
+| `AWS_ACCOUNT_ID` | Tu AWS Account ID |
+
+Cada push a `main` construye las imágenes, las sube a ECR y despliega en EKS automáticamente.
+
+---
+
+kubectl run psql-create-dbs --image=postgres:alpine3.22 --restart=Never --env="PGPASSWORD=SecurePass123!" --command -- psql -h travelhub-prod-postgres.ci3w0yecas02.us-east-1.rds.amazonaws.com -U postgres -d postgres -c "CREATE DATABASE users_db;" -c "CREATE DATABASE anomalies_db;" -c "CREATE DATABASE auth_db" 2>&1
+
+
+kubectl exec -n default deploy/users-deployment -- python /app/run_migrations.py
+kubectl exec -n default deploy/detector-anomalias-deployment -- python /app/run_migrations.py
+
+
+
+```
+patch_deployments() {
+  local namespace=$1
+  echo "Patching deployments in namespace: $namespace"
+  
+  kubectl get deployment -n "$namespace" -o jsonpath='{.items[*].metadata.name}' | tr ' ' '\n' | while read deploy; do
+    kubectl patch deployment "$deploy" -n "$namespace" --type=merge -p '{"spec":{"template":{"spec":{"nodeSelector":{"role":"observability"},"tolerations":[{"key":"dedicated","operator":"Equal","value":"observability","effect":"NoSchedule"}]}}}}'
+  done
+}
+
+# Patch namespaces
+patch_deployments "istio-system"
+patch_deployments "monitoring" || true
 ```

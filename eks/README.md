@@ -102,7 +102,7 @@ kubectl run psql-client --rm -it --image=postgres:16-alpine -- \
   psql -h CHANGE_RDS_ENDPOINT -U postgres -c "CREATE DATABASE users_db;"
 
 kubectl run psql-client --rm -it --image=postgres:16-alpine -- \
-  psql -h CHANGE_RDS_ENDPOINT -U postgres -c "CREATE DATABASE login_handler_db;"
+  psql -h travelhub-prod-postgres.ci3w0yecas02.us-east-1.rds.amazonaws.com -U postgres -c "CREATE DATABASE auth_db;"
 ```
 
 ---
