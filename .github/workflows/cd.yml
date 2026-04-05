@@ -250,18 +250,18 @@ jobs:
           if [[ "${{ needs.build-login-handler-ms.result }}" == "success" ]]; then
             SERVICES="$SERVICES login-handler-deployment"
           fi
-          if [[ "${{ needs.build-reservasms.result }}" == "success" ]]; then
-            SERVICES="$SERVICES reservas-deployment"
-          fi
-          if [[ "${{ needs.build-detectoranomaliasms.result }}" == "success" ]]; then
-            SERVICES="$SERVICES detector-anomalias-deployment"
-          fi
+          #if [[ "${{ needs.build-reservasms.result }}" == "success" ]]; then
+          #  SERVICES="$SERVICES reservas-deployment"
+          #fi
+          #if [[ "${{ needs.build-detectoranomaliasms.result }}" == "success" ]]; then
+          #  SERVICES="$SERVICES detector-anomalias-deployment"
+          #fi
           if [[ "${{ needs.build-hospedajesms.result }}" == "success" ]]; then
             SERVICES="$SERVICES hospedajes-deployment"
           fi
-          if [[ "${{ needs.build-notificacionesms.result }}" == "success" ]]; then
-            SERVICES="$SERVICES notificaciones-deployment"
-          fi
+          #if [[ "${{ needs.build-notificacionesms.result }}" == "success" ]]; then
+          #  SERVICES="$SERVICES notificaciones-deployment"
+          #fi
           for deploy in $SERVICES; do
             echo "Restarting $deploy..."
             kubectl rollout restart deployment/$deploy -n workloads
@@ -269,7 +269,8 @@ jobs:
 
       - name: Wait for deployments to be ready
         run: |
-          for deploy in detector-anomalias-deployment hospedajes-deployment login-handler-deployment notificaciones-deployment reservas-deployment users-deployment; do
+        # notificaciones-deployment reservas-deployment detector-anomalias-deployment
+          for deploy in hospedajes-deployment login-handler-deployment users-deployment; do
             echo "Waiting for $deploy..."
             kubectl rollout status deployment/$deploy -n workloads --timeout=180s
           done
@@ -280,7 +281,7 @@ jobs:
           kubectl exec -n workloads deploy/login-handler-deployment -- python /app/run_migrations.py
           kubectl wait --for=condition=ready pod -l app=users-app -n workloads --timeout=120s
           kubectl exec -n workloads deploy/users-deployment -- python /app/run_migrations.py
-          kubectl wait --for=condition=ready pod -l app=detector-anomalias-app -n workloads --timeout=120s
-          kubectl exec -n workloads deploy/detector-anomalias-deployment -- python /app/run_migrations.py
-          kubectl wait --for=condition=ready pod -l app=reservas-app -n workloads --timeout=120s
-          kubectl exec -n workloads deploy/reservas-deployment -- python /app/run_migrations.py
+          # kubectl wait --for=condition=ready pod -l app=detector-anomalias-app -n workloads --timeout=120s
+          # kubectl exec -n workloads deploy/detector-anomalias-deployment -- python /app/run_migrations.py
+          # kubectl wait --for=condition=ready pod -l app=reservas-app -n workloads --timeout=120s
+          # kubectl exec -n workloads deploy/reservas-deployment -- python /app/run_migrations.py
