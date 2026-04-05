@@ -359,7 +359,11 @@ cd ./k8s
 ./install-istio-ambient.sh
 ```
 
+1. Check gateway status:
 
+```bash
+kubectl get gateway -n workloads
+```
 
 ## Paso 4 — Actualizar los manifiestos K8s
 
