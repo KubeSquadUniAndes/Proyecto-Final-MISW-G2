@@ -264,7 +264,7 @@ jobs:
           fi
           for deploy in $SERVICES; do
             echo "Restarting $deploy..."
-            kubectl rollout restart deployment/$deploy -n default
+            kubectl rollout restart deployment/$deploy -n workloads
           done
 
       - name: Wait for deployments to be ready
