@@ -269,7 +269,7 @@ jobs:
 
       - name: Wait for deployments to be ready
         run: |
-        # notificaciones-deployment reservas-deployment detector-anomalias-deployment
+          # notificaciones-deployment reservas-deployment detector-anomalias-deployment
           for deploy in hospedajes-deployment login-handler-deployment users-deployment; do
             echo "Waiting for $deploy..."
             kubectl rollout status deployment/$deploy -n workloads --timeout=180s
