@@ -271,16 +271,16 @@ jobs:
         run: |
           for deploy in detector-anomalias-deployment hospedajes-deployment login-handler-deployment notificaciones-deployment reservas-deployment users-deployment; do
             echo "Waiting for $deploy..."
-            kubectl rollout status deployment/$deploy -n default --timeout=180s
+            kubectl rollout status deployment/$deploy -n workloads --timeout=180s
           done
 
       - name: Run migrations
         run: |
-          kubectl wait --for=condition=ready pod -l app=login-handler-app -n default --timeout=120s
-          kubectl exec -n default deploy/login-handler-deployment -- python /app/run_migrations.py
-          kubectl wait --for=condition=ready pod -l app=users-app -n default --timeout=120s
-          kubectl exec -n default deploy/users-deployment -- python /app/run_migrations.py
-          kubectl wait --for=condition=ready pod -l app=detector-anomalias-app -n default --timeout=120s
-          kubectl exec -n default deploy/detector-anomalias-deployment -- python /app/run_migrations.py
-          kubectl wait --for=condition=ready pod -l app=reservas-app -n default --timeout=120s
-          kubectl exec -n default deploy/reservas-deployment -- python /app/run_migrations.py
+          kubectl wait --for=condition=ready pod -l app=login-handler-app -n workloads --timeout=120s
+          kubectl exec -n workloads deploy/login-handler-deployment -- python /app/run_migrations.py
+          kubectl wait --for=condition=ready pod -l app=users-app -n workloads --timeout=120s
+          kubectl exec -n workloads deploy/users-deployment -- python /app/run_migrations.py
+          kubectl wait --for=condition=ready pod -l app=detector-anomalias-app -n workloads --timeout=120s
+          kubectl exec -n workloads deploy/detector-anomalias-deployment -- python /app/run_migrations.py
+          kubectl wait --for=condition=ready pod -l app=reservas-app -n workloads --timeout=120s
+          kubectl exec -n workloads deploy/reservas-deployment -- python /app/run_migrations.py

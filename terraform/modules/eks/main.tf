@@ -131,8 +131,10 @@ resource "aws_eks_node_group" "workloads" {
   ]
 
   tags = {
-    Project     = var.project
-    Environment = var.environment
+    Project                                                          = var.project
+    Environment                                                      = var.environment
+    "k8s.io/cluster-autoscaler/enabled"                              = "true"
+    "k8s.io/cluster-autoscaler/${var.project}-${var.environment}"    = "owned"
   }
 }
 
@@ -142,7 +144,7 @@ resource "aws_eks_node_group" "observability" {
   node_group_name = "${var.project}-${var.environment}-observability"
   node_role_arn   = aws_iam_role.eks_nodes.arn
   subnet_ids      = var.private_subnets
-  instance_types  = ["t3.medium"]
+  instance_types  = ["t3.micro"]
 
   scaling_config {
     desired_size = 1
