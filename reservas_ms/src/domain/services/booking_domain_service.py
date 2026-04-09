@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 
-from src.domain.entities.booking import Booking, BookingStatus
+from src.domain.entities.booking import BookingStatus
 from src.domain.repositories.booking_repository_port import BookingRepositoryPort
 
 

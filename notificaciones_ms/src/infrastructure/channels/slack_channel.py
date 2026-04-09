@@ -27,13 +27,25 @@ async def send_slack(dto: SendNotificationDTO) -> bool:
             {
                 "color": color,
                 "fields": [
-                    {"title": "User ID",       "value": str(dto.user_id),    "short": True},
-                    {"title": "Booking ID",    "value": str(dto.booking_id), "short": True},
-                    {"title": "Anomaly Type",  "value": dto.anomaly_type,    "short": True},
-                    {"title": "Severity",      "value": dto.severity.upper(),"short": True},
-                    {"title": "Score",         "value": f"{dto.score:.2f} / 1.00", "short": True},
-                    {"title": "Detected At",   "value": dto.detected_at.isoformat(), "short": True},
-                    {"title": "Description",   "value": dto.description,     "short": False},
+                    {"title": "User ID", "value": str(dto.user_id), "short": True},
+                    {
+                        "title": "Booking ID",
+                        "value": str(dto.booking_id),
+                        "short": True,
+                    },
+                    {"title": "Anomaly Type", "value": dto.anomaly_type, "short": True},
+                    {"title": "Severity", "value": dto.severity.upper(), "short": True},
+                    {
+                        "title": "Score",
+                        "value": f"{dto.score:.2f} / 1.00",
+                        "short": True,
+                    },
+                    {
+                        "title": "Detected At",
+                        "value": dto.detected_at.isoformat(),
+                        "short": True,
+                    },
+                    {"title": "Description", "value": dto.description, "short": False},
                 ],
                 "footer": "notificaciones_ms",
             }

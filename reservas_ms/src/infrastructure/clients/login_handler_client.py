@@ -5,13 +5,13 @@ On each protected request, reservas_ms calls this client to:
 2. Call login_handler_ms GET /api/v1/auth/me to verify the user is not blocked
    (the user could have been blocked after the token was issued).
 """
+
 import logging
 from uuid import UUID
 
 import httpx
 import jwt
 
-from src.infrastructure.config.settings import settings
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +29,9 @@ class LoginHandlerClient:
         Raises ValueError on any failure.
         """
         try:
-            payload = jwt.decode(token, self._jwt_secret, algorithms=[self._jwt_algorithm])
+            payload = jwt.decode(
+                token, self._jwt_secret, algorithms=[self._jwt_algorithm]
+            )
             if payload.get("type") != "access":
                 raise ValueError("Token is not an access token")
             return payload
@@ -57,7 +59,9 @@ class LoginHandlerClient:
                 return response.json()
         except (httpx.ConnectError, httpx.TimeoutException) as exc:
             logger.error("login_handler_ms unreachable: %s", exc)
-            raise ConnectionError("Authentication service is unavailable. Try again later.")
+            raise ConnectionError(
+                "Authentication service is unavailable. Try again later."
+            )
 
     async def validate(self, token: str) -> UUID:
         """Full validation: local decode + remote status check.

@@ -1,5 +1,7 @@
 from src.application.dtos.auth_dto import BlockUserDTO, MessageDTO
-from src.domain.repositories.refresh_token_repository_port import RefreshTokenRepositoryPort
+from src.domain.repositories.refresh_token_repository_port import (
+    RefreshTokenRepositoryPort,
+)
 from src.domain.repositories.user_repository_port import UserRepositoryPort
 
 

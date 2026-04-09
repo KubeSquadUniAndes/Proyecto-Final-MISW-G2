@@ -58,10 +58,13 @@ class CreateBookingUseCase:
                 if result.get("is_anomalous"):
                     logger.warning(
                         "create_booking_anomaly booking_id=%s action=%s",
-                        booking.id, result.get("action_taken"),
+                        booking.id,
+                        result.get("action_taken"),
                     )
             except Exception as exc:
-                logger.error("anomaly_check_failed booking_id=%s error=%s", booking.id, exc)
+                logger.error(
+                    "anomaly_check_failed booking_id=%s error=%s", booking.id, exc
+                )
                 raise ValueError("Error anomaly_check_failed")
 
         # 5. Persist the booking

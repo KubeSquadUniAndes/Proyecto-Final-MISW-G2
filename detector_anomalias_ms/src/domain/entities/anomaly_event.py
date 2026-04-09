@@ -5,10 +5,10 @@ from uuid import UUID, uuid4
 
 
 class AnomalyType(str, Enum):
-    HIGH_FREQUENCY = "high_frequency"       # Too many bookings in a short window
-    UNUSUAL_DURATION = "unusual_duration"   # Booking duration outside normal range
-    MULTI_RESOURCE = "multi_resource"       # Many different resources in a short window
-    RANDOM_SAMPLE = "random_sample"         # Triggered by configurable random sampling
+    HIGH_FREQUENCY = "high_frequency"  # Too many bookings in a short window
+    UNUSUAL_DURATION = "unusual_duration"  # Booking duration outside normal range
+    MULTI_RESOURCE = "multi_resource"  # Many different resources in a short window
+    RANDOM_SAMPLE = "random_sample"  # Triggered by configurable random sampling
 
 
 class AnomalySeverity(str, Enum):
@@ -23,7 +23,7 @@ class AnomalyEvent:
     booking_id: UUID
     anomaly_type: AnomalyType
     severity: AnomalySeverity
-    score: float                            # 0.0 – 1.0, higher = more anomalous
+    score: float  # 0.0 – 1.0, higher = more anomalous
     description: str
     id: UUID = field(default_factory=uuid4)
     resolved: bool = False

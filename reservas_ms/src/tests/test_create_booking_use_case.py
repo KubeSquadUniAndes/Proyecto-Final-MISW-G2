@@ -1,4 +1,5 @@
 """Tests for the CreateBooking use case using mocks."""
+
 from datetime import datetime, timedelta
 from unittest.mock import AsyncMock
 from uuid import uuid4
@@ -41,7 +42,9 @@ def use_case(mock_repo):
 
 
 @pytest.mark.asyncio
-async def test_create_booking_success(use_case, mock_repo, user_id, resource_id, valid_times):
+async def test_create_booking_success(
+    use_case, mock_repo, user_id, resource_id, valid_times
+):
     start_time, end_time = valid_times
 
     # Arrange

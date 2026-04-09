@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from fastapi import Depends, Header, HTTPException, Security, status
+from fastapi import Header, HTTPException, Security, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from src.infrastructure.config.settings import settings

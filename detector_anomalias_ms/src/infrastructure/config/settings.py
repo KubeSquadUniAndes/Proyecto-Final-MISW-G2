@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     DB_ECHO: bool = False
 
     # Server
-    HOST: str = "0.0.0.0"
+    HOST: str = "0.0.0.0"  # nosec B104
     PORT: int = 8002
     WORKERS: int = 1
 

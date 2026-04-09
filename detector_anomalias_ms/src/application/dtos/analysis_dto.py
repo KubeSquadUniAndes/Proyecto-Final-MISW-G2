@@ -8,6 +8,7 @@ from src.domain.entities.anomaly_event import AnomalyType, AnomalySeverity
 
 # ── Request DTOs ─────────────────────────────────────────────────────────────
 
+
 class AnalyzeBookingDTO(BaseModel):
     user_id: UUID
     booking_id: UUID
@@ -17,6 +18,7 @@ class AnalyzeBookingDTO(BaseModel):
 
 
 # ── Response DTOs ─────────────────────────────────────────────────────────────
+
 
 class AnomalyEventDTO(BaseModel):
     id: UUID
@@ -36,5 +38,5 @@ class AnalysisResultDTO(BaseModel):
     is_anomalous: bool
     anomaly_count: int
     events: list[AnomalyEventDTO]
-    action_taken: str                      # "none" | "user_blocked" | "alert_sent"
+    action_taken: str  # "none" | "user_blocked" | "alert_sent"
     message: str
