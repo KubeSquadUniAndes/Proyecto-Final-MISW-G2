@@ -53,21 +53,21 @@ jobs:
 
       # ── Lint ────────────────────────────────────────────────────────────────
       - name: Lint (ruff)
-        run: ruff check ${{ matrix.src_path }}
+        run: python -m ruff check ${{ matrix.src_path }}
 
       - name: Format check (ruff)
-        run: ruff format --check ${{ matrix.src_path }}
+        run: python -m ruff format --check ${{ matrix.src_path }}
 
       # ── Type check ──────────────────────────────────────────────────────────
       - name: Type check (mypy)
-        run: mypy ${{ matrix.mypy_path }}
+        run: python -m mypy ${{ matrix.mypy_path }}
 
       # ── Security ────────────────────────────────────────────────────────────
       - name: SAST (bandit)
-        run: bandit -r ${{ matrix.src_path }} -ll -q
+        run: python -m bandit -r ${{ matrix.src_path }} -ll -q
 
       - name: Dependency vulnerabilities (pip-audit)
-        run: pip-audit -r requirements.txt --skip-editable --ignore-vuln CVE-2026-4539
+        run: python -m pip_audit -r requirements.txt --skip-editable --ignore-vuln CVE-2026-4539
 
       # ── Unit tests + coverage ────────────────────────────────────────────────
       - name: Unit tests
@@ -75,7 +75,7 @@ jobs:
           DEBUG: "false"
           PYTHONPATH: ${{ github.workspace }}/${{ matrix.service }}
         run: |
-          pytest ${{ matrix.test_path }} \
+          python -m pytest ${{ matrix.test_path }} \
             --cov=${{ matrix.src_path }} \
             --cov-config=.coveragerc \
             --cov-report=term-missing \
