@@ -60,7 +60,7 @@ jobs:
 
       # ── Type check ──────────────────────────────────────────────────────────
       - name: Type check (mypy)
-        run: python -m mypy ${{ matrix.mypy_path }}
+        run: python -m mypy ${{ matrix.mypy_path }} --explicit-package-bases
 
       # ── Security ────────────────────────────────────────────────────────────
       - name: SAST (bandit)
