@@ -1,0 +1,49 @@
+{
+  "id": "travelhub-env",
+  "name": "TravelHub - EKS",
+  "values": [
+    {
+      "key": "base_url",
+      "value": "http://ac579e79af7f644ea9a28fcf0b880a47-b476310f4eeda9e2.elb.us-east-1.amazonaws.com",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "test_email",
+      "value": "newman.test@example.com",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "test_password",
+      "value": "SecurePass123!",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "access_token",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "refresh_token",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "user_id",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "internal_api_key",
+      "value": "secure_internal_api",
+      "type": "default",
+      "enabled": true
+    }
+  ],
+  "_postman_variable_scope": "environment"
+}

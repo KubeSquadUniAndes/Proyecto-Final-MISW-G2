@@ -89,3 +89,31 @@ jobs:
         with:
           name: coverage-${{ matrix.service }}
           path: ${{ matrix.service }}/coverage.xml
+
+  # ── E2E tests with Newman (solo en push a main, requiere EKS desplegado) ────
+  e2e:
+    name: E2E Tests (Newman)
+    runs-on: ubuntu-latest
+    needs: ci
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install Newman
+        run: npm install -g newman newman-reporter-htmlextra
+
+      - name: Run Newman tests
+        run: |
+          newman run postman/travelhub-collection.json \
+            -e postman/travelhub-environment.json \
+            --env-var base_url=${{ secrets.EKS_BASE_URL }} \
+            -r cli,htmlextra \
+            --reporter-htmlextra-export postman/report.html \
+            --bail
+
+      - name: Upload Newman report
+        uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: newman-report
+          path: postman/report.html

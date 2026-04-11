@@ -392,60 +392,56 @@ kubectl run psql-client --rm -it --image=postgres:16-alpine -- \
   psql -h travelhub-prod-postgres.ci3w0yecas02.us-east-1.rds.amazonaws.com -U postgres -c "CREATE DATABASE auth_db;"
 ```
 
----
-## Paso 3 - Apply /k8s files. 
-
-```
-git commit -m 'anything'
-git push
-```
----
-
-# Obtener Account ID
-aws sts get-caller-identity --query Account --output text
-
-# Obtener RDS endpoint
-cd terraform/envs/prod
-terraform output rds_endpoint
-```
-
-
 
 ---
 
-## Paso 8 — CI/CD automático con GitHub Actions
+# Pruebas con Newman (Postman)
 
-Agrega estos secrets en tu repositorio (Settings → Secrets):
+### Prerequisitos
 
-| Secret | Valor |
-|--------|-------|
-| `AWS_ACCESS_KEY_ID` | Access key de un IAM user con permisos EKS + ECR |
-| `AWS_SECRET_ACCESS_KEY` | Secret key |
-| `AWS_ACCOUNT_ID` | Tu AWS Account ID |
+```bash
+npm install -g newman
+```
 
-Cada push a `main` construye las imágenes, las sube a ECR y despliega en EKS automáticamente.
+### Ejecutar la colección completa
+
+```bash
+newman run postman/travelhub-collection.json -e postman/travelhub-environment.json
+```
+
+### Ejecutar con reporte HTML (opcional)
+
+```bash
+npm install -g newman-reporter-htmlextra
+newman run postman/travelhub-collection.json -e postman/travelhub-environment.json -r htmlextra --reporter-htmlextra-export postman/report.html
+```
+
+### Archivos
+
+| Archivo | Descripción |
+|---|---|
+| `postman/travelhub-collection.json` | Colección con todos los requests y tests |
+| `postman/travelhub-environment.json` | Variables de entorno (base_url, tokens, etc.) |
+
+### Cobertura de tests
+
+| # | Endpoint | Escenario |
+|---|---|---|
+| 1 | `GET /users/health` | Health check users-ms |
+| 2 | `POST /users/register` | Registro exitoso — valida `user_type: traveler` |
+| 3 | `POST /users/register` | Email duplicado → 409 |
+| 4 | `POST /users/register` | Password corta → 422 |
+| 5 | `GET /login-handler/health` | Health check login-handler-ms |
+| 6 | `POST /auth/login` | Login exitoso — guarda tokens en env |
+| 7 | `POST /auth/login` | Credenciales inválidas → 401 |
+| 8 | `GET /auth/me` | Perfil autenticado — valida `role: traveler` |
+| 9 | `GET /auth/me` | Sin token → 403 |
+| 10 | `POST /auth/refresh-token` | Rotación de tokens |
+| 11 | `POST /auth/block-user` | Bloqueo de usuario con API key válida |
+| 12 | `POST /auth/login` | Usuario bloqueado → 403 |
+| 13 | `POST /auth/block-user` | API key inválida → 403 |
+| 14 | `POST /auth/logout` | Logout exitoso |
+
+> Los tests están encadenados — el token del login se propaga automáticamente a los requests siguientes mediante variables de entorno.
 
 ---
-
-kubectl run psql-create-dbs --image=postgres:alpine3.22 --restart=Never --env="PGPASSWORD=SecurePass123!" --command -- psql -h travelhub-prod-postgres.ci3w0yecas02.us-east-1.rds.amazonaws.com -U postgres -d postgres -c "CREATE DATABASE users_db;" -c "CREATE DATABASE anomalies_db;" -c "CREATE DATABASE auth_db" 2>&1
-
-
-kubectl exec -n default deploy/users-deployment -- python /app/run_migrations.py
-kubectl exec -n default deploy/detector-anomalias-deployment -- python /app/run_migrations.py
-
-
-
-```
-patch_deployments() {
-  local namespace=$1
-  echo "Patching deployments in namespace: $namespace"
-  
-  kubectl get deployment -n "$namespace" -o jsonpath='{.items[*].metadata.name}' | tr ' ' '\n' | while read deploy; do
-    kubectl patch deployment "$deploy" -n "$namespace" --type=merge -p '{"spec":{"template":{"spec":{"nodeSelector":{"role":"observability"},"tolerations":[{"key":"dedicated","operator":"Equal","value":"observability","effect":"NoSchedule"}]}}}}'
-  done
-}
-
-# Patch namespaces
-patch_deployments "istio-system"
-patch_deployments "monitoring" || true
-```

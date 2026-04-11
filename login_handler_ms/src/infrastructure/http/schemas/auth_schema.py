@@ -3,13 +3,14 @@ from uuid import UUID
 
 from pydantic import BaseModel, EmailStr, field_validator
 
-from src.domain.entities.user import UserStatus
+from src.domain.entities.user import UserRole, UserStatus
 
 
 class RegisterRequest(BaseModel):
     email: EmailStr
     password: str
     full_name: str | None = None
+    role: UserRole | None = None
 
     @field_validator("password")
     @classmethod
@@ -64,6 +65,7 @@ class UserResponse(BaseModel):
     full_name: str | None
     status: UserStatus
     is_superuser: bool
+    role: UserRole | None
     created_at: datetime
     updated_at: datetime
 
