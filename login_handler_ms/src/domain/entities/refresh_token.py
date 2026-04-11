@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 from uuid import UUID, uuid4
 
 
@@ -16,4 +16,4 @@ class RefreshToken:
         self.revoked = True
 
     def is_valid(self) -> bool:
-        return not self.revoked and datetime.utcnow() < self.expires_at
+        return not self.revoked and datetime.now(timezone.utc) < self.expires_at
