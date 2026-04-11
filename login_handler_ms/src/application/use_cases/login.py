@@ -29,7 +29,8 @@ class LoginUseCase:
         if not user.is_active():
             raise PermissionError("User account is inactive")
 
-        access_token = self._jwt.create_access_token(user.id)
+        extra_claims = {"role": user.role.value} if user.role else {}
+        access_token = self._jwt.create_access_token(user.id, extra_claims=extra_claims)
         raw_refresh, expires_at = self._jwt.create_refresh_token(user.id)
 
         token_entity = RefreshToken(

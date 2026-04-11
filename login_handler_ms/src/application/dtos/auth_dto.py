@@ -3,7 +3,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, EmailStr
 
-from src.domain.entities.user import UserStatus
+from src.domain.entities.user import UserRole, UserStatus
 
 
 # ── Request DTOs ─────────────────────────────────────────────────────────────
@@ -12,6 +12,7 @@ class RegisterUserDTO(BaseModel):
     email: EmailStr
     password: str
     full_name: str | None = None
+    role: UserRole | None = None
 
 
 class LoginDTO(BaseModel):
@@ -36,6 +37,7 @@ class UserResponseDTO(BaseModel):
     full_name: str | None
     status: UserStatus
     is_superuser: bool
+    role: UserRole | None
     created_at: datetime
     updated_at: datetime
 

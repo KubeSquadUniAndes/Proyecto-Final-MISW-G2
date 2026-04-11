@@ -3,7 +3,7 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.domain.entities.user import User, UserStatus
+from src.domain.entities.user import User, UserRole, UserStatus
 from src.domain.repositories.user_repository_port import UserRepositoryPort
 from src.infrastructure.database.models.user_model import UserModel
 
@@ -22,6 +22,7 @@ class SQLAlchemyUserRepository(UserRepositoryPort):
             full_name=model.full_name,
             status=UserStatus(model.status),
             is_superuser=model.is_superuser,
+            role=UserRole(model.role) if model.role else None,
             created_at=model.created_at,
             updated_at=model.updated_at,
         )
@@ -34,6 +35,7 @@ class SQLAlchemyUserRepository(UserRepositoryPort):
             full_name=user.full_name,
             status=user.status,
             is_superuser=user.is_superuser,
+            role=user.role,
             created_at=user.created_at,
             updated_at=user.updated_at,
         )

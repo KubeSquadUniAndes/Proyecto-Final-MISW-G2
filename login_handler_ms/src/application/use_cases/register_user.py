@@ -27,6 +27,7 @@ class RegisterUserUseCase:
             email=dto.email,
             hashed_password=hashed,
             full_name=dto.full_name,
+            role=dto.role,
         )
         saved = await self._user_repo.save(user)
         return UserResponseDTO(
@@ -35,6 +36,7 @@ class RegisterUserUseCase:
             full_name=saved.full_name,
             status=saved.status,
             is_superuser=saved.is_superuser,
+            role=saved.role,
             created_at=saved.created_at,
             updated_at=saved.updated_at,
         )

@@ -5,7 +5,7 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 
 from src.infrastructure.database.base import Base
-from src.domain.entities.user import UserStatus
+from src.domain.entities.user import UserRole, UserStatus
 
 
 class UserModel(Base):
@@ -21,6 +21,11 @@ class UserModel(Base):
         default=UserStatus.ACTIVE,
     )
     is_superuser = Column(Boolean, nullable=False, default=False)
+    role = Column(
+        Enum(UserRole, name="user_role_enum", values_callable=lambda x: [e.value for e in x]),
+        nullable=True,
+        default=None,
+    )
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = Column(
         DateTime(timezone=True),
