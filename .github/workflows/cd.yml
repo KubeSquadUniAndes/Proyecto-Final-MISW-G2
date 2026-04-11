@@ -281,3 +281,45 @@ jobs:
           # kubectl exec -n workloads deploy/detector-anomalias-deployment -- python /app/run_migrations.py
           # kubectl wait --for=condition=ready pod -l app=reservas-app -n workloads --timeout=120s
           # kubectl exec -n workloads deploy/reservas-deployment -- python /app/run_migrations.py
+
+  # ── E2E tests with Newman (después del deploy) ────────────────────────────
+  e2e:
+    name: E2E Tests (Newman)
+    runs-on: ubuntu-latest
+    needs: deploy
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Get NLB endpoint
+        id: nlb
+        run: |
+          aws eks update-kubeconfig --region $AWS_REGION --name $EKS_CLUSTER
+          BASE_URL=$(kubectl get svc travelhub-gateway-istio -n workloads \
+            -o jsonpath='http://{.status.loadBalancer.ingress[0].hostname}')
+          echo "base_url=$BASE_URL" >> $GITHUB_OUTPUT
+
+      - name: Install Newman
+        run: npm install -g newman newman-reporter-htmlextra
+
+      - name: Run Newman tests
+        run: |
+          newman run postman/travelhub-collection.json \
+            -e postman/travelhub-environment.json \
+            --env-var base_url=${{ steps.nlb.outputs.base_url }} \
+            -r cli,htmlextra \
+            --reporter-htmlextra-export postman/report.html \
+            --bail
+
+      - name: Upload Newman report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: newman-report-cd
+          path: postman/report.html
