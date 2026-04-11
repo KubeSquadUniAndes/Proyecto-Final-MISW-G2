@@ -1,11 +1,11 @@
 """HTTP client adapter: calls detector_anomalias_ms to analyze bookings."""
+
 import logging
 from datetime import datetime
 from uuid import UUID
 
 import httpx
 
-from src.infrastructure.config.settings import settings
 
 logger = logging.getLogger(__name__)
 
@@ -48,13 +48,16 @@ class AnomalyDetectorClient:
                 if result.get("is_anomalous"):
                     logger.warning(
                         "anomaly_detected booking_id=%s user_id=%s action=%s",
-                        booking_id, user_id, result.get("action_taken"),
+                        booking_id,
+                        user_id,
+                        result.get("action_taken"),
                     )
                 return result
         except httpx.HTTPStatusError as exc:
             logger.error(
                 "detector_http_error booking_id=%s status=%s",
-                booking_id, exc.response.status_code,
+                booking_id,
+                exc.response.status_code,
             )
             return {"is_anomalous": False, "error": str(exc)}
         except Exception as exc:

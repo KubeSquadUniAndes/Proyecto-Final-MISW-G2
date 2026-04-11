@@ -8,16 +8,13 @@ class RefreshTokenRepositoryPort(ABC):
     """Output port: defines the contract for RefreshToken persistence."""
 
     @abstractmethod
-    async def save(self, token: RefreshToken) -> RefreshToken:
-        ...
+    async def save(self, token: RefreshToken) -> RefreshToken: ...
 
     @abstractmethod
-    async def get_by_token(self, token: str) -> RefreshToken | None:
-        ...
+    async def get_by_token(self, token: str) -> RefreshToken | None: ...
 
     @abstractmethod
-    async def revoke_by_token(self, token: str) -> bool:
-        ...
+    async def revoke_by_token(self, token: str) -> bool: ...
 
     @abstractmethod
     async def revoke_all_by_user(self, user_id: UUID) -> int:

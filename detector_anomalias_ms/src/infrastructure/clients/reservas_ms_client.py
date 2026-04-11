@@ -4,11 +4,14 @@ For the experiment, this returns stub values (0) so the random sampler
 is the primary anomaly trigger. Wire up a real httpx client when
 reservas_ms exposes the required query endpoints.
 """
+
 import logging
 from datetime import datetime
 from uuid import UUID
 
-from src.domain.repositories.booking_history_repository_port import BookingHistoryRepositoryPort
+from src.domain.repositories.booking_history_repository_port import (
+    BookingHistoryRepositoryPort,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -31,5 +34,7 @@ class ReservasMsBookingHistoryClient(BookingHistoryRepositoryPort):
 
     async def count_distinct_resources(self, user_id: UUID, since: datetime) -> int:
         # TODO: GET {base_url}/api/v1/bookings/distinct-resources?user_id={user_id}&since={since}
-        logger.debug("stub: count_distinct_resources user_id=%s since=%s", user_id, since)
+        logger.debug(
+            "stub: count_distinct_resources user_id=%s since=%s", user_id, since
+        )
         return 0

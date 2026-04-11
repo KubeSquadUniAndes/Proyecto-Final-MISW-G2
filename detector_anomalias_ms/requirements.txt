@@ -2,7 +2,7 @@
 greenlet>=3.0.0
 
 # Web framework
-fastapi==0.115.6
+fastapi==0.121.0
 uvicorn[standard]==0.32.1
 
 # Database
@@ -21,3 +21,9 @@ httpx==0.28.1
 pytest==8.3.4
 pytest-asyncio==0.24.0
 pytest-cov==6.0.0
+
+# Dev tools
+ruff==0.8.4
+mypy==1.13.0
+bandit==1.8.3
+pip-audit==2.9.0

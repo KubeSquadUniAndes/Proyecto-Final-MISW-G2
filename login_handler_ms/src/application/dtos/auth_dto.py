@@ -8,6 +8,7 @@ from src.domain.entities.user import UserStatus
 
 # ── Request DTOs ─────────────────────────────────────────────────────────────
 
+
 class RegisterUserDTO(BaseModel):
     email: EmailStr
     password: str
@@ -29,6 +30,7 @@ class BlockUserDTO(BaseModel):
 
 
 # ── Response DTOs ─────────────────────────────────────────────────────────────
+
 
 class UserResponseDTO(BaseModel):
     id: UUID

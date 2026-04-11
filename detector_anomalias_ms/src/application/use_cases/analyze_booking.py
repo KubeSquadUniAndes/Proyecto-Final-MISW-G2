@@ -1,8 +1,14 @@
 import logging
 
-from src.application.dtos.analysis_dto import AnalysisResultDTO, AnalyzeBookingDTO, AnomalyEventDTO
+from src.application.dtos.analysis_dto import (
+    AnalysisResultDTO,
+    AnalyzeBookingDTO,
+    AnomalyEventDTO,
+)
 from src.domain.entities.booking_analysis import BookingAnalysisRequest
-from src.domain.repositories.anomaly_event_repository_port import AnomalyEventRepositoryPort
+from src.domain.repositories.anomaly_event_repository_port import (
+    AnomalyEventRepositoryPort,
+)
 from src.domain.repositories.notification_port import NotificationPort
 from src.domain.services.anomaly_detector_service import AnomalyDetectorService
 
@@ -49,7 +55,8 @@ class AnalyzeBookingUseCase:
         if not is_anomalous:
             logger.info(
                 "booking_analysis=clean user_id=%s booking_id=%s",
-                dto.user_id, dto.booking_id,
+                dto.user_id,
+                dto.booking_id,
             )
             return AnalysisResultDTO(
                 booking_id=dto.booking_id,
@@ -68,8 +75,12 @@ class AnalyzeBookingUseCase:
             logger.warning(
                 "anomaly_detected type=%s severity=%s score=%.2f "
                 "user_id=%s booking_id=%s description=%r",
-                event.anomaly_type, event.severity, event.score,
-                event.user_id, event.booking_id, event.description,
+                event.anomaly_type,
+                event.severity,
+                event.score,
+                event.user_id,
+                event.booking_id,
+                event.description,
             )
 
         # ── Step 2b: Block user via login_handler_ms ──────────────────────────
@@ -77,17 +88,18 @@ class AnalyzeBookingUseCase:
         block_success = await self._notification.block_user(dto.user_id, reason)
         if block_success:
             action_taken = "user_blocked"
-            logger.warning(
-                "user_blocked user_id=%s reason=%r", dto.user_id, reason
-            )
+            logger.warning("user_blocked user_id=%s reason=%r", dto.user_id, reason)
         else:
             logger.error(
-                "block_user_failed user_id=%s — login_handler_ms unreachable", dto.user_id
+                "block_user_failed user_id=%s — login_handler_ms unreachable",
+                dto.user_id,
             )
 
         # ── Step 2c: Send security alert email ───────────────────────────────
         highest_severity_event = max(saved_events, key=lambda e: e.score)
-        email_sent = await self._notification.send_security_alert_email(highest_severity_event)
+        email_sent = await self._notification.send_security_alert_email(
+            highest_severity_event
+        )
         if email_sent:
             action_taken = "user_blocked_and_alerted" if block_success else "alert_sent"
             logger.info("security_alert_email_sent user_id=%s", dto.user_id)
@@ -98,16 +110,19 @@ class AnalyzeBookingUseCase:
             booking_id=dto.booking_id,
             is_anomalous=True,
             anomaly_count=len(saved_events),
-            events=[AnomalyEventDTO(
-                id=e.id,
-                user_id=e.user_id,
-                booking_id=e.booking_id,
-                anomaly_type=e.anomaly_type,
-                severity=e.severity,
-                score=e.score,
-                description=e.description,
-                created_at=e.created_at,
-            ) for e in saved_events],
+            events=[
+                AnomalyEventDTO(
+                    id=e.id,
+                    user_id=e.user_id,
+                    booking_id=e.booking_id,
+                    anomaly_type=e.anomaly_type,
+                    severity=e.severity,
+                    score=e.score,
+                    description=e.description,
+                    created_at=e.created_at,
+                )
+                for e in saved_events
+            ],
             action_taken=action_taken,
             message=(
                 f"Anomaly detected ({len(saved_events)} rule(s) triggered). "

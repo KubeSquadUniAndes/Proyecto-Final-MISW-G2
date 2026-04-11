@@ -1,5 +1,7 @@
 from src.application.dtos.auth_dto import MessageDTO, RefreshTokenDTO
-from src.domain.repositories.refresh_token_repository_port import RefreshTokenRepositoryPort
+from src.domain.repositories.refresh_token_repository_port import (
+    RefreshTokenRepositoryPort,
+)
 
 
 class LogoutUseCase:

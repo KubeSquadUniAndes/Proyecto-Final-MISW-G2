@@ -37,6 +37,7 @@ def _make_repos(db: AsyncSession):
 
 # ── POST /bookings/ ────────────────────────────────────────────────────────────
 
+
 @router.post(
     "/",
     response_model=BookingResponse,
@@ -58,7 +59,9 @@ async def create_booking(
     Requires a valid JWT — if the user is blocked, returns 403.
     """
     repo, domain_service = _make_repos(db)
-    use_case = CreateBookingUseCase(repo, domain_service, anomaly_client=_anomaly_client)
+    use_case = CreateBookingUseCase(
+        repo, domain_service, anomaly_client=_anomaly_client
+    )
     try:
         dto = CreateBookingDTO(
             user_id=user_id,
@@ -74,6 +77,7 @@ async def create_booking(
 
 
 # ── PATCH /bookings/{booking_id} ───────────────────────────────────────────────
+
 
 @router.patch(
     "/{booking_id}",
@@ -98,7 +102,9 @@ async def update_booking(
     Requires a valid JWT — if the user is blocked, returns 403.
     """
     repo, domain_service = _make_repos(db)
-    use_case = UpdateBookingUseCase(repo, domain_service, anomaly_client=_anomaly_client)
+    use_case = UpdateBookingUseCase(
+        repo, domain_service, anomaly_client=_anomaly_client
+    )
     try:
         dto = UpdateBookingDTO(
             booking_id=booking_id,

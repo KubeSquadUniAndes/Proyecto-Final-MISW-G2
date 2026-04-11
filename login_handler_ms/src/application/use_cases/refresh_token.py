@@ -1,9 +1,9 @@
-from datetime import datetime
-
 from src.application.dtos.auth_dto import RefreshTokenDTO, TokenResponseDTO
 from src.application.dtos.jwt_service_port import JWTServicePort
 from src.domain.entities.refresh_token import RefreshToken
-from src.domain.repositories.refresh_token_repository_port import RefreshTokenRepositoryPort
+from src.domain.repositories.refresh_token_repository_port import (
+    RefreshTokenRepositoryPort,
+)
 from src.domain.repositories.user_repository_port import UserRepositoryPort
 
 
