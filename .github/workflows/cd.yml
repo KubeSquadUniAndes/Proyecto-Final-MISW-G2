@@ -90,7 +90,7 @@ jobs:
   build-reservasms:
     name: Build reservasms
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true) || (github.event_name == 'workflow_dispatch' && (github.event.inputs.service == 'reservasms' || github.event.inputs.service == 'all')) }}
+    if: false # temporalmente deshabilitado
     outputs:
       image: ${{ steps.build.outputs.image }}
     steps:
@@ -119,7 +119,7 @@ jobs:
   build-detectoranomaliasms:
     name: Build detectoranomaliasms
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true) || (github.event_name == 'workflow_dispatch' && (github.event.inputs.service == 'detectoranomaliasms' || github.event.inputs.service == 'all')) }}
+    if: false # temporalmente deshabilitado
     outputs:
       image: ${{ steps.build.outputs.image }}
     steps:
@@ -148,7 +148,7 @@ jobs:
   build-hospedajesms:
     name: Build hospedajesms
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true) || (github.event_name == 'workflow_dispatch' && (github.event.inputs.service == 'hospedajesms' || github.event.inputs.service == 'all')) }}
+    if: false # temporalmente deshabilitado
     outputs:
       image: ${{ steps.build.outputs.image }}
     steps:
@@ -177,7 +177,7 @@ jobs:
   build-notificacionesms:
     name: Build notificacionesms
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true) || (github.event_name == 'workflow_dispatch' && (github.event.inputs.service == 'notificacionesms' || github.event.inputs.service == 'all')) }}
+    if: false # temporalmente deshabilitado
     outputs:
       image: ${{ steps.build.outputs.image }}
     steps:
@@ -209,19 +209,15 @@ jobs:
     needs:
       - build-users-ms
       - build-login-handler-ms
-      - build-reservasms
-      - build-detectoranomaliasms
-      - build-hospedajesms
-      - build-notificacionesms
+      # - build-reservasms          # temporalmente deshabilitado
+      # - build-detectoranomaliasms # temporalmente deshabilitado
+      # - build-hospedajesms        # temporalmente deshabilitado
+      # - build-notificacionesms    # temporalmente deshabilitado
     if: |
       always() &&
       (
         needs.build-users-ms.result == 'success' ||
-        needs.build-login-handler-ms.result == 'success' ||
-        needs.build-reservasms.result == 'success' ||
-        needs.build-detectoranomaliasms.result == 'success' ||
-        needs.build-hospedajesms.result == 'success' ||
-        needs.build-notificacionesms.result == 'success'
+        needs.build-login-handler-ms.result == 'success'
       )
     steps:
       - uses: actions/checkout@v4
@@ -256,9 +252,9 @@ jobs:
           #if [[ "${{ needs.build-detectoranomaliasms.result }}" == "success" ]]; then
           #  SERVICES="$SERVICES detector-anomalias-deployment"
           #fi
-          if [[ "${{ needs.build-hospedajesms.result }}" == "success" ]]; then
-            SERVICES="$SERVICES hospedajes-deployment"
-          fi
+          # if [[ "${{ needs.build-hospedajesms.result }}" == "success" ]]; then
+          #   SERVICES="$SERVICES hospedajes-deployment"
+          # fi
           #if [[ "${{ needs.build-notificacionesms.result }}" == "success" ]]; then
           #  SERVICES="$SERVICES notificaciones-deployment"
           #fi
@@ -269,8 +265,8 @@ jobs:
 
       - name: Wait for deployments to be ready
         run: |
-          # notificaciones-deployment reservas-deployment detector-anomalias-deployment
-          for deploy in hospedajes-deployment login-handler-deployment users-deployment; do
+          # notificaciones-deployment reservas-deployment detector-anomalias-deployment hospedajes-deployment
+          for deploy in login-handler-deployment users-deployment; do
             echo "Waiting for $deploy..."
             kubectl rollout status deployment/$deploy -n workloads --timeout=180s
           done
@@ -285,3 +281,45 @@ jobs:
           # kubectl exec -n workloads deploy/detector-anomalias-deployment -- python /app/run_migrations.py
           # kubectl wait --for=condition=ready pod -l app=reservas-app -n workloads --timeout=120s
           # kubectl exec -n workloads deploy/reservas-deployment -- python /app/run_migrations.py
+
+  # ── E2E tests with Newman (después del deploy) ────────────────────────────
+  e2e:
+    name: E2E Tests (Newman)
+    runs-on: ubuntu-latest
+    needs: deploy
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Get NLB endpoint
+        id: nlb
+        run: |
+          aws eks update-kubeconfig --region $AWS_REGION --name $EKS_CLUSTER
+          BASE_URL=$(kubectl get svc travelhub-gateway-istio -n workloads \
+            -o jsonpath='http://{.status.loadBalancer.ingress[0].hostname}')
+          echo "base_url=$BASE_URL" >> $GITHUB_OUTPUT
+
+      - name: Install Newman
+        run: npm install -g newman newman-reporter-htmlextra
+
+      - name: Run Newman tests
+        run: |
+          newman run postman/travelhub-collection.json \
+            -e postman/travelhub-environment.json \
+            --env-var base_url=${{ steps.nlb.outputs.base_url }} \
+            -r cli,htmlextra \
+            --reporter-htmlextra-export postman/report.html \
+            --bail
+
+      - name: Upload Newman report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: newman-report-cd
+          path: postman/report.html

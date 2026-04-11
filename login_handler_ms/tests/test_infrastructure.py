@@ -2,7 +2,7 @@
 import os
 os.environ.setdefault("DATABASE_URL", "postgresql+asyncpg://x:x@localhost/x")
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from unittest.mock import AsyncMock, MagicMock, patch
 from uuid import uuid4
 
@@ -143,17 +143,17 @@ def test_user_unblock_not_blocked():
 # ── RefreshToken entity ───────────────────────────────────────────────────────
 
 def test_refresh_token_valid():
-    t = RefreshToken(user_id=uuid4(), token="tok", expires_at=datetime.utcnow() + timedelta(days=1))
+    t = RefreshToken(user_id=uuid4(), token="tok", expires_at=datetime.now(timezone.utc) + timedelta(days=1))
     assert t.is_valid() is True
 
 
 def test_refresh_token_expired():
-    t = RefreshToken(user_id=uuid4(), token="tok", expires_at=datetime.utcnow() - timedelta(days=1))
+    t = RefreshToken(user_id=uuid4(), token="tok", expires_at=datetime.now(timezone.utc) - timedelta(days=1))
     assert t.is_valid() is False
 
 
 def test_refresh_token_revoked():
-    t = RefreshToken(user_id=uuid4(), token="tok", expires_at=datetime.utcnow() + timedelta(days=1))
+    t = RefreshToken(user_id=uuid4(), token="tok", expires_at=datetime.now(timezone.utc) + timedelta(days=1))
     t.revoke()
     assert t.is_valid() is False
 
@@ -263,7 +263,7 @@ async def test_register_endpoint_success(app):
     from src.application.dtos.auth_dto import UserResponseDTO
     mock_result = UserResponseDTO(
         id=uuid4(), email="new@test.com", full_name=None,
-        status=UserStatus.ACTIVE, is_superuser=False,
+        status=UserStatus.ACTIVE, is_superuser=False, role=None,
         created_at=datetime.utcnow(), updated_at=datetime.utcnow(),
     )
     mock_session = AsyncMock()

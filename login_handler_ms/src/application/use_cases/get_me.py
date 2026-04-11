@@ -21,6 +21,7 @@ class GetMeUseCase:
             full_name=user.full_name,
             status=user.status,
             is_superuser=user.is_superuser,
+            role=user.role,
             created_at=user.created_at,
             updated_at=user.updated_at,
         )

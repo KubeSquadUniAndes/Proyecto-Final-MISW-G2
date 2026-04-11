@@ -14,6 +14,7 @@ class LoginHandlerClient:
         email: str,
         password: str,
         full_name: str,
+        role: str,
     ) -> None:
         """
         Creates a user entry in login_handler_ms so they can log in.
@@ -24,6 +25,7 @@ class LoginHandlerClient:
             "email": email,
             "password": password,
             "full_name": full_name,
+            "role": role,
         }
 
         async with httpx.AsyncClient(timeout=10.0) as client:

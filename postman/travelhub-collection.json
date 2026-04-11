@@ -1,0 +1,430 @@
+{
+  "info": {
+    "name": "TravelHub - Auth & Users",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [],
+  "item": [
+    {
+      "name": "Users MS",
+      "item": [
+        {
+          "name": "Health Check",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/users/health"
+          }
+        },
+        {
+          "name": "Registrar usuario (traveler)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const timestamp = Date.now();",
+                  "pm.environment.set('test_email', `newman.${timestamp}@example.com`);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Respuesta contiene campos requeridos', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('id');",
+                  "  pm.expect(body).to.have.property('email');",
+                  "  pm.expect(body).to.have.property('user_type');",
+                  "  pm.expect(body.user_type).to.eql('traveler');",
+                  "});",
+                  "",
+                  "pm.test('Email coincide con el enviado', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.email).to.eql(pm.environment.get('test_email'));",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "  const body = pm.response.json();",
+                  "  pm.environment.set('user_id', body.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/users/api/v1/users/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"first_name\": \"Newman\",\n  \"last_name\": \"Test\",\n  \"email\": \"{{test_email}}\",\n  \"phone\": \"+57 300 000 0000\",\n  \"country\": \"Colombia\",\n  \"city\": \"Bogotá\",\n  \"birth_date\": \"1995-01-01\",\n  \"password\": \"{{test_password}}\",\n  \"user_type\": \"traveler\",\n  \"identification_type\": \"CC\",\n  \"identification_number\": \"1111111111\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Registrar usuario - email duplicado (debe fallar)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 409 Conflict', function () {",
+                  "  pm.response.to.have.status(409);",
+                  "});",
+                  "",
+                  "pm.test('Mensaje de error presente', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('detail');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/users/api/v1/users/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"first_name\": \"Newman\",\n  \"last_name\": \"Test\",\n  \"email\": \"{{test_email}}\",\n  \"phone\": \"+57 300 000 0000\",\n  \"country\": \"Colombia\",\n  \"city\": \"Bogotá\",\n  \"birth_date\": \"1995-01-01\",\n  \"password\": \"{{test_password}}\",\n  \"user_type\": \"traveler\",\n  \"identification_type\": \"CC\",\n  \"identification_number\": \"1111111111\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Registrar usuario - password corta (debe fallar)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 422 Unprocessable Entity', function () {",
+                  "  pm.response.to.have.status(422);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/users/api/v1/users/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"first_name\": \"Newman\",\n  \"last_name\": \"Test\",\n  \"email\": \"otro@example.com\",\n  \"phone\": \"+57 300 000 0000\",\n  \"country\": \"Colombia\",\n  \"city\": \"Bogotá\",\n  \"birth_date\": \"1995-01-01\",\n  \"password\": \"123\",\n  \"user_type\": \"traveler\",\n  \"identification_type\": \"CC\",\n  \"identification_number\": \"2222222222\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Login Handler MS",
+      "item": [
+        {
+          "name": "Health Check",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/login-handler/health"
+          }
+        },
+        {
+          "name": "Login - credenciales válidas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Retorna access_token y refresh_token', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('access_token');",
+                  "  pm.expect(body).to.have.property('refresh_token');",
+                  "  pm.expect(body.token_type).to.eql('bearer');",
+                  "});",
+                  "",
+                  "const body = pm.response.json();",
+                  "pm.environment.set('access_token', body.access_token);",
+                  "pm.environment.set('refresh_token', body.refresh_token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/login-handler/api/v1/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{test_email}}\",\n  \"password\": \"{{test_password}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login - credenciales inválidas (debe fallar)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 401 Unauthorized', function () {",
+                  "  pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "pm.test('Mensaje de error presente', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('detail');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/login-handler/api/v1/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{test_email}}\",\n  \"password\": \"wrong_password\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Me - token válido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Retorna perfil con rol', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('id');",
+                  "  pm.expect(body).to.have.property('email');",
+                  "  pm.expect(body).to.have.property('role');",
+                  "  pm.expect(body.role).to.eql('traveler');",
+                  "  pm.expect(body).to.have.property('status');",
+                  "  pm.expect(body.status).to.eql('active');",
+                  "});",
+                  "",
+                  "const body = pm.response.json();",
+                  "pm.environment.set('user_id', body.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": "{{base_url}}/login-handler/api/v1/auth/me"
+          }
+        },
+        {
+          "name": "Get Me - sin token (debe fallar)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 403 Forbidden', function () {",
+                  "  pm.response.to.have.status(403);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/login-handler/api/v1/auth/me"
+          }
+        },
+        {
+          "name": "Refresh Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Retorna nuevos tokens', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('access_token');",
+                  "  pm.expect(body).to.have.property('refresh_token');",
+                  "});",
+                  "",
+                  "const body = pm.response.json();",
+                  "pm.environment.set('access_token', body.access_token);",
+                  "pm.environment.set('refresh_token', body.refresh_token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/login-handler/api/v1/auth/refresh-token",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh_token\": \"{{refresh_token}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Block User - API key válida",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Mensaje de confirmación', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('message');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-Api-Key", "value": "{{internal_api_key}}" }
+            ],
+            "url": "{{base_url}}/login-handler/api/v1/auth/block-user",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": \"{{user_id}}\",\n  \"reason\": \"Newman test block\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login - usuario bloqueado (debe fallar)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 403 Forbidden', function () {",
+                  "  pm.response.to.have.status(403);",
+                  "});",
+                  "",
+                  "pm.test('Indica que la cuenta está bloqueada', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.detail).to.include('blocked');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/login-handler/api/v1/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{test_email}}\",\n  \"password\": \"{{test_password}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Block User - API key inválida (debe fallar)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 403 Forbidden', function () {",
+                  "  pm.response.to.have.status(403);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-Api-Key", "value": "wrong_key" }
+            ],
+            "url": "{{base_url}}/login-handler/api/v1/auth/block-user",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": \"{{user_id}}\",\n  \"reason\": \"test\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Mensaje de confirmación', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('message');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/login-handler/api/v1/auth/logout",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh_token\": \"{{refresh_token}}\"\n}"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

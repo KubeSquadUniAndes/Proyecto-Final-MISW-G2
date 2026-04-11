@@ -10,6 +10,11 @@ class UserStatus(str, Enum):
     INACTIVE = "inactive"
 
 
+class UserRole(str, Enum):
+    TRAVELER = "traveler"
+    HOTEL = "hotel"
+
+
 @dataclass
 class User:
     email: str
@@ -18,6 +23,7 @@ class User:
     full_name: str | None = None
     status: UserStatus = UserStatus.ACTIVE
     is_superuser: bool = False
+    role: UserRole | None = None
     created_at: datetime = field(default_factory=datetime.utcnow)
     updated_at: datetime = field(default_factory=datetime.utcnow)
 
