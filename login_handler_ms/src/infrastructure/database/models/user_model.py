@@ -22,7 +22,11 @@ class UserModel(Base):
     )
     is_superuser = Column(Boolean, nullable=False, default=False)
     role = Column(
-        Enum(UserRole, name="user_role_enum", values_callable=lambda x: [e.value for e in x]),
+        Enum(
+            UserRole,
+            name="user_role_enum",
+            values_callable=lambda x: [e.value for e in x],
+        ),
         nullable=True,
         default=None,
     )
