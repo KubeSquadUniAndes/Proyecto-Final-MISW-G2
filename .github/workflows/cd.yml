@@ -90,7 +90,7 @@ jobs:
   build-reservasms:
     name: Build reservasms
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true) || (github.event_name == 'workflow_dispatch' && (github.event.inputs.service == 'reservasms' || github.event.inputs.service == 'all')) }}
+    if: false # temporalmente deshabilitado
     outputs:
       image: ${{ steps.build.outputs.image }}
     steps:
@@ -119,7 +119,7 @@ jobs:
   build-detectoranomaliasms:
     name: Build detectoranomaliasms
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true) || (github.event_name == 'workflow_dispatch' && (github.event.inputs.service == 'detectoranomaliasms' || github.event.inputs.service == 'all')) }}
+    if: false # temporalmente deshabilitado
     outputs:
       image: ${{ steps.build.outputs.image }}
     steps:
@@ -148,7 +148,7 @@ jobs:
   build-hospedajesms:
     name: Build hospedajesms
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true) || (github.event_name == 'workflow_dispatch' && (github.event.inputs.service == 'hospedajesms' || github.event.inputs.service == 'all')) }}
+    if: false # temporalmente deshabilitado
     outputs:
       image: ${{ steps.build.outputs.image }}
     steps:
@@ -177,7 +177,7 @@ jobs:
   build-notificacionesms:
     name: Build notificacionesms
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true) || (github.event_name == 'workflow_dispatch' && (github.event.inputs.service == 'notificacionesms' || github.event.inputs.service == 'all')) }}
+    if: false # temporalmente deshabilitado
     outputs:
       image: ${{ steps.build.outputs.image }}
     steps:
@@ -209,19 +209,15 @@ jobs:
     needs:
       - build-users-ms
       - build-login-handler-ms
-      - build-reservasms
-      - build-detectoranomaliasms
-      - build-hospedajesms
-      - build-notificacionesms
+      # - build-reservasms          # temporalmente deshabilitado
+      # - build-detectoranomaliasms # temporalmente deshabilitado
+      # - build-hospedajesms        # temporalmente deshabilitado
+      # - build-notificacionesms    # temporalmente deshabilitado
     if: |
       always() &&
       (
         needs.build-users-ms.result == 'success' ||
-        needs.build-login-handler-ms.result == 'success' ||
-        needs.build-reservasms.result == 'success' ||
-        needs.build-detectoranomaliasms.result == 'success' ||
-        needs.build-hospedajesms.result == 'success' ||
-        needs.build-notificacionesms.result == 'success'
+        needs.build-login-handler-ms.result == 'success'
       )
     steps:
       - uses: actions/checkout@v4
@@ -256,9 +252,9 @@ jobs:
           #if [[ "${{ needs.build-detectoranomaliasms.result }}" == "success" ]]; then
           #  SERVICES="$SERVICES detector-anomalias-deployment"
           #fi
-          if [[ "${{ needs.build-hospedajesms.result }}" == "success" ]]; then
-            SERVICES="$SERVICES hospedajes-deployment"
-          fi
+          # if [[ "${{ needs.build-hospedajesms.result }}" == "success" ]]; then
+          #   SERVICES="$SERVICES hospedajes-deployment"
+          # fi
           #if [[ "${{ needs.build-notificacionesms.result }}" == "success" ]]; then
           #  SERVICES="$SERVICES notificaciones-deployment"
           #fi
@@ -269,8 +265,8 @@ jobs:
 
       - name: Wait for deployments to be ready
         run: |
-          # notificaciones-deployment reservas-deployment detector-anomalias-deployment
-          for deploy in hospedajes-deployment login-handler-deployment users-deployment; do
+          # notificaciones-deployment reservas-deployment detector-anomalias-deployment hospedajes-deployment
+          for deploy in login-handler-deployment users-deployment; do
             echo "Waiting for $deploy..."
             kubectl rollout status deployment/$deploy -n workloads --timeout=180s
           done
