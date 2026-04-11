@@ -4,7 +4,9 @@ from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.domain.entities.refresh_token import RefreshToken
-from src.domain.repositories.refresh_token_repository_port import RefreshTokenRepositoryPort
+from src.domain.repositories.refresh_token_repository_port import (
+    RefreshTokenRepositoryPort,
+)
 from src.infrastructure.database.models.refresh_token_model import RefreshTokenModel
 
 

@@ -3,7 +3,9 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from src.infrastructure.config.settings import settings
 from src.infrastructure.http.routes.health_router import router as health_router
-from src.infrastructure.http.routes.notification_router import router as notification_router
+from src.infrastructure.http.routes.notification_router import (
+    router as notification_router,
+)
 
 
 def create_app() -> FastAPI:

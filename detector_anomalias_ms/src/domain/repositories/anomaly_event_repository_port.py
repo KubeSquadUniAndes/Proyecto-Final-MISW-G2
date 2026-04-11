@@ -8,12 +8,10 @@ class AnomalyEventRepositoryPort(ABC):
     """Output port: persists and queries anomaly events."""
 
     @abstractmethod
-    async def save(self, event: AnomalyEvent) -> AnomalyEvent:
-        ...
+    async def save(self, event: AnomalyEvent) -> AnomalyEvent: ...
 
     @abstractmethod
-    async def list_by_user(self, user_id: UUID) -> list[AnomalyEvent]:
-        ...
+    async def list_by_user(self, user_id: UUID) -> list[AnomalyEvent]: ...
 
     @abstractmethod
     async def count_recent_by_user(self, user_id: UUID, since: object) -> int:

@@ -42,7 +42,9 @@ class NotificationAdapter(NotificationPort):
         except httpx.HTTPStatusError as exc:
             logger.error(
                 "block_user_http_error user_id=%s status=%s body=%s",
-                user_id, exc.response.status_code, exc.response.text,
+                user_id,
+                exc.response.status_code,
+                exc.response.text,
             )
             return False
         except Exception as exc:
@@ -83,7 +85,9 @@ class NotificationAdapter(NotificationPort):
         except httpx.HTTPStatusError as exc:
             logger.error(
                 "notification_http_error user_id=%s status=%s body=%s",
-                event.user_id, exc.response.status_code, exc.response.text,
+                event.user_id,
+                exc.response.status_code,
+                exc.response.text,
             )
             return False
         except Exception as exc:

@@ -23,7 +23,10 @@ from src.infrastructure.database.repositories.sqlalchemy_refresh_token_repositor
 from src.infrastructure.database.repositories.sqlalchemy_user_repository import (
     SQLAlchemyUserRepository,
 )
-from src.infrastructure.http.dependencies import get_current_user_id, require_internal_api_key
+from src.infrastructure.http.dependencies import (
+    get_current_user_id,
+    require_internal_api_key,
+)
 from src.infrastructure.http.schemas.auth_schema import (
     BlockUserRequest,
     ErrorResponse,
@@ -46,6 +49,7 @@ _password_service = BcryptPasswordService()
 
 # ── Composition helpers ───────────────────────────────────────────────────────
 
+
 def _make_repos(db: AsyncSession):
     user_repo = SQLAlchemyUserRepository(db)
     token_repo = SQLAlchemyRefreshTokenRepository(db)
@@ -53,6 +57,7 @@ def _make_repos(db: AsyncSession):
 
 
 # ── Endpoints ─────────────────────────────────────────────────────────────────
+
 
 @router.post(
     "/register",
@@ -113,7 +118,9 @@ async def logout(body: RefreshTokenRequest, db: AsyncSession = Depends(get_db)):
     "/refresh-token",
     response_model=TokenResponse,
     summary="Rotate refresh token and get new token pair",
-    responses={401: {"model": ErrorResponse, "description": "Invalid or expired token"}},
+    responses={
+        401: {"model": ErrorResponse, "description": "Invalid or expired token"}
+    },
 )
 async def refresh_token(body: RefreshTokenRequest, db: AsyncSession = Depends(get_db)):
     user_repo, token_repo = _make_repos(db)
