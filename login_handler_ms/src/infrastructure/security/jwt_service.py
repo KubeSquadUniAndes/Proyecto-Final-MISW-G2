@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from uuid import UUID
+from uuid import UUID, uuid4
 
 import jwt
 
@@ -37,6 +37,7 @@ class JWTService(JWTServicePort):
             "exp": expire,
             "iat": datetime.utcnow(),
             "type": "refresh",
+            "jti": str(uuid4()),
         }
         token = jwt.encode(
             payload, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM
