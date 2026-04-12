@@ -234,8 +234,10 @@ jobs:
 
       - name: Apply k8s manifests in order
         run: |
-          chmod +x k8s/deploy.sh
-          ./k8s/deploy.sh apply
+          for f in $(ls k8s/partial/*.yaml | sort); do
+            echo "Applying $f"
+            kubectl apply -f "$f"
+          done
 
       - name: Restart deployments to pull new images
         run: |
