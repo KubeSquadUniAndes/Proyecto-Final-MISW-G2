@@ -1,34 +1,21 @@
-# Imagen base
-FROM public.ecr.aws/docker/library/python:3.14-slim AS base
+FROM python:3.12-slim
 
-# Variables de entorno
-# ENV PYTHONDONTWRITEBYTECODE=1
-# ENV PYTHONUNBUFFERED=1
+WORKDIR /app
 
-# Crear directorio de la app
-WORKDIR /
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
 
-# Copiar dependencias
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Imagen base
-FROM public.ecr.aws/docker/library/python:3.14-slim AS runner
+COPY . .
 
-WORKDIR /app
-COPY --from=base /usr/local/lib/python3.14/site-packages /usr/local/lib/python3.14/site-packages
-COPY --from=base /usr/local/bin /usr/local/bin
+ENV PYTHONPATH=/app
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
-COPY hospedajes_model.py .
-COPY main.py .
-COPY postgres_db.py .
+EXPOSE 8003
 
-RUN groupadd -r noroot && useradd -r -g noroot noroot
-RUN chown -R noroot:noroot /app
-USER noroot
-
-# Exponer el puerto Flask
-EXPOSE 8000
-
-# Comando de ejecución
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8003"]
