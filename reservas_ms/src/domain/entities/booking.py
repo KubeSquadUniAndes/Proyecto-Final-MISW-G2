@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from datetime import datetime
+from decimal import Decimal
 from enum import Enum
 from uuid import UUID, uuid4
 
@@ -11,6 +12,14 @@ class BookingStatus(str, Enum):
     COMPLETED = "completed"
 
 
+STATUS_DISPLAY = {
+    BookingStatus.PENDING: "Pendiente de pago",
+    BookingStatus.CONFIRMED: "Confirmada",
+    BookingStatus.CANCELLED: "Cancelada",
+    BookingStatus.COMPLETED: "Completada",
+}
+
+
 @dataclass
 class Booking:
     user_id: UUID
@@ -20,8 +29,30 @@ class Booking:
     id: UUID = field(default_factory=uuid4)
     status: BookingStatus = BookingStatus.PENDING
     notes: str | None = None
+    booking_code: str | None = None
+    room_type: str | None = None
+    num_guests: int = 1
+    additional_guests: list | None = None
+    special_requests: str | None = None
+    price_per_night: Decimal | None = None
+    total_nights: int | None = None
+    total_price: Decimal | None = None
+    taxes: Decimal | None = None
+    final_price: Decimal | None = None
+    traveler_name: str | None = None
+    traveler_email: str | None = None
+    traveler_phone: str | None = None
+    traveler_document: str | None = None
     created_at: datetime = field(default_factory=datetime.utcnow)
     updated_at: datetime = field(default_factory=datetime.utcnow)
+
+    @property
+    def status_display(self) -> str:
+        return STATUS_DISPLAY.get(self.status, self.status.value)
+
+    @property
+    def cancellable(self) -> bool:
+        return self.status in (BookingStatus.PENDING, BookingStatus.CONFIRMED)
 
     def confirm(self) -> None:
         if self.status != BookingStatus.PENDING:

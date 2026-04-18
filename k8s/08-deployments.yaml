@@ -228,7 +228,7 @@ spec:
         command: ["sh", "-c", "until pg_isready -h $RDS_HOST -p $RDS_PORT -U postgres; do echo 'waiting for RDS...'; sleep 2; done"]
       containers:
       - name: loginhandlerms
-        image: 780522923809.dkr.ecr.us-east-1.amazonaws.com/travelhub/login-handler-ms:latest
+        image: 780522923809.dkr.ecr.us-east-1.amazonaws.com/travelhub/loginhandlerms:latest
         imagePullPolicy: Always
         envFrom:
           - configMapRef:
@@ -475,7 +475,7 @@ spec:
         command: ["sh", "-c", "until pg_isready -h $RDS_HOST -p $RDS_PORT -U postgres; do echo 'waiting for RDS...'; sleep 2; done"]
       containers:
       - name: users-ms
-        image: 780522923809.dkr.ecr.us-east-1.amazonaws.com/travelhub/users-ms:latest
+        image: 780522923809.dkr.ecr.us-east-1.amazonaws.com/travelhub/usersms:latest
         imagePullPolicy: Always
         envFrom:
             - configMapRef:

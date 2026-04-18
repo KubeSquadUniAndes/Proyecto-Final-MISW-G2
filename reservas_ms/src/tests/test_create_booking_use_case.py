@@ -25,7 +25,7 @@ def resource_id():
 @pytest.fixture
 def valid_times():
     now = datetime.utcnow()
-    return now + timedelta(hours=1), now + timedelta(hours=3)
+    return now, now + timedelta(days=3)
 
 
 @pytest.fixture
@@ -53,6 +53,7 @@ async def test_create_booking_success(
         resource_id=resource_id,
         start_time=start_time,
         end_time=end_time,
+        booking_code="TH-2026-TEST1",
     )
     mock_repo.save.return_value = expected_booking
 

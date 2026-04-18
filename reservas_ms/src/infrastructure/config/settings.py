@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     DEBUG: bool = False
     ENVIRONMENT: str = "development"
 
-    # Database
+    # Database — default points to production RDS, override in .env for local development
     DATABASE_URL: str = "postgresql+asyncpg://postgres:postgres@travelhub-prod-postgres.ci3w0yecas02.us-east-1.rds.amazonaws.com:5432/bookings_db"
     DB_ECHO: bool = False
 
@@ -20,6 +20,12 @@ class Settings(BaseSettings):
     # JWT (shared with login_handler_ms — used for local token decode)
     JWT_SECRET_KEY: str = "change-me-in-production"
     JWT_ALGORITHM: str = "HS256"
+
+    # Encryption — injected via K8s Secret in production (AWS Secrets Manager)
+    # In local development, set this in .env (never commit)
+    AES_ENCRYPTION_KEY: str = (
+        "ebb9c223f7a78f929a3505b3bcdcccd957121330d3a7ee5b3acd591e269e9871"
+    )
 
     # External services
     LOGIN_HANDLER_MS_URL: str = "http://login_handler_ms:8001"

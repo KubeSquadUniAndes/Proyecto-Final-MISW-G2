@@ -17,6 +17,9 @@ class BookingRepositoryPort(ABC):
     async def list_by_user(self, user_id: UUID) -> list[Booking]: ...
 
     @abstractmethod
+    async def get_active_by_user(self, user_id: UUID) -> list[Booking]: ...
+
+    @abstractmethod
     async def update(self, booking: Booking) -> Booking: ...
 
     @abstractmethod

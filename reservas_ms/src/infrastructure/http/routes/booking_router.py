@@ -3,8 +3,14 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.application.dtos.booking_dto import CreateBookingDTO, UpdateBookingDTO
+from src.application.dtos.booking_dto import (
+    CancelBookingDTO,
+    CreateBookingDTO,
+    UpdateBookingDTO,
+)
+from src.application.use_cases.cancel_booking import CancelBookingUseCase
 from src.application.use_cases.create_booking import CreateBookingUseCase
+from src.application.use_cases.list_bookings import ListBookingsUseCase
 from src.application.use_cases.update_booking import UpdateBookingUseCase
 from src.domain.services.booking_domain_service import BookingDomainService
 from src.infrastructure.clients.anomaly_detector_client import AnomalyDetectorClient
@@ -29,10 +35,60 @@ _anomaly_client = AnomalyDetectorClient(
 )
 
 
-def _make_repos(db: AsyncSession):
-    repo = SQLAlchemyBookingRepository(db)
-    domain_service = BookingDomainService(repo)
-    return repo, domain_service
+def _make_repo(db: AsyncSession) -> SQLAlchemyBookingRepository:
+    return SQLAlchemyBookingRepository(db)
+
+
+# ── GET /bookings/ ─────────────────────────────────────────────────────────────
+
+
+@router.get(
+    "/",
+    response_model=list[BookingResponse],
+    summary="List active bookings for the authenticated user",
+    responses={401: {"model": ErrorResponse}},
+)
+async def list_bookings(
+    user_id: UUID = Depends(get_current_user_id),
+    db: AsyncSession = Depends(get_db),
+) -> list[BookingResponse]:
+    repo = _make_repo(db)
+    use_case = ListBookingsUseCase(repo)
+    results = await use_case.execute(user_id)
+    return [BookingResponse(**r.model_dump()) for r in results]
+
+
+# ── GET /bookings/{booking_id} ─────────────────────────────────────────────────
+
+
+@router.get(
+    "/{booking_id}",
+    response_model=BookingResponse,
+    summary="Get booking detail",
+    responses={
+        401: {"model": ErrorResponse},
+        403: {"model": ErrorResponse},
+        404: {"model": ErrorResponse},
+    },
+)
+async def get_booking(
+    booking_id: UUID,
+    user_id: UUID = Depends(get_current_user_id),
+    db: AsyncSession = Depends(get_db),
+) -> BookingResponse:
+    repo = _make_repo(db)
+    booking = await repo.get_by_id(booking_id)
+    if not booking:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Booking not found"
+        )
+    if booking.user_id != user_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Access denied"
+        )
+    from src.application.use_cases.create_booking import _build_response
+
+    return BookingResponse(**_build_response(booking).model_dump())
 
 
 # ── POST /bookings/ ────────────────────────────────────────────────────────────
@@ -44,9 +100,9 @@ def _make_repos(db: AsyncSession):
     status_code=status.HTTP_201_CREATED,
     summary="Create a new booking",
     responses={
-        401: {"model": ErrorResponse, "description": "Unauthorized"},
-        403: {"model": ErrorResponse, "description": "User blocked or inactive"},
-        409: {"model": ErrorResponse, "description": "Schedule conflict"},
+        401: {"model": ErrorResponse},
+        403: {"model": ErrorResponse},
+        409: {"model": ErrorResponse},
     },
 )
 async def create_booking(
@@ -54,13 +110,12 @@ async def create_booking(
     user_id: UUID = Depends(get_current_user_id),
     db: AsyncSession = Depends(get_db),
 ) -> BookingResponse:
-    """Creates a booking for the authenticated user.
-    Calls detector_anomalias_ms after creation.
-    Requires a valid JWT — if the user is blocked, returns 403.
-    """
-    repo, domain_service = _make_repos(db)
+    repo = _make_repo(db)
+    domain_service = BookingDomainService(repo)
     use_case = CreateBookingUseCase(
-        repo, domain_service, anomaly_client=_anomaly_client
+        repo,
+        domain_service,
+        anomaly_client=_anomaly_client,
     )
     try:
         dto = CreateBookingDTO(
@@ -69,6 +124,15 @@ async def create_booking(
             start_time=body.start_time,
             end_time=body.end_time,
             notes=body.notes,
+            room_type=body.room_type,
+            num_guests=body.num_guests,
+            additional_guests=body.additional_guests,
+            special_requests=body.special_requests,
+            price_per_night=body.price_per_night,
+            traveler_name=body.traveler_name,
+            traveler_email=body.traveler_email,
+            traveler_phone=body.traveler_phone,
+            traveler_document=body.traveler_document,
         )
         result = await use_case.execute(dto)
         return BookingResponse(**result.model_dump())
@@ -84,10 +148,10 @@ async def create_booking(
     response_model=BookingResponse,
     summary="Update dates or notes of an existing booking",
     responses={
-        401: {"model": ErrorResponse, "description": "Unauthorized"},
-        403: {"model": ErrorResponse, "description": "User blocked or not the owner"},
-        404: {"model": ErrorResponse, "description": "Booking not found"},
-        409: {"model": ErrorResponse, "description": "Schedule conflict"},
+        401: {"model": ErrorResponse},
+        403: {"model": ErrorResponse},
+        404: {"model": ErrorResponse},
+        409: {"model": ErrorResponse},
     },
 )
 async def update_booking(
@@ -96,12 +160,8 @@ async def update_booking(
     user_id: UUID = Depends(get_current_user_id),
     db: AsyncSession = Depends(get_db),
 ) -> BookingResponse:
-    """Updates dates and/or notes of an existing booking.
-    Only the owner can modify their own bookings.
-    Calls detector_anomalias_ms after update.
-    Requires a valid JWT — if the user is blocked, returns 403.
-    """
-    repo, domain_service = _make_repos(db)
+    repo = _make_repo(db)
+    domain_service = BookingDomainService(repo)
     use_case = UpdateBookingUseCase(
         repo, domain_service, anomaly_client=_anomaly_client
     )
@@ -119,3 +179,46 @@ async def update_booking(
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc))
     except PermissionError as exc:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(exc))
+
+
+# ── DELETE /bookings/{booking_id} ──────────────────────────────────────────────
+
+
+@router.delete(
+    "/{booking_id}",
+    response_model=BookingResponse,
+    summary="Cancel a booking",
+    responses={
+        401: {"model": ErrorResponse},
+        403: {"model": ErrorResponse},
+        404: {"model": ErrorResponse},
+        409: {"model": ErrorResponse},
+        503: {
+            "model": ErrorResponse,
+            "description": "Availability service unavailable",
+        },
+    },
+)
+async def cancel_booking(
+    booking_id: UUID,
+    user_id: UUID = Depends(get_current_user_id),
+    db: AsyncSession = Depends(get_db),
+) -> BookingResponse:
+    repo = _make_repo(db)
+    use_case = CancelBookingUseCase(repo)
+    try:
+        dto = CancelBookingDTO(booking_id=booking_id, user_id=user_id)
+        result = await use_case.execute(dto)
+        return BookingResponse(**result.model_dump())
+    except LookupError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc))
+    except PermissionError as exc:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(exc))
+    except ValueError as exc:
+        detail = str(exc)
+        code = (
+            status.HTTP_503_SERVICE_UNAVAILABLE
+            if "availability" in detail.lower()
+            else status.HTTP_409_CONFLICT
+        )
+        raise HTTPException(status_code=code, detail=detail)

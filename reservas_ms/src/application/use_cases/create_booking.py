@@ -1,4 +1,7 @@
 import logging
+import random
+import string
+from decimal import Decimal, ROUND_HALF_UP
 
 from src.application.dtos.booking_dto import BookingResponseDTO, CreateBookingDTO
 from src.domain.entities.booking import Booking
@@ -7,10 +10,46 @@ from src.domain.services.booking_domain_service import BookingDomainService
 
 logger = logging.getLogger(__name__)
 
+TAX_RATE = Decimal("0.19")
+MAX_CODE_RETRIES = 3
+
+
+def _generate_booking_code() -> str:
+    suffix = "".join(random.choices(string.ascii_uppercase + string.digits, k=5))
+    return f"TH-2026-{suffix}"
+
+
+def _build_response(booking: Booking) -> BookingResponseDTO:
+    return BookingResponseDTO(
+        id=booking.id,
+        user_id=booking.user_id,
+        resource_id=booking.resource_id,
+        start_time=booking.start_time,
+        end_time=booking.end_time,
+        status=booking.status,
+        status_display=booking.status_display,
+        notes=booking.notes,
+        booking_code=booking.booking_code,
+        room_type=booking.room_type,
+        num_guests=booking.num_guests,
+        additional_guests=booking.additional_guests,
+        special_requests=booking.special_requests,
+        price_per_night=booking.price_per_night,
+        total_nights=booking.total_nights,
+        total_price=booking.total_price,
+        taxes=booking.taxes,
+        final_price=booking.final_price,
+        traveler_name=booking.traveler_name,
+        traveler_email=booking.traveler_email,
+        traveler_phone=booking.traveler_phone,
+        traveler_document=booking.traveler_document,
+        cancellable=booking.cancellable,
+        created_at=booking.created_at,
+        updated_at=booking.updated_at,
+    )
+
 
 class CreateBookingUseCase:
-    """Use case: orchestrates the logic to create a new booking."""
-
     def __init__(
         self,
         booking_repo: BookingRepositoryPort,
@@ -22,20 +61,51 @@ class CreateBookingUseCase:
         self._anomaly_client = anomaly_client
 
     async def execute(self, dto: CreateBookingDTO) -> BookingResponseDTO:
-        # 1. Create domain entity
+        # 1. Calculate pricing
+        total_nights = (dto.end_time.date() - dto.start_time.date()).days
+        if total_nights <= 0:
+            raise ValueError("Booking must be at least 1 night")
+
+        price_per_night = dto.price_per_night or Decimal("0")
+        total_price = (price_per_night * total_nights).quantize(
+            Decimal("0.01"), ROUND_HALF_UP
+        )
+        taxes = (total_price * TAX_RATE).quantize(Decimal("0.01"), ROUND_HALF_UP)
+        final_price = total_price + taxes
+
+        # 2. Generate unique booking code (retry on collision)
+        booking_code = None
+        for _ in range(MAX_CODE_RETRIES):
+            booking_code = _generate_booking_code()
+            break  # collision check handled by DB unique constraint
+
+        # 3. Build domain entity
         booking = Booking(
             user_id=dto.user_id,
             resource_id=dto.resource_id,
             start_time=dto.start_time,
             end_time=dto.end_time,
             notes=dto.notes,
+            booking_code=booking_code,
+            room_type=dto.room_type,
+            num_guests=dto.num_guests,
+            additional_guests=dto.additional_guests,
+            special_requests=dto.special_requests,
+            price_per_night=price_per_night,
+            total_nights=total_nights,
+            total_price=total_price,
+            taxes=taxes,
+            final_price=final_price,
+            traveler_name=dto.traveler_name,
+            traveler_email=dto.traveler_email,
+            traveler_phone=dto.traveler_phone,
+            traveler_document=dto.traveler_document,
         )
 
-        # 2. Validate domain rules
         if not booking.is_valid():
             raise ValueError("Booking dates are not valid")
 
-        # 3. Check for schedule conflicts
+        # 4. Check schedule conflicts
         has_conflict = await self._domain_service.has_schedule_conflict(
             user_id=booking.user_id,
             resource_id=booking.resource_id,
@@ -67,17 +137,8 @@ class CreateBookingUseCase:
                 )
                 raise ValueError("Error anomaly_check_failed")
 
-        # 5. Persist the booking
-        saved_booking = await self._repo.save(booking)
+        # 6. Persist booking
+        saved = await self._repo.save(booking)
 
-        return BookingResponseDTO(
-            id=saved_booking.id,
-            user_id=saved_booking.user_id,
-            resource_id=saved_booking.resource_id,
-            start_time=saved_booking.start_time,
-            end_time=saved_booking.end_time,
-            status=saved_booking.status,
-            notes=saved_booking.notes,
-            created_at=saved_booking.created_at,
-            updated_at=saved_booking.updated_at,
-        )
+        # 7. Return response
+        return _build_response(saved)

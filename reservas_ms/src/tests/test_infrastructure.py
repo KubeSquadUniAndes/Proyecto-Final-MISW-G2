@@ -267,7 +267,7 @@ def test_create_booking_request_valid():
     r = CreateBookingRequest(
         resource_id=uuid4(),
         start_time=now,
-        end_time=now + timedelta(hours=1),
+        end_time=now + timedelta(days=2),
     )
     assert r.end_time > r.start_time
 
@@ -277,7 +277,7 @@ def test_create_booking_request_invalid():
     with pytest.raises(Exception):
         CreateBookingRequest(
             resource_id=uuid4(),
-            start_time=now + timedelta(hours=1),
+            start_time=now + timedelta(days=2),
             end_time=now,
         )
 
@@ -344,9 +344,25 @@ async def test_create_booking_success(app):
         user_id=uid,
         resource_id=uuid4(),
         start_time=now,
-        end_time=now + timedelta(hours=1),
+        end_time=now + timedelta(days=2),
         status=BookingStatus.PENDING,
+        status_display="Pendiente de pago",
         notes=None,
+        booking_code="TH-2026-TEST1",
+        room_type=None,
+        num_guests=1,
+        additional_guests=None,
+        special_requests=None,
+        price_per_night=None,
+        total_nights=None,
+        total_price=None,
+        taxes=None,
+        final_price=None,
+        traveler_name=None,
+        traveler_email=None,
+        traveler_phone=None,
+        traveler_document=None,
+        cancellable=True,
         created_at=now,
         updated_at=now,
     )
