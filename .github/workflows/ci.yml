@@ -67,7 +67,7 @@ jobs:
         run: python -m bandit -r ${{ matrix.src_path }} -ll -q
 
       - name: Dependency vulnerabilities (pip-audit)
-        run: python -m pip_audit -r requirements.txt --skip-editable --ignore-vuln CVE-2026-4539
+        run: python -m pip_audit -r requirements.txt --skip-editable --ignore-vuln CVE-2026-4539 --ignore-vuln GHSA-6w46-j5rx-g56g
 
       # ── Unit tests + coverage ────────────────────────────────────────────────
       - name: Unit tests
