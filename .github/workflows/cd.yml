@@ -173,35 +173,6 @@ jobs:
           docker push $ECR_REGISTRY/travelhub/detectoranomaliasms:latest
           echo "image=$IMAGE" >> $GITHUB_OUTPUT
 
-  # ── Build & Push hospedajesms ─────────────────────────────────────────────
-  build-hospedajesms:
-    name: Build hospedajesms
-    runs-on: ubuntu-latest
-    if: false # temporalmente deshabilitado
-    outputs:
-      image: ${{ steps.build.outputs.image }}
-    steps:
-      - uses: actions/checkout@v4
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
-      - name: Login to ECR
-        uses: aws-actions/amazon-ecr-login@v2
-      - name: Build and push hospedajesms
-        id: build
-        env:
-          IMAGE_TAG: ${{ github.sha }}
-        run: |
-          IMAGE=$ECR_REGISTRY/travelhub/hospedajesms:$IMAGE_TAG
-          docker build -t $IMAGE ./hospedajes_ms
-          docker push $IMAGE
-          docker tag $IMAGE $ECR_REGISTRY/travelhub/hospedajesms:latest
-          docker push $ECR_REGISTRY/travelhub/hospedajesms:latest
-          echo "image=$IMAGE" >> $GITHUB_OUTPUT
-
   # ── Build & Push notificacionesms ─────────────────────────────────────────
   build-notificacionesms:
     name: Build notificacionesms
