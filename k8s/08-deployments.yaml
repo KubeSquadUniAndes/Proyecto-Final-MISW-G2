@@ -148,7 +148,7 @@ spec:
           - secretRef:
               name: hospedajes-ms-secret
         ports:
-        - containerPort: 8000
+        - containerPort: 8003
           name: http
         resources:
           requests:
@@ -160,14 +160,14 @@ spec:
         readinessProbe:
           httpGet:
             path: /health
-            port: 8000
+            port: 8003
           initialDelaySeconds: 5
           periodSeconds: 10
           failureThreshold: 3
         livenessProbe:
           httpGet:
             path: /health
-            port: 8000
+            port: 8003
           initialDelaySeconds: 10
           periodSeconds: 30
           failureThreshold: 3
@@ -228,7 +228,7 @@ spec:
         command: ["sh", "-c", "until pg_isready -h $RDS_HOST -p $RDS_PORT -U postgres; do echo 'waiting for RDS...'; sleep 2; done"]
       containers:
       - name: loginhandlerms
-        image: 780522923809.dkr.ecr.us-east-1.amazonaws.com/travelhub/loginhandlerms:latest
+        image: 780522923809.dkr.ecr.us-east-1.amazonaws.com/travelhub/login-handler-ms:latest
         imagePullPolicy: Always
         envFrom:
           - configMapRef:

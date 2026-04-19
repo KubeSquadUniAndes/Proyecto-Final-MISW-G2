@@ -1,15 +1,15 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: login-handler-deployment
+  name: detector-anomalias-deployment
   namespace: workloads
   labels:
-    app: login-handler-app
+    app: detector-anomalias-app
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: login-handler-app
+      app: detector-anomalias-app
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -18,12 +18,11 @@ spec:
   template:
     metadata:
       labels:
-        app: login-handler-app
+        app: detector-anomalias-app
         version: v1
     spec:
       nodeSelector:
         role: workloads
-      serviceAccountName: login-handler-sa
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -34,7 +33,7 @@ spec:
                 - key: app
                   operator: In
                   values:
-                  - login-handler-app
+                  - detector-anomalias-app
               topologyKey: kubernetes.io/hostname
       terminationGracePeriodSeconds: 30
       initContainers:
@@ -53,24 +52,24 @@ spec:
               key: RDS_PORT
         command: ["sh", "-c", "until pg_isready -h $RDS_HOST -p $RDS_PORT -U postgres; do echo 'waiting for RDS...'; sleep 2; done"]
       containers:
-      - name: loginhandlerms
-        image: 780522923809.dkr.ecr.us-east-1.amazonaws.com/travelhub/login-handler-ms:latest
+      - name: detector-anomalias
+        image: 780522923809.dkr.ecr.us-east-1.amazonaws.com/travelhub/detectoranomaliasms:latest
         imagePullPolicy: Always
         envFrom:
           - configMapRef:
-              name: login-handler-ms-config
+              name: detector-anomalias-ms-config
           - secretRef:
-              name: login-handler-ms-secret
+              name: detector-anomalias-ms-secret
         ports:
         - containerPort: 8000
           name: http
         resources:
           requests:
             cpu: "100m"
-            memory: "128Mi"
+            memory: "256Mi"
           limits:
             cpu: "500m"
-            memory: "256Mi"
+            memory: "512Mi"
         readinessProbe:
           httpGet:
             path: /health
@@ -154,10 +153,10 @@ spec:
         resources:
           requests:
             cpu: "100m"
-            memory: "128Mi"
+            memory: "256Mi"
           limits:
             cpu: "500m"
-            memory: "256Mi"
+            memory: "512Mi"
         readinessProbe:
           httpGet:
             path: /health
@@ -169,6 +168,254 @@ spec:
           httpGet:
             path: /health
             port: 8003
+          initialDelaySeconds: 10
+          periodSeconds: 30
+          failureThreshold: 3
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: login-handler-deployment
+  namespace: workloads
+  labels:
+    app: login-handler-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: login-handler-app
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: login-handler-app
+        version: v1
+    spec:
+      nodeSelector:
+        role: workloads
+      serviceAccountName: login-handler-sa
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - login-handler-app
+              topologyKey: kubernetes.io/hostname
+      terminationGracePeriodSeconds: 30
+      initContainers:
+      - name: wait-for-postgres
+        image: postgres:alpine3.22
+        env:
+        - name: RDS_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: rds-config
+              key: RDS_HOST
+        - name: RDS_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: rds-config
+              key: RDS_PORT
+        command: ["sh", "-c", "until pg_isready -h $RDS_HOST -p $RDS_PORT -U postgres; do echo 'waiting for RDS...'; sleep 2; done"]
+      containers:
+      - name: loginhandlerms
+        image: 780522923809.dkr.ecr.us-east-1.amazonaws.com/travelhub/login-handler-ms:latest
+        imagePullPolicy: Always
+        envFrom:
+          - configMapRef:
+              name: login-handler-ms-config
+          - secretRef:
+              name: login-handler-ms-secret
+        ports:
+        - containerPort: 8000
+          name: http
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "256Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          failureThreshold: 3
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 30
+          failureThreshold: 3
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notificaciones-deployment
+  namespace: workloads
+  labels:
+    app: notificaciones-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: notificaciones-app
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: notificaciones-app
+        version: v1
+    spec:
+      nodeSelector:
+        role: workloads
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - notificaciones-app
+              topologyKey: kubernetes.io/hostname
+      terminationGracePeriodSeconds: 30
+      # notificaciones-ms has no database — remove init container
+      containers:
+      - name: notificacionesms
+        image: 780522923809.dkr.ecr.us-east-1.amazonaws.com/travelhub/notificacionesms:latest
+        imagePullPolicy: Always
+        envFrom:
+          - configMapRef:
+              name: notificaciones-ms-config
+          - secretRef:
+              name: notificaciones-ms-secret
+        ports:
+        - containerPort: 8000
+          name: http
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "256Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          failureThreshold: 3
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 30
+          failureThreshold: 3
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: reservas-deployment
+  namespace: workloads
+  labels:
+    app: reservas-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: reservas-app
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: reservas-app
+        version: v1
+    spec:
+      nodeSelector:
+        role: workloads
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - reservas-app
+              topologyKey: kubernetes.io/hostname
+      terminationGracePeriodSeconds: 30
+      initContainers:
+      - name: wait-for-postgres
+        image: postgres:alpine3.22
+        env:
+        - name: RDS_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: rds-config
+              key: RDS_HOST
+        - name: RDS_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: rds-config
+              key: RDS_PORT
+        command: ["sh", "-c", "until pg_isready -h $RDS_HOST -p $RDS_PORT -U postgres; do echo 'waiting for RDS...'; sleep 2; done"]
+      containers:
+      - name: reservasms
+        image: 780522923809.dkr.ecr.us-east-1.amazonaws.com/travelhub/reservasms:latest
+        imagePullPolicy: Always
+        envFrom:
+          - configMapRef:
+              name: reservas-ms-config
+          - secretRef:
+              name: reservas-ms-secret
+        ports:
+        - containerPort: 8000
+          name: http
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "256Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          failureThreshold: 3
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
           initialDelaySeconds: 10
           periodSeconds: 30
           failureThreshold: 3
@@ -228,23 +475,23 @@ spec:
         command: ["sh", "-c", "until pg_isready -h $RDS_HOST -p $RDS_PORT -U postgres; do echo 'waiting for RDS...'; sleep 2; done"]
       containers:
       - name: users-ms
-        image: 780522923809.dkr.ecr.us-east-1.amazonaws.com/travelhub/users-ms:latest
+        image: 780522923809.dkr.ecr.us-east-1.amazonaws.com/travelhub/usersms:latest
         imagePullPolicy: Always
         envFrom:
-          - configMapRef:
-              name: users-ms-config
-          - secretRef:
-              name: users-ms-secret
+            - configMapRef:
+                name: users-ms-config
+            - secretRef:
+                name: users-ms-secret
         ports:
         - containerPort: 8000
           name: http
         resources:
           requests:
             cpu: "100m"
-            memory: "128Mi"
+            memory: "256Mi"
           limits:
             cpu: "500m"
-            memory: "256Mi"
+            memory: "512Mi"
         readinessProbe:
           httpGet:
             path: /health

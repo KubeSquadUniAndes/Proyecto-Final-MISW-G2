@@ -32,7 +32,6 @@ jobs:
   build-users-ms:
     name: Build users-ms
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true) || (github.event_name == 'workflow_dispatch' && (github.event.inputs.service == 'users-ms' || github.event.inputs.service == 'all')) }}
     outputs:
       image: ${{ steps.build.outputs.image }}
     steps:
@@ -50,18 +49,17 @@ jobs:
         env:
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          IMAGE=$ECR_REGISTRY/travelhub/users-ms:$IMAGE_TAG
-          docker build -t $IMAGE ./users_ms
+          IMAGE=$ECR_REGISTRY/travelhub/usersms:$IMAGE_TAG
+          docker build --platform linux/amd64 -t $IMAGE ./users_ms
           docker push $IMAGE
-          docker tag $IMAGE $ECR_REGISTRY/travelhub/users-ms:latest
-          docker push $ECR_REGISTRY/travelhub/users-ms:latest
+          docker tag $IMAGE $ECR_REGISTRY/travelhub/usersms:latest
+          docker push $ECR_REGISTRY/travelhub/usersms:latest
           echo "image=$IMAGE" >> $GITHUB_OUTPUT
 
   # ── Build & Push login-handler-ms ─────────────────────────────────────────
   build-login-handler-ms:
     name: Build login-handler-ms
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true) || (github.event_name == 'workflow_dispatch' && (github.event.inputs.service == 'login-handler-ms' || github.event.inputs.service == 'all')) }}
     outputs:
       image: ${{ steps.build.outputs.image }}
     steps:
@@ -80,7 +78,7 @@ jobs:
           IMAGE_TAG: ${{ github.sha }}
         run: |
           IMAGE=$ECR_REGISTRY/travelhub/login-handler-ms:$IMAGE_TAG
-          docker build -t $IMAGE ./login_handler_ms
+          docker build --platform linux/amd64 -t $IMAGE ./login_handler_ms
           docker push $IMAGE
           docker tag $IMAGE $ECR_REGISTRY/travelhub/login-handler-ms:latest
           docker push $ECR_REGISTRY/travelhub/login-handler-ms:latest
@@ -90,7 +88,6 @@ jobs:
   build-hospedajesms:
     name: Build hospedajesms
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true) || (github.event_name == 'workflow_dispatch' && (github.event.inputs.service == 'hospedajesms' || github.event.inputs.service == 'all')) }}
     outputs:
       image: ${{ steps.build.outputs.image }}
     steps:
@@ -109,7 +106,7 @@ jobs:
           IMAGE_TAG: ${{ github.sha }}
         run: |
           IMAGE=$ECR_REGISTRY/travelhub/hospedajesms:$IMAGE_TAG
-          docker build -t $IMAGE ./hospedajes_ms
+          docker build --platform linux/amd64 -t $IMAGE ./hospedajes_ms
           docker push $IMAGE
           docker tag $IMAGE $ECR_REGISTRY/travelhub/hospedajesms:latest
           docker push $ECR_REGISTRY/travelhub/hospedajesms:latest
@@ -119,7 +116,6 @@ jobs:
   build-reservasms:
     name: Build reservasms
     runs-on: ubuntu-latest
-    if: false # temporalmente deshabilitado
     outputs:
       image: ${{ steps.build.outputs.image }}
     steps:
@@ -138,7 +134,7 @@ jobs:
           IMAGE_TAG: ${{ github.sha }}
         run: |
           IMAGE=$ECR_REGISTRY/travelhub/reservasms:$IMAGE_TAG
-          docker build -t $IMAGE ./reservas_ms
+          docker build --platform linux/amd64 -t $IMAGE ./reservas_ms
           docker push $IMAGE
           docker tag $IMAGE $ECR_REGISTRY/travelhub/reservasms:latest
           docker push $ECR_REGISTRY/travelhub/reservasms:latest
@@ -148,7 +144,6 @@ jobs:
   build-detectoranomaliasms:
     name: Build detectoranomaliasms
     runs-on: ubuntu-latest
-    if: false # temporalmente deshabilitado
     outputs:
       image: ${{ steps.build.outputs.image }}
     steps:
@@ -167,7 +162,7 @@ jobs:
           IMAGE_TAG: ${{ github.sha }}
         run: |
           IMAGE=$ECR_REGISTRY/travelhub/detectoranomaliasms:$IMAGE_TAG
-          docker build -t $IMAGE ./detector_anomalias_ms
+          docker build --platform linux/amd64 -t $IMAGE ./detector_anomalias_ms
           docker push $IMAGE
           docker tag $IMAGE $ECR_REGISTRY/travelhub/detectoranomaliasms:latest
           docker push $ECR_REGISTRY/travelhub/detectoranomaliasms:latest
@@ -177,7 +172,6 @@ jobs:
   build-notificacionesms:
     name: Build notificacionesms
     runs-on: ubuntu-latest
-    if: false # temporalmente deshabilitado
     outputs:
       image: ${{ steps.build.outputs.image }}
     steps:
@@ -196,7 +190,7 @@ jobs:
           IMAGE_TAG: ${{ github.sha }}
         run: |
           IMAGE=$ECR_REGISTRY/travelhub/notificacionesms:$IMAGE_TAG
-          docker build -t $IMAGE ./notificaciones_ms
+          docker build --platform linux/amd64 -t $IMAGE ./notificaciones_ms
           docker push $IMAGE
           docker tag $IMAGE $ECR_REGISTRY/travelhub/notificacionesms:latest
           docker push $ECR_REGISTRY/travelhub/notificacionesms:latest
@@ -210,15 +204,18 @@ jobs:
       - build-users-ms
       - build-login-handler-ms
       - build-hospedajesms
-      # - build-reservasms          # temporalmente deshabilitado
-      # - build-detectoranomaliasms # temporalmente deshabilitado
-      # - build-notificacionesms    # temporalmente deshabilitado
+      - build-reservasms
+      - build-detectoranomaliasms
+      - build-notificacionesms
     if: |
       always() &&
       (
         needs.build-users-ms.result == 'success' ||
         needs.build-login-handler-ms.result == 'success' ||
-        needs.build-hospedajesms.result == 'success'
+        needs.build-hospedajesms.result == 'success' ||
+        needs.build-reservasms.result == 'success' ||
+        needs.build-detectoranomaliasms.result == 'success' ||
+        needs.build-notificacionesms.result == 'success'
       )
     steps:
       - uses: actions/checkout@v4
@@ -256,15 +253,15 @@ jobs:
           if [[ "${{ needs.build-hospedajesms.result }}" == "success" ]]; then
             SERVICES="$SERVICES hospedajes-deployment"
           fi
-          #if [[ "${{ needs.build-reservasms.result }}" == "success" ]]; then
-          #  SERVICES="$SERVICES reservas-deployment"
-          #fi
-          #if [[ "${{ needs.build-detectoranomaliasms.result }}" == "success" ]]; then
-          #  SERVICES="$SERVICES detector-anomalias-deployment"
-          #fi
-          #if [[ "${{ needs.build-notificacionesms.result }}" == "success" ]]; then
-          #  SERVICES="$SERVICES notificaciones-deployment"
-          #fi
+          if [[ "${{ needs.build-reservasms.result }}" == "success" ]]; then
+            SERVICES="$SERVICES reservas-deployment"
+          fi
+          if [[ "${{ needs.build-detectoranomaliasms.result }}" == "success" ]]; then
+            SERVICES="$SERVICES detector-anomalias-deployment"
+          fi
+          if [[ "${{ needs.build-notificacionesms.result }}" == "success" ]]; then
+            SERVICES="$SERVICES notificaciones-deployment"
+          fi
           for deploy in $SERVICES; do
             echo "Restarting $deploy..."
             kubectl rollout restart deployment/$deploy -n workloads
@@ -272,8 +269,8 @@ jobs:
 
       - name: Wait for deployments to be ready
         run: |
-          # notificaciones-deployment reservas-deployment detector-anomalias-deployment
-          for deploy in login-handler-deployment users-deployment hospedajes-deployment; do
+          for deploy in login-handler-deployment users-deployment hospedajes-deployment \
+                        reservas-deployment detector-anomalias-deployment notificaciones-deployment; do
             echo "Waiting for $deploy..."
             kubectl rollout status deployment/$deploy -n workloads --timeout=180s
           done
@@ -286,10 +283,11 @@ jobs:
           kubectl exec -n workloads deploy/users-deployment -- python /app/run_migrations.py
           kubectl wait --for=condition=ready pod -l app=hospedajes-app -n workloads --timeout=120s
           echo "hospedajes_ms uses create_all on startup — tables already created"
-          # kubectl wait --for=condition=ready pod -l app=detector-anomalias-app -n workloads --timeout=120s
-          # kubectl exec -n workloads deploy/detector-anomalias-deployment -- python /app/run_migrations.py
-          # kubectl wait --for=condition=ready pod -l app=reservas-app -n workloads --timeout=120s
-          # kubectl exec -n workloads deploy/reservas-deployment -- python /app/run_migrations.py
+          kubectl wait --for=condition=ready pod -l app=detector-anomalias-app -n workloads --timeout=120s
+          kubectl exec -n workloads deploy/detector-anomalias-deployment -- python /app/run_migrations.py
+          kubectl wait --for=condition=ready pod -l app=reservas-app -n workloads --timeout=120s
+          kubectl exec -n workloads deploy/reservas-deployment -- \
+            sh -c "cd /app && PYTHONPATH= alembic stamp head"
 
   # ── E2E tests with Newman (después del deploy) ────────────────────────────
   e2e:
@@ -311,7 +309,7 @@ jobs:
         run: |
           aws eks update-kubeconfig --region $AWS_REGION --name $EKS_CLUSTER
           BASE_URL=$(kubectl get svc travelhub-gateway-istio -n workloads \
-            -o jsonpath='http://{.status.loadBalancer.ingress[0].hostname}')
+            -o jsonpath='https://{.status.loadBalancer.ingress[0].hostname}')
           echo "base_url=$BASE_URL" >> $GITHUB_OUTPUT
 
       - name: Install Newman

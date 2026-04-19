@@ -11,10 +11,9 @@ metadata:
   name: travelhub-gateway
   namespace: workloads
   annotations:
-    # AWS EKS: use NLB for the ingress gateway service
-    # service.beta.kubernetes.io/aws-load-balancer-type: external
-    # service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: ip
-    # service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
+    service.beta.kubernetes.io/aws-load-balancer-type: external
+    service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: ip
+    service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
 spec:
   gatewayClassName: istio
   listeners:

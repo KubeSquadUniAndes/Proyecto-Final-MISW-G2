@@ -31,6 +31,10 @@ jobs:
             test_path: src/tests/
             src_path: src
             mypy_path: src/domain src/application
+          - service: hospedajes_ms
+            test_path: tests/
+            src_path: src
+            mypy_path: src/domain src/application
 
     env:
       PYTHONPATH: ${{ github.workspace }}/${{ matrix.service }}
