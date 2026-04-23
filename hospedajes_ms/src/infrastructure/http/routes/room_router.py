@@ -14,7 +14,10 @@ from src.infrastructure.database.base import get_db
 from src.infrastructure.database.repositories.sqlalchemy_room_repository import (
     SQLAlchemyRoomRepository,
 )
-from src.infrastructure.http.dependencies import require_hotel_or_traveler_role, require_hotel_role
+from src.infrastructure.http.dependencies import (
+    require_hotel_or_traveler_role,
+    require_hotel_role,
+)
 from src.infrastructure.http.schemas.room_schema import (
     CreateRoomRequest,
     ErrorResponse,
@@ -46,7 +49,9 @@ async def create_room(
     repo = _make_repo(db)
     use_case = CreateRoomUseCase(repo)
     try:
-        result = await use_case.execute(CreateRoomDTO(hotel_id=hotel_id, **body.model_dump()))
+        result = await use_case.execute(
+            CreateRoomDTO(hotel_id=hotel_id, **body.model_dump())
+        )
         return RoomResponse(**result.model_dump())
     except ValueError as exc:
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc))
@@ -58,7 +63,9 @@ async def create_room(
     summary="List all rooms",
 )
 async def list_rooms(
-    hotel_id: UUID | None = Query(default=None, description="Filtrar habitaciones por hotel"),
+    hotel_id: UUID | None = Query(
+        default=None, description="Filtrar habitaciones por hotel"
+    ),
     db: AsyncSession = Depends(get_db),
     _: UUID = Depends(require_hotel_or_traveler_role),
 ):

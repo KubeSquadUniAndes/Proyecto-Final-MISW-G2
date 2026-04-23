@@ -29,12 +29,8 @@ class Room:
     amenities: str
     hotel_id: UUID = field(default_factory=uuid4)
     id: UUID = field(default_factory=uuid4)
-    created_at: datetime = field(
-        default_factory=lambda: datetime.now(timezone.utc)
-    )
-    updated_at: datetime = field(
-        default_factory=lambda: datetime.now(timezone.utc)
-    )
+    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
 
     def mark_available(self) -> None:
         self.status = RoomStatus.DISPONIBLE

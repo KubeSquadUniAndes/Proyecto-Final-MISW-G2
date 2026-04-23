@@ -6,7 +6,9 @@ class Settings(BaseSettings):
     APP_VERSION: str = "0.1.0"
     DEBUG: bool = False
 
-    DATABASE_URL: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/hospedajes_db"
+    DATABASE_URL: str = (
+        "postgresql+asyncpg://postgres:postgres@localhost:5432/hospedajes_db"
+    )
     DB_ECHO: bool = False
 
     HOST: str = "0.0.0.0"  # nosec B104
