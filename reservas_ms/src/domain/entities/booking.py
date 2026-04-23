@@ -60,6 +60,12 @@ class Booking:
         self.status = BookingStatus.CONFIRMED
         self.updated_at = datetime.utcnow()
 
+    def reject(self) -> None:
+        if self.status != BookingStatus.PENDING:
+            raise ValueError(f"Cannot reject a booking with status '{self.status}'")
+        self.status = BookingStatus.CANCELLED
+        self.updated_at = datetime.utcnow()
+
     def cancel(self) -> None:
         if self.status in (BookingStatus.CANCELLED, BookingStatus.COMPLETED):
             raise ValueError(f"Cannot cancel a booking with status '{self.status}'")

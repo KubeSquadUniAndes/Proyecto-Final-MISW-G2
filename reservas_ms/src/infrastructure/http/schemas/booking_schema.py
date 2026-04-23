@@ -81,3 +81,7 @@ class BookingResponse(BaseModel):
 class ErrorResponse(BaseModel):
     detail: str
     code: str | None = None
+
+
+class RejectBookingRequest(BaseModel):
+    rejection_reason: str

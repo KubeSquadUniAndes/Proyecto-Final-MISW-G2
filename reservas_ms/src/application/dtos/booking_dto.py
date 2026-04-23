@@ -56,6 +56,17 @@ class CancelBookingDTO(BaseModel):
     user_id: UUID
 
 
+class ApproveBookingDTO(BaseModel):
+    booking_id: UUID
+    admin_user_id: UUID
+
+
+class RejectBookingDTO(BaseModel):
+    booking_id: UUID
+    admin_user_id: UUID
+    rejection_reason: str
+
+
 class BookingResponseDTO(BaseModel):
     id: UUID
     user_id: UUID

@@ -4,13 +4,17 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.application.dtos.booking_dto import (
+    ApproveBookingDTO,
     CancelBookingDTO,
     CreateBookingDTO,
+    RejectBookingDTO,
     UpdateBookingDTO,
 )
+from src.application.use_cases.approve_booking import ApproveBookingUseCase
 from src.application.use_cases.cancel_booking import CancelBookingUseCase
 from src.application.use_cases.create_booking import CreateBookingUseCase
 from src.application.use_cases.list_bookings import ListBookingsUseCase
+from src.application.use_cases.reject_booking import RejectBookingUseCase
 from src.application.use_cases.update_booking import UpdateBookingUseCase
 from src.domain.services.booking_domain_service import BookingDomainService
 from src.infrastructure.clients.anomaly_detector_client import AnomalyDetectorClient
@@ -24,6 +28,7 @@ from src.infrastructure.http.schemas.booking_schema import (
     BookingResponse,
     CreateBookingRequest,
     ErrorResponse,
+    RejectBookingRequest,
     UpdateBookingRequest,
 )
 
@@ -222,3 +227,76 @@ async def cancel_booking(
             else status.HTTP_409_CONFLICT
         )
         raise HTTPException(status_code=code, detail=detail)
+
+
+# ── PATCH /bookings/{booking_id}/approve ──────────────────────────────────────
+
+
+@router.patch(
+    "/{booking_id}/approve",
+    response_model=BookingResponse,
+    summary="Approve a pending booking (hotel admin)",
+    responses={
+        401: {"model": ErrorResponse},
+        403: {"model": ErrorResponse},
+        404: {"model": ErrorResponse},
+        409: {"model": ErrorResponse},
+    },
+)
+async def approve_booking(
+    booking_id: UUID,
+    user_id: UUID = Depends(get_current_user_id),
+    db: AsyncSession = Depends(get_db),
+) -> BookingResponse:
+    """Approve a pending booking and trigger payment processing."""
+    repo = _make_repo(db)
+    use_case = ApproveBookingUseCase(repo)
+    try:
+        dto = ApproveBookingDTO(booking_id=booking_id, admin_user_id=user_id)
+        result = await use_case.execute(dto)
+        return BookingResponse(**result.model_dump())
+    except LookupError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc))
+    except PermissionError as exc:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(exc))
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc))
+
+
+# ── PATCH /bookings/{booking_id}/reject ───────────────────────────────────────
+
+
+@router.patch(
+    "/{booking_id}/reject",
+    response_model=BookingResponse,
+    summary="Reject a pending booking (hotel admin)",
+    responses={
+        401: {"model": ErrorResponse},
+        403: {"model": ErrorResponse},
+        404: {"model": ErrorResponse},
+        409: {"model": ErrorResponse},
+    },
+)
+async def reject_booking(
+    booking_id: UUID,
+    body: RejectBookingRequest,
+    user_id: UUID = Depends(get_current_user_id),
+    db: AsyncSession = Depends(get_db),
+) -> BookingResponse:
+    """Reject a pending booking and release inventory."""
+    repo = _make_repo(db)
+    use_case = RejectBookingUseCase(repo)
+    try:
+        dto = RejectBookingDTO(
+            booking_id=booking_id,
+            admin_user_id=user_id,
+            rejection_reason=body.rejection_reason,
+        )
+        result = await use_case.execute(dto)
+        return BookingResponse(**result.model_dump())
+    except LookupError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc))
+    except PermissionError as exc:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(exc))
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc))
