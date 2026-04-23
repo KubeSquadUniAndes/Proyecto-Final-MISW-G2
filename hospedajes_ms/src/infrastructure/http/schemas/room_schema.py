@@ -52,6 +52,7 @@ class UpdateRoomRequest(BaseModel):
 
 class RoomResponse(BaseModel):
     id: UUID
+    hotel_id: UUID
     name: str
     room_type: RoomType
     price: Decimal
