@@ -1,5 +1,4 @@
 import uuid
-from decimal import Decimal
 
 from sqlalchemy import Column, DateTime, Enum, Float, Integer, Numeric, String, Text
 from sqlalchemy.dialects.postgresql import UUID

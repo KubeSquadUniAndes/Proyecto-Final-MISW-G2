@@ -1,7 +1,6 @@
 """Use case: Approve a pending booking (hotel admin action)."""
 
 import logging
-from datetime import datetime
 
 from src.application.dtos.booking_dto import ApproveBookingDTO, BookingResponseDTO
 from src.domain.entities.booking import BookingStatus
@@ -19,7 +18,7 @@ class ApproveBookingUseCase:
     async def execute(self, dto: ApproveBookingDTO) -> BookingResponseDTO:
         """
         Approve a booking in pending status.
-        
+
         Raises:
             LookupError: Booking not found
             ValueError: Booking is not in pending status or hold expired

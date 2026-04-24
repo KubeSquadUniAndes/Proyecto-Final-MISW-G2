@@ -1,7 +1,6 @@
 """Unit tests for CheckAvailabilityUseCase."""
 
 from datetime import datetime, timedelta
-from decimal import Decimal
 from uuid import uuid4
 
 import pytest
@@ -17,9 +16,7 @@ class MockBookingRepository:
     def __init__(self):
         self.bookings = []
 
-    async def get_by_resource_and_date_range(
-        self, resource_id, start_time, end_time
-    ):
+    async def get_by_resource_and_date_range(self, resource_id, start_time, end_time):
         """Return bookings that overlap with the date range."""
         return [
             b
@@ -67,7 +64,7 @@ async def test_check_availability_with_bookings():
     repo = MockBookingRepository()
     resource_id = uuid4()
     user_id = uuid4()
-    
+
     start_time = datetime.utcnow() + timedelta(days=1)
     end_time = datetime.utcnow() + timedelta(days=10)
 
@@ -127,7 +124,7 @@ async def test_check_availability_filter_by_room_type():
     repo = MockBookingRepository()
     resource_id = uuid4()
     user_id = uuid4()
-    
+
     start_time = datetime.utcnow() + timedelta(days=1)
     end_time = datetime.utcnow() + timedelta(days=10)
 
@@ -181,7 +178,7 @@ async def test_check_availability_filter_by_status():
     repo = MockBookingRepository()
     resource_id = uuid4()
     user_id = uuid4()
-    
+
     start_time = datetime.utcnow() + timedelta(days=1)
     end_time = datetime.utcnow() + timedelta(days=10)
 
@@ -237,7 +234,7 @@ async def test_check_availability_different_resource():
     resource_id_1 = uuid4()
     resource_id_2 = uuid4()
     user_id = uuid4()
-    
+
     start_time = datetime.utcnow() + timedelta(days=1)
     end_time = datetime.utcnow() + timedelta(days=10)
 
@@ -289,7 +286,7 @@ async def test_check_availability_no_overlap():
     repo = MockBookingRepository()
     resource_id = uuid4()
     user_id = uuid4()
-    
+
     # Query range: days 10-15
     start_time = datetime.utcnow() + timedelta(days=10)
     end_time = datetime.utcnow() + timedelta(days=15)
@@ -339,15 +336,14 @@ async def test_check_availability_no_overlap():
 async def test_check_availability_invalid_date_range():
     """Test that end_time before start_time raises error."""
     # Arrange
-    repo = MockBookingRepository()
     resource_id = uuid4()
-    
+
     start_time = datetime.utcnow() + timedelta(days=10)
     end_time = datetime.utcnow() + timedelta(days=5)  # Before start_time
 
     # Act & Assert
     with pytest.raises(ValueError, match="end_time must be after start_time"):
-        dto = AvailabilityQueryDTO(
+        AvailabilityQueryDTO(
             resource_id=resource_id,
             start_time=start_time,
             end_time=end_time,

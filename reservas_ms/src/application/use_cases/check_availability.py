@@ -23,7 +23,7 @@ class CheckAvailabilityUseCase:
     async def execute(self, dto: AvailabilityQueryDTO) -> AvailabilityResponseDTO:
         """
         Get all bookings for a resource in the specified date range.
-        
+
         Returns bookings that overlap with the query range.
         """
         # Get all bookings for the resource
@@ -35,9 +35,7 @@ class CheckAvailabilityUseCase:
 
         # Filter by room_type if specified
         if dto.room_type:
-            all_bookings = [
-                b for b in all_bookings if b.room_type == dto.room_type
-            ]
+            all_bookings = [b for b in all_bookings if b.room_type == dto.room_type]
 
         # Filter by status if specified
         if dto.status:

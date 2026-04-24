@@ -98,9 +98,9 @@ class SQLAlchemyRoomRepository(RoomRepositoryPort):
 
     async def count_by_status(self, status: RoomStatus) -> int:
         result = await self._session.execute(
-            select(func.count()).select_from(RoomModel).where(
-                RoomModel.status == status
-            )
+            select(func.count())
+            .select_from(RoomModel)
+            .where(RoomModel.status == status)
         )
         return result.scalar_one()
 

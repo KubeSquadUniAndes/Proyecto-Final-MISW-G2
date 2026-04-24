@@ -18,7 +18,7 @@ class RejectBookingUseCase:
     async def execute(self, dto: RejectBookingDTO) -> BookingResponseDTO:
         """
         Reject a booking in pending status.
-        
+
         Raises:
             LookupError: Booking not found
             ValueError: Booking is not in pending status or hold expired
@@ -44,7 +44,7 @@ class RejectBookingUseCase:
 
         # Reject booking (changes status to CANCELLED)
         booking.reject()
-        
+
         # Store rejection reason in notes
         rejection_note = f"[REJECTED by admin] {dto.rejection_reason}"
         if booking.notes:
