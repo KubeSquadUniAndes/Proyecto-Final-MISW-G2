@@ -13,6 +13,7 @@ class RoomModel(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     hotel_id = Column(UUID(as_uuid=True), nullable=False, index=True)
+    hotel_name = Column(String(255), nullable=True)
     name = Column(String(255), nullable=False)
     room_type = Column(
         Enum(

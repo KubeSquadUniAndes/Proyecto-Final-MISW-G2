@@ -14,6 +14,7 @@ class ListRoomsUseCase:
             RoomResponseDTO(
                 id=r.id,
                 hotel_id=r.hotel_id,
+                hotel_name=r.hotel_name,
                 name=r.name,
                 room_type=r.room_type,
                 price=r.price,

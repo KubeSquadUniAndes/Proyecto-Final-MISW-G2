@@ -28,6 +28,7 @@ class RegisterUserUseCase:
             hashed_password=hashed,
             full_name=dto.full_name,
             role=dto.role,
+            **({"id": dto.user_id} if dto.user_id else {}),
         )
         saved = await self._user_repo.save(user)
         return UserResponseDTO(

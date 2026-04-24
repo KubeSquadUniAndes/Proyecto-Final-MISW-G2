@@ -9,9 +9,18 @@ bearer_scheme = HTTPBearer()
 _jwt_service = JWTService()
 
 
+from dataclasses import dataclass
+
+
+@dataclass
+class TokenClaims:
+    user_id: UUID
+    full_name: str | None = None
+
+
 async def require_hotel_role(
     credentials: HTTPAuthorizationCredentials = Security(bearer_scheme),
-) -> UUID:
+) -> TokenClaims:
     """Validates JWT and ensures the caller has the 'hotel' role."""
     try:
         payload = _jwt_service.decode_access_token(credentials.credentials)
@@ -29,12 +38,15 @@ async def require_hotel_role(
             detail="Access restricted to hotel role",
         )
 
-    return UUID(payload["sub"])
+    return TokenClaims(
+        user_id=UUID(payload["sub"]),
+        full_name=payload.get("full_name"),
+    )
 
 
 async def require_hotel_or_traveler_role(
     credentials: HTTPAuthorizationCredentials = Security(bearer_scheme),
-) -> UUID:
+) -> TokenClaims:
     """Validates JWT and ensures the caller has the 'hotel' or 'traveler' role."""
     try:
         payload = _jwt_service.decode_access_token(credentials.credentials)
@@ -52,4 +64,7 @@ async def require_hotel_or_traveler_role(
             detail="Access restricted to hotel or traveler role",
         )
 
-    return UUID(payload["sub"])
+    return TokenClaims(
+        user_id=UUID(payload["sub"]),
+        full_name=payload.get("full_name"),
+    )

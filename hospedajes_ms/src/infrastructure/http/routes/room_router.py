@@ -15,6 +15,7 @@ from src.infrastructure.database.repositories.sqlalchemy_room_repository import 
     SQLAlchemyRoomRepository,
 )
 from src.infrastructure.http.dependencies import (
+    TokenClaims,
     require_hotel_or_traveler_role,
     require_hotel_role,
 )
@@ -44,13 +45,17 @@ def _make_repo(db: AsyncSession) -> SQLAlchemyRoomRepository:
 async def create_room(
     body: CreateRoomRequest,
     db: AsyncSession = Depends(get_db),
-    hotel_id: UUID = Depends(require_hotel_role),
+    claims: TokenClaims = Depends(require_hotel_role),
 ):
     repo = _make_repo(db)
     use_case = CreateRoomUseCase(repo)
     try:
         result = await use_case.execute(
-            CreateRoomDTO(hotel_id=hotel_id, **body.model_dump())
+            CreateRoomDTO(
+                hotel_id=claims.user_id,
+                hotel_name=claims.full_name,
+                **body.model_dump(),
+            )
         )
         return RoomResponse(**result.model_dump())
     except ValueError as exc:
@@ -67,7 +72,7 @@ async def list_rooms(
         default=None, description="Filtrar habitaciones por hotel"
     ),
     db: AsyncSession = Depends(get_db),
-    _: UUID = Depends(require_hotel_or_traveler_role),
+    _: TokenClaims = Depends(require_hotel_or_traveler_role),
 ):
     repo = _make_repo(db)
     use_case = ListRoomsUseCase(repo)
@@ -82,7 +87,7 @@ async def list_rooms(
 )
 async def get_stats(
     db: AsyncSession = Depends(get_db),
-    _: UUID = Depends(require_hotel_role),
+    _: TokenClaims = Depends(require_hotel_role),
 ):
     repo = _make_repo(db)
     use_case = GetRoomStatsUseCase(repo)
@@ -99,7 +104,7 @@ async def get_stats(
 async def get_room(
     room_id: UUID,
     db: AsyncSession = Depends(get_db),
-    _: UUID = Depends(require_hotel_or_traveler_role),
+    _: TokenClaims = Depends(require_hotel_or_traveler_role),
 ):
     repo = _make_repo(db)
     use_case = GetRoomUseCase(repo)
@@ -120,7 +125,7 @@ async def update_room(
     room_id: UUID,
     body: UpdateRoomRequest,
     db: AsyncSession = Depends(get_db),
-    _: UUID = Depends(require_hotel_role),
+    _: TokenClaims = Depends(require_hotel_role),
 ):
     repo = _make_repo(db)
     use_case = UpdateRoomUseCase(repo)
@@ -140,7 +145,7 @@ async def update_room(
 async def delete_room(
     room_id: UUID,
     db: AsyncSession = Depends(get_db),
-    _: UUID = Depends(require_hotel_role),
+    _: TokenClaims = Depends(require_hotel_role),
 ):
     repo = _make_repo(db)
     use_case = DeleteRoomUseCase(repo)

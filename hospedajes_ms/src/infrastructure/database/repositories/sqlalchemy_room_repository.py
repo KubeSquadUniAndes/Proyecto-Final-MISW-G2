@@ -17,6 +17,7 @@ class SQLAlchemyRoomRepository(RoomRepositoryPort):
         return Room(
             id=model.id,
             hotel_id=model.hotel_id,
+            hotel_name=model.hotel_name,
             name=model.name,
             room_type=RoomType(model.room_type),
             price=Decimal(str(model.price)),
@@ -33,6 +34,7 @@ class SQLAlchemyRoomRepository(RoomRepositoryPort):
         return RoomModel(
             id=room.id,
             hotel_id=room.hotel_id,
+            hotel_name=room.hotel_name,
             name=room.name,
             room_type=room.room_type,
             price=room.price,
