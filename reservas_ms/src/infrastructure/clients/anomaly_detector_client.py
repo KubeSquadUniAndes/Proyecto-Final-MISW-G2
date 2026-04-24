@@ -21,7 +21,7 @@ class AnomalyDetectorClient:
         self,
         user_id: UUID,
         booking_id: UUID,
-        resource_id: UUID,
+        room_id: UUID,
         start_time: datetime,
         end_time: datetime,
     ) -> dict:
@@ -32,7 +32,7 @@ class AnomalyDetectorClient:
         payload = {
             "user_id": str(user_id),
             "booking_id": str(booking_id),
-            "resource_id": str(resource_id),
+            "resource_id": str(room_id),
             "start_time": start_time.isoformat(),
             "end_time": end_time.isoformat(),
         }

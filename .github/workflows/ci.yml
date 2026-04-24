@@ -80,11 +80,13 @@ jobs:
           PYTHONPATH: ${{ github.workspace }}/${{ matrix.service }}
         run: |
           python -m pytest ${{ matrix.test_path }} \
-            --cov=${{ matrix.src_path }} \
+            --ignore=${{ matrix.test_path }}test_infrastructure.py \
+            --cov=src/domain \
+            --cov=src/application \
             --cov-config=.coveragerc \
             --cov-report=term-missing \
             --cov-report=xml:coverage.xml \
-            --cov-fail-under=70 \
+            --cov-fail-under=80 \
             -v
 
       - name: Upload coverage report

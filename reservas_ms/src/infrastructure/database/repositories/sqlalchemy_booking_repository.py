@@ -26,7 +26,8 @@ class SQLAlchemyBookingRepository(BookingRepositoryPort):
         return Booking(
             id=model.id,
             user_id=model.user_id,
-            resource_id=model.resource_id,
+            hotel_id=model.hotel_id,
+            room_id=model.room_id,
             start_time=model.start_time,
             end_time=model.end_time,
             status=BookingStatus(model.status),
@@ -110,7 +111,8 @@ class SQLAlchemyBookingRepository(BookingRepositoryPort):
         model = BookingModel(
             id=booking.id,
             user_id=booking.user_id,
-            resource_id=booking.resource_id,
+            hotel_id=booking.hotel_id,
+            room_id=booking.room_id,
             start_time=booking.start_time,
             end_time=booking.end_time,
             status=booking.status,
@@ -212,3 +214,33 @@ class SQLAlchemyBookingRepository(BookingRepositoryPort):
         await self._session.delete(model)
         await self._session.flush()
         return True
+
+    async def get_by_room_and_date_range(
+        self, room_id: UUID, start_time, end_time
+    ) -> list[Booking]:
+        """Get all bookings for a room that overlap with the date range."""
+        result = await self._session.execute(
+            select(BookingModel).where(
+                BookingModel.room_id == room_id,
+                BookingModel.start_time < end_time,
+                BookingModel.end_time > start_time,
+            )
+        )
+        models = result.scalars().all()
+        bookings = []
+        for m in models:
+            decrypted = await self._decrypt_row(m)
+            bookings.append(self._to_domain(m, decrypted))
+        return bookings
+
+    async def list_by_hotel(self, hotel_id: UUID) -> list[Booking]:
+        """Get all bookings for a hotel."""
+        result = await self._session.execute(
+            select(BookingModel).where(BookingModel.hotel_id == hotel_id)
+        )
+        models = result.scalars().all()
+        bookings = []
+        for m in models:
+            decrypted = await self._decrypt_row(m)
+            bookings.append(self._to_domain(m, decrypted))
+        return bookings

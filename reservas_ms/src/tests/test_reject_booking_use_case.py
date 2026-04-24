@@ -37,12 +37,14 @@ async def test_reject_booking_success():
     booking_id = uuid4()
     user_id = uuid4()
     admin_id = uuid4()
-    resource_id = uuid4()
+    hotel_id = uuid4()
+    room_id = uuid4()
 
     booking = Booking(
         id=booking_id,
         user_id=user_id,
-        resource_id=resource_id,
+        hotel_id=hotel_id,
+        room_id=room_id,
         start_time=datetime.utcnow() + timedelta(days=1),
         end_time=datetime.utcnow() + timedelta(days=3),
         status=BookingStatus.PENDING,
@@ -93,12 +95,14 @@ async def test_reject_booking_not_pending():
     booking_id = uuid4()
     user_id = uuid4()
     admin_id = uuid4()
-    resource_id = uuid4()
+    hotel_id = uuid4()
+    room_id = uuid4()
 
     booking = Booking(
         id=booking_id,
         user_id=user_id,
-        resource_id=resource_id,
+        hotel_id=hotel_id,
+        room_id=room_id,
         start_time=datetime.utcnow() + timedelta(days=1),
         end_time=datetime.utcnow() + timedelta(days=3),
         status=BookingStatus.CONFIRMED,  # Already confirmed
@@ -125,12 +129,14 @@ async def test_reject_booking_already_cancelled():
     booking_id = uuid4()
     user_id = uuid4()
     admin_id = uuid4()
-    resource_id = uuid4()
+    hotel_id = uuid4()
+    room_id = uuid4()
 
     booking = Booking(
         id=booking_id,
         user_id=user_id,
-        resource_id=resource_id,
+        hotel_id=hotel_id,
+        room_id=room_id,
         start_time=datetime.utcnow() + timedelta(days=1),
         end_time=datetime.utcnow() + timedelta(days=3),
         status=BookingStatus.CANCELLED,
@@ -157,12 +163,14 @@ async def test_reject_booking_appends_to_existing_notes():
     booking_id = uuid4()
     user_id = uuid4()
     admin_id = uuid4()
-    resource_id = uuid4()
+    hotel_id = uuid4()
+    room_id = uuid4()
 
     booking = Booking(
         id=booking_id,
         user_id=user_id,
-        resource_id=resource_id,
+        hotel_id=hotel_id,
+        room_id=room_id,
         start_time=datetime.utcnow() + timedelta(days=1),
         end_time=datetime.utcnow() + timedelta(days=3),
         status=BookingStatus.PENDING,
@@ -194,13 +202,15 @@ async def test_reject_booking_updates_timestamp():
     booking_id = uuid4()
     user_id = uuid4()
     admin_id = uuid4()
-    resource_id = uuid4()
+    hotel_id = uuid4()
+    room_id = uuid4()
 
     original_time = datetime.utcnow() - timedelta(hours=1)
     booking = Booking(
         id=booking_id,
         user_id=user_id,
-        resource_id=resource_id,
+        hotel_id=hotel_id,
+        room_id=room_id,
         start_time=datetime.utcnow() + timedelta(days=1),
         end_time=datetime.utcnow() + timedelta(days=3),
         status=BookingStatus.PENDING,
@@ -232,12 +242,14 @@ async def test_reject_booking_with_empty_reason():
     booking_id = uuid4()
     user_id = uuid4()
     admin_id = uuid4()
-    resource_id = uuid4()
+    hotel_id = uuid4()
+    room_id = uuid4()
 
     booking = Booking(
         id=booking_id,
         user_id=user_id,
-        resource_id=resource_id,
+        hotel_id=hotel_id,
+        room_id=room_id,
         start_time=datetime.utcnow() + timedelta(days=1),
         end_time=datetime.utcnow() + timedelta(days=3),
         status=BookingStatus.PENDING,

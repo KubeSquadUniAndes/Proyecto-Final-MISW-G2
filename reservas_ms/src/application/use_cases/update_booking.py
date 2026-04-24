@@ -42,7 +42,7 @@ class UpdateBookingUseCase:
 
         has_conflict = await self._domain_service.has_schedule_conflict(
             user_id=booking.user_id,
-            resource_id=booking.resource_id,
+            room_id=booking.room_id,
             start_time=booking.start_time,
             end_time=booking.end_time,
             exclude_booking_id=booking.id,
@@ -55,7 +55,7 @@ class UpdateBookingUseCase:
                 result = await self._anomaly_client.analyze(
                     user_id=booking.user_id,
                     booking_id=booking.id,
-                    resource_id=booking.resource_id,
+                    room_id=booking.room_id,
                     start_time=booking.start_time,
                     end_time=booking.end_time,
                 )

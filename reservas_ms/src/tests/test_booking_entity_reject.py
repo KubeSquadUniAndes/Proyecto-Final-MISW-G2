@@ -12,7 +12,8 @@ def test_reject_pending_booking():
     """Test rejecting a pending booking changes status to cancelled."""
     booking = Booking(
         user_id=uuid4(),
-        resource_id=uuid4(),
+        hotel_id=uuid4(),
+        room_id=uuid4(),
         start_time=datetime.utcnow() + timedelta(days=1),
         end_time=datetime.utcnow() + timedelta(days=3),
         status=BookingStatus.PENDING,
@@ -29,7 +30,8 @@ def test_reject_confirmed_booking_fails():
     """Test rejecting a confirmed booking raises ValueError."""
     booking = Booking(
         user_id=uuid4(),
-        resource_id=uuid4(),
+        hotel_id=uuid4(),
+        room_id=uuid4(),
         start_time=datetime.utcnow() + timedelta(days=1),
         end_time=datetime.utcnow() + timedelta(days=3),
         status=BookingStatus.CONFIRMED,
@@ -43,7 +45,8 @@ def test_reject_cancelled_booking_fails():
     """Test rejecting an already cancelled booking raises ValueError."""
     booking = Booking(
         user_id=uuid4(),
-        resource_id=uuid4(),
+        hotel_id=uuid4(),
+        room_id=uuid4(),
         start_time=datetime.utcnow() + timedelta(days=1),
         end_time=datetime.utcnow() + timedelta(days=3),
         status=BookingStatus.CANCELLED,
@@ -57,7 +60,8 @@ def test_reject_completed_booking_fails():
     """Test rejecting a completed booking raises ValueError."""
     booking = Booking(
         user_id=uuid4(),
-        resource_id=uuid4(),
+        hotel_id=uuid4(),
+        room_id=uuid4(),
         start_time=datetime.utcnow() - timedelta(days=3),
         end_time=datetime.utcnow() - timedelta(days=1),
         status=BookingStatus.COMPLETED,
@@ -71,7 +75,8 @@ def test_confirm_and_reject_flow():
     """Test that a booking can be confirmed but not rejected after confirmation."""
     booking = Booking(
         user_id=uuid4(),
-        resource_id=uuid4(),
+        hotel_id=uuid4(),
+        room_id=uuid4(),
         start_time=datetime.utcnow() + timedelta(days=1),
         end_time=datetime.utcnow() + timedelta(days=3),
         status=BookingStatus.PENDING,
