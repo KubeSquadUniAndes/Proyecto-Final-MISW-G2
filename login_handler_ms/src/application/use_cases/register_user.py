@@ -1,3 +1,5 @@
+from uuid import uuid4
+
 from src.application.dtos.auth_dto import RegisterUserDTO, UserResponseDTO
 from src.domain.entities.user import User
 from src.domain.repositories.user_repository_port import UserRepositoryPort
@@ -24,11 +26,11 @@ class RegisterUserUseCase:
 
         hashed = self._password_service.hash(dto.password)
         user = User(
+            id=dto.user_id if dto.user_id is not None else uuid4(),
             email=dto.email,
             hashed_password=hashed,
             full_name=dto.full_name,
             role=dto.role,
-            **({"id": dto.user_id} if dto.user_id else {}),
         )
         saved = await self._user_repo.save(user)
         return UserResponseDTO(
