@@ -24,3 +24,8 @@ class BookingRepositoryPort(ABC):
 
     @abstractmethod
     async def delete(self, booking_id: UUID) -> bool: ...
+
+    @abstractmethod
+    async def get_by_resource_and_date_range(
+        self, resource_id: UUID, start_time, end_time
+    ) -> list[Booking]: ...

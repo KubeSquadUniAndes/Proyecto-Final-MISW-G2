@@ -85,3 +85,12 @@ class ErrorResponse(BaseModel):
 
 class RejectBookingRequest(BaseModel):
     rejection_reason: str
+
+
+class AvailabilityResponse(BaseModel):
+    resource_id: UUID
+    query_range: dict
+    filters: dict
+    bookings: list[dict]
+    total_bookings: int
+    summary: dict

@@ -1,3 +1,4 @@
+from datetime import datetime
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -10,8 +11,10 @@ from src.application.dtos.booking_dto import (
     RejectBookingDTO,
     UpdateBookingDTO,
 )
+from src.application.dtos.availability_dto import AvailabilityQueryDTO
 from src.application.use_cases.approve_booking import ApproveBookingUseCase
 from src.application.use_cases.cancel_booking import CancelBookingUseCase
+from src.application.use_cases.check_availability import CheckAvailabilityUseCase
 from src.application.use_cases.create_booking import CreateBookingUseCase
 from src.application.use_cases.list_bookings import ListBookingsUseCase
 from src.application.use_cases.reject_booking import RejectBookingUseCase
@@ -25,6 +28,7 @@ from src.infrastructure.database.repositories.sqlalchemy_booking_repository impo
 )
 from src.infrastructure.http.middleware.auth_dependency import get_current_user_id
 from src.infrastructure.http.schemas.booking_schema import (
+    AvailabilityResponse,
     BookingResponse,
     CreateBookingRequest,
     ErrorResponse,
@@ -61,6 +65,41 @@ async def list_bookings(
     use_case = ListBookingsUseCase(repo)
     results = await use_case.execute(user_id)
     return [BookingResponse(**r.model_dump()) for r in results]
+
+
+# ── GET /bookings/availability ────────────────────────────────────────────────
+
+
+@router.get(
+    "/availability",
+    response_model=AvailabilityResponse,
+    summary="Check availability for a resource in a date range",
+    responses={
+        400: {"model": ErrorResponse},
+        422: {"model": ErrorResponse},
+    },
+)
+async def check_availability(
+    resource_id: UUID,
+    start_time: datetime,
+    end_time: datetime,
+    room_type: str | None = None,
+    db: AsyncSession = Depends(get_db),
+) -> AvailabilityResponse:
+    """Get all bookings for a resource in the specified date range."""
+    repo = _make_repo(db)
+    use_case = CheckAvailabilityUseCase(repo)
+    try:
+        dto = AvailabilityQueryDTO(
+            resource_id=resource_id,
+            start_time=start_time,
+            end_time=end_time,
+            room_type=room_type,
+        )
+        result = await use_case.execute(dto)
+        return AvailabilityResponse(**result.model_dump())
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc))
 
 
 # ── GET /bookings/{booking_id} ─────────────────────────────────────────────────
