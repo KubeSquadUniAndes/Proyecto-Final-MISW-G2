@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from uuid import UUID
 
 from fastapi import HTTPException, Security, status
@@ -7,9 +8,6 @@ from src.infrastructure.security.jwt_service import JWTService
 
 bearer_scheme = HTTPBearer()
 _jwt_service = JWTService()
-
-
-from dataclasses import dataclass
 
 
 @dataclass
