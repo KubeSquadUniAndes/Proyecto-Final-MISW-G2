@@ -16,12 +16,12 @@ class MockBookingRepository:
     def __init__(self):
         self.bookings = []
 
-    async def get_by_resource_and_date_range(self, resource_id, start_time, end_time):
+    async def get_by_room_and_date_range(self, room_id, start_time, end_time):
         """Return bookings that overlap with the date range."""
         return [
             b
             for b in self.bookings
-            if b.resource_id == resource_id
+            if b.room_id == room_id
             and b.start_time < end_time
             and b.end_time > start_time
         ]
@@ -35,13 +35,13 @@ async def test_check_availability_no_bookings():
     """Test availability check when no bookings exist."""
     # Arrange
     repo = MockBookingRepository()
-    resource_id = uuid4()
+    room_id = uuid4()
     start_time = datetime.utcnow() + timedelta(days=1)
     end_time = datetime.utcnow() + timedelta(days=5)
 
     use_case = CheckAvailabilityUseCase(repo)
     dto = AvailabilityQueryDTO(
-        resource_id=resource_id,
+        room_id=room_id,
         start_time=start_time,
         end_time=end_time,
     )
@@ -50,7 +50,7 @@ async def test_check_availability_no_bookings():
     result = await use_case.execute(dto)
 
     # Assert
-    assert result.resource_id == resource_id
+    assert result.room_id == room_id
     assert result.total_bookings == 0
     assert len(result.bookings) == 0
     assert result.summary["confirmed"] == 0
@@ -62,7 +62,8 @@ async def test_check_availability_with_bookings():
     """Test availability check with existing bookings."""
     # Arrange
     repo = MockBookingRepository()
-    resource_id = uuid4()
+    hotel_id = uuid4()
+    room_id = uuid4()
     user_id = uuid4()
 
     start_time = datetime.utcnow() + timedelta(days=1)
@@ -72,7 +73,8 @@ async def test_check_availability_with_bookings():
     booking1 = Booking(
         id=uuid4(),
         user_id=user_id,
-        resource_id=resource_id,
+        hotel_id=hotel_id,
+        room_id=room_id,
         start_time=datetime.utcnow() + timedelta(days=2),
         end_time=datetime.utcnow() + timedelta(days=4),
         status=BookingStatus.CONFIRMED,
@@ -87,7 +89,8 @@ async def test_check_availability_with_bookings():
     booking2 = Booking(
         id=uuid4(),
         user_id=user_id,
-        resource_id=resource_id,
+        hotel_id=hotel_id,
+        room_id=room_id,
         start_time=datetime.utcnow() + timedelta(days=6),
         end_time=datetime.utcnow() + timedelta(days=8),
         status=BookingStatus.PENDING,
@@ -100,7 +103,7 @@ async def test_check_availability_with_bookings():
 
     use_case = CheckAvailabilityUseCase(repo)
     dto = AvailabilityQueryDTO(
-        resource_id=resource_id,
+        room_id=room_id,
         start_time=start_time,
         end_time=end_time,
     )
@@ -109,7 +112,7 @@ async def test_check_availability_with_bookings():
     result = await use_case.execute(dto)
 
     # Assert
-    assert result.resource_id == resource_id
+    assert result.room_id == room_id
     assert result.total_bookings == 2
     assert len(result.bookings) == 2
     assert result.summary["confirmed"] == 1
@@ -122,7 +125,8 @@ async def test_check_availability_filter_by_room_type():
     """Test availability check filtered by room type."""
     # Arrange
     repo = MockBookingRepository()
-    resource_id = uuid4()
+    hotel_id = uuid4()
+    room_id = uuid4()
     user_id = uuid4()
 
     start_time = datetime.utcnow() + timedelta(days=1)
@@ -132,7 +136,8 @@ async def test_check_availability_filter_by_room_type():
     booking1 = Booking(
         id=uuid4(),
         user_id=user_id,
-        resource_id=resource_id,
+        hotel_id=hotel_id,
+        room_id=room_id,
         start_time=datetime.utcnow() + timedelta(days=2),
         end_time=datetime.utcnow() + timedelta(days=4),
         status=BookingStatus.CONFIRMED,
@@ -145,7 +150,8 @@ async def test_check_availability_filter_by_room_type():
     booking2 = Booking(
         id=uuid4(),
         user_id=user_id,
-        resource_id=resource_id,
+        hotel_id=hotel_id,
+        room_id=room_id,
         start_time=datetime.utcnow() + timedelta(days=6),
         end_time=datetime.utcnow() + timedelta(days=8),
         status=BookingStatus.CONFIRMED,
@@ -156,7 +162,7 @@ async def test_check_availability_filter_by_room_type():
 
     use_case = CheckAvailabilityUseCase(repo)
     dto = AvailabilityQueryDTO(
-        resource_id=resource_id,
+        room_id=room_id,
         start_time=start_time,
         end_time=end_time,
         room_type="Deluxe",
@@ -176,7 +182,8 @@ async def test_check_availability_filter_by_status():
     """Test availability check filtered by status."""
     # Arrange
     repo = MockBookingRepository()
-    resource_id = uuid4()
+    hotel_id = uuid4()
+    room_id = uuid4()
     user_id = uuid4()
 
     start_time = datetime.utcnow() + timedelta(days=1)
@@ -186,7 +193,8 @@ async def test_check_availability_filter_by_status():
     booking1 = Booking(
         id=uuid4(),
         user_id=user_id,
-        resource_id=resource_id,
+        hotel_id=hotel_id,
+        room_id=room_id,
         start_time=datetime.utcnow() + timedelta(days=2),
         end_time=datetime.utcnow() + timedelta(days=4),
         status=BookingStatus.CONFIRMED,
@@ -199,7 +207,8 @@ async def test_check_availability_filter_by_status():
     booking2 = Booking(
         id=uuid4(),
         user_id=user_id,
-        resource_id=resource_id,
+        hotel_id=hotel_id,
+        room_id=room_id,
         start_time=datetime.utcnow() + timedelta(days=6),
         end_time=datetime.utcnow() + timedelta(days=8),
         status=BookingStatus.PENDING,
@@ -210,7 +219,7 @@ async def test_check_availability_filter_by_status():
 
     use_case = CheckAvailabilityUseCase(repo)
     dto = AvailabilityQueryDTO(
-        resource_id=resource_id,
+        room_id=room_id,
         start_time=start_time,
         end_time=end_time,
         status=BookingStatus.CONFIRMED,
@@ -231,18 +240,20 @@ async def test_check_availability_different_resource():
     """Test that bookings from different resources are not returned."""
     # Arrange
     repo = MockBookingRepository()
-    resource_id_1 = uuid4()
-    resource_id_2 = uuid4()
+    hotel_id = uuid4()
+    room_id_1 = uuid4()
+    room_id_2 = uuid4()
     user_id = uuid4()
 
     start_time = datetime.utcnow() + timedelta(days=1)
     end_time = datetime.utcnow() + timedelta(days=10)
 
-    # Add booking for resource 1
+    # Add booking for room 1
     booking1 = Booking(
         id=uuid4(),
         user_id=user_id,
-        resource_id=resource_id_1,
+        hotel_id=hotel_id,
+        room_id=room_id_1,
         start_time=datetime.utcnow() + timedelta(days=2),
         end_time=datetime.utcnow() + timedelta(days=4),
         status=BookingStatus.CONFIRMED,
@@ -251,11 +262,12 @@ async def test_check_availability_different_resource():
     )
     repo.add_booking(booking1)
 
-    # Add booking for resource 2
+    # Add booking for room 2
     booking2 = Booking(
         id=uuid4(),
         user_id=user_id,
-        resource_id=resource_id_2,
+        hotel_id=hotel_id,
+        room_id=room_id_2,
         start_time=datetime.utcnow() + timedelta(days=6),
         end_time=datetime.utcnow() + timedelta(days=8),
         status=BookingStatus.CONFIRMED,
@@ -266,7 +278,7 @@ async def test_check_availability_different_resource():
 
     use_case = CheckAvailabilityUseCase(repo)
     dto = AvailabilityQueryDTO(
-        resource_id=resource_id_1,
+        room_id=room_id_1,
         start_time=start_time,
         end_time=end_time,
     )
@@ -284,7 +296,8 @@ async def test_check_availability_no_overlap():
     """Test that bookings outside the date range are not returned."""
     # Arrange
     repo = MockBookingRepository()
-    resource_id = uuid4()
+    hotel_id = uuid4()
+    room_id = uuid4()
     user_id = uuid4()
 
     # Query range: days 10-15
@@ -295,7 +308,8 @@ async def test_check_availability_no_overlap():
     booking1 = Booking(
         id=uuid4(),
         user_id=user_id,
-        resource_id=resource_id,
+        hotel_id=hotel_id,
+        room_id=room_id,
         start_time=datetime.utcnow() + timedelta(days=2),
         end_time=datetime.utcnow() + timedelta(days=4),
         status=BookingStatus.CONFIRMED,
@@ -308,7 +322,8 @@ async def test_check_availability_no_overlap():
     booking2 = Booking(
         id=uuid4(),
         user_id=user_id,
-        resource_id=resource_id,
+        hotel_id=hotel_id,
+        room_id=room_id,
         start_time=datetime.utcnow() + timedelta(days=20),
         end_time=datetime.utcnow() + timedelta(days=25),
         status=BookingStatus.CONFIRMED,
@@ -319,7 +334,7 @@ async def test_check_availability_no_overlap():
 
     use_case = CheckAvailabilityUseCase(repo)
     dto = AvailabilityQueryDTO(
-        resource_id=resource_id,
+        room_id=room_id,
         start_time=start_time,
         end_time=end_time,
     )
@@ -336,7 +351,7 @@ async def test_check_availability_no_overlap():
 async def test_check_availability_invalid_date_range():
     """Test that end_time before start_time raises error."""
     # Arrange
-    resource_id = uuid4()
+    room_id = uuid4()
 
     start_time = datetime.utcnow() + timedelta(days=10)
     end_time = datetime.utcnow() + timedelta(days=5)  # Before start_time
@@ -344,7 +359,7 @@ async def test_check_availability_invalid_date_range():
     # Act & Assert
     with pytest.raises(ValueError, match="end_time must be after start_time"):
         AvailabilityQueryDTO(
-            resource_id=resource_id,
+            room_id=room_id,
             start_time=start_time,
             end_time=end_time,
         )

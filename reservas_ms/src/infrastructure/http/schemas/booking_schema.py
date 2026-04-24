@@ -8,7 +8,8 @@ from src.domain.entities.booking import BookingStatus
 
 
 class CreateBookingRequest(BaseModel):
-    resource_id: UUID
+    hotel_id: UUID
+    room_id: UUID
     start_time: datetime
     end_time: datetime
     notes: str | None = None
@@ -51,7 +52,8 @@ class UpdateBookingRequest(BaseModel):
 class BookingResponse(BaseModel):
     id: UUID
     user_id: UUID
-    resource_id: UUID
+    hotel_id: UUID
+    room_id: UUID
     start_time: datetime
     end_time: datetime
     status: BookingStatus
@@ -88,7 +90,7 @@ class RejectBookingRequest(BaseModel):
 
 
 class AvailabilityResponse(BaseModel):
-    resource_id: UUID
+    room_id: UUID
     query_range: dict
     filters: dict
     bookings: list[dict]

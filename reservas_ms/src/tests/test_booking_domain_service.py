@@ -25,12 +25,14 @@ async def test_has_schedule_conflict_no_conflict():
     service = BookingDomainService(repo)
 
     user_id = uuid4()
-    resource_id = uuid4()
+    hotel_id = uuid4()
+    room_id = uuid4()
 
     existing_booking = Booking(
         id=uuid4(),
         user_id=user_id,
-        resource_id=resource_id,
+        hotel_id=hotel_id,
+        room_id=room_id,
         start_time=datetime.utcnow() + timedelta(days=1),
         end_time=datetime.utcnow() + timedelta(days=3),
         total_price=Decimal("300.00"),
@@ -41,7 +43,7 @@ async def test_has_schedule_conflict_no_conflict():
     # New booking after existing one
     has_conflict = await service.has_schedule_conflict(
         user_id=user_id,
-        resource_id=resource_id,
+        room_id=room_id,
         start_time=datetime.utcnow() + timedelta(days=5),
         end_time=datetime.utcnow() + timedelta(days=7),
     )
@@ -56,12 +58,14 @@ async def test_has_schedule_conflict_with_overlap():
     service = BookingDomainService(repo)
 
     user_id = uuid4()
-    resource_id = uuid4()
+    hotel_id = uuid4()
+    room_id = uuid4()
 
     existing_booking = Booking(
         id=uuid4(),
         user_id=user_id,
-        resource_id=resource_id,
+        hotel_id=hotel_id,
+        room_id=room_id,
         start_time=datetime.utcnow() + timedelta(days=1),
         end_time=datetime.utcnow() + timedelta(days=5),
         total_price=Decimal("300.00"),
@@ -72,7 +76,7 @@ async def test_has_schedule_conflict_with_overlap():
     # New booking overlaps with existing one
     has_conflict = await service.has_schedule_conflict(
         user_id=user_id,
-        resource_id=resource_id,
+        room_id=room_id,
         start_time=datetime.utcnow() + timedelta(days=3),
         end_time=datetime.utcnow() + timedelta(days=7),
     )
@@ -87,13 +91,15 @@ async def test_has_schedule_conflict_different_resource():
     service = BookingDomainService(repo)
 
     user_id = uuid4()
-    resource1_id = uuid4()
-    resource2_id = uuid4()
+    hotel_id = uuid4()
+    room1_id = uuid4()
+    room2_id = uuid4()
 
     existing_booking = Booking(
         id=uuid4(),
         user_id=user_id,
-        resource_id=resource1_id,
+        hotel_id=hotel_id,
+        room_id=room1_id,
         start_time=datetime.utcnow() + timedelta(days=1),
         end_time=datetime.utcnow() + timedelta(days=5),
         total_price=Decimal("300.00"),
@@ -104,7 +110,7 @@ async def test_has_schedule_conflict_different_resource():
     # New booking for different resource
     has_conflict = await service.has_schedule_conflict(
         user_id=user_id,
-        resource_id=resource2_id,
+        room_id=room2_id,
         start_time=datetime.utcnow() + timedelta(days=2),
         end_time=datetime.utcnow() + timedelta(days=4),
     )
@@ -119,12 +125,14 @@ async def test_has_schedule_conflict_cancelled_booking_ignored():
     service = BookingDomainService(repo)
 
     user_id = uuid4()
-    resource_id = uuid4()
+    hotel_id = uuid4()
+    room_id = uuid4()
 
     cancelled_booking = Booking(
         id=uuid4(),
         user_id=user_id,
-        resource_id=resource_id,
+        hotel_id=hotel_id,
+        room_id=room_id,
         start_time=datetime.utcnow() + timedelta(days=1),
         end_time=datetime.utcnow() + timedelta(days=5),
         total_price=Decimal("300.00"),
@@ -135,7 +143,7 @@ async def test_has_schedule_conflict_cancelled_booking_ignored():
     # New booking overlaps with cancelled one
     has_conflict = await service.has_schedule_conflict(
         user_id=user_id,
-        resource_id=resource_id,
+        room_id=room_id,
         start_time=datetime.utcnow() + timedelta(days=2),
         end_time=datetime.utcnow() + timedelta(days=4),
     )
@@ -150,13 +158,15 @@ async def test_has_schedule_conflict_exclude_booking():
     service = BookingDomainService(repo)
 
     user_id = uuid4()
-    resource_id = uuid4()
+    hotel_id = uuid4()
+    room_id = uuid4()
     booking_id = uuid4()
 
     existing_booking = Booking(
         id=booking_id,
         user_id=user_id,
-        resource_id=resource_id,
+        hotel_id=hotel_id,
+        room_id=room_id,
         start_time=datetime.utcnow() + timedelta(days=1),
         end_time=datetime.utcnow() + timedelta(days=5),
         total_price=Decimal("300.00"),
@@ -167,7 +177,7 @@ async def test_has_schedule_conflict_exclude_booking():
     # Check same time range but exclude the existing booking
     has_conflict = await service.has_schedule_conflict(
         user_id=user_id,
-        resource_id=resource_id,
+        room_id=room_id,
         start_time=datetime.utcnow() + timedelta(days=2),
         end_time=datetime.utcnow() + timedelta(days=4),
         exclude_booking_id=booking_id,
@@ -183,13 +193,15 @@ async def test_has_schedule_conflict_timezone_aware():
     service = BookingDomainService(repo)
 
     user_id = uuid4()
-    resource_id = uuid4()
+    hotel_id = uuid4()
+    room_id = uuid4()
 
     # Create booking with timezone-aware datetime
     existing_booking = Booking(
         id=uuid4(),
         user_id=user_id,
-        resource_id=resource_id,
+        hotel_id=hotel_id,
+        room_id=room_id,
         start_time=datetime.now(timezone.utc) + timedelta(days=1),
         end_time=datetime.now(timezone.utc) + timedelta(days=5),
         total_price=Decimal("300.00"),
@@ -200,7 +212,7 @@ async def test_has_schedule_conflict_timezone_aware():
     # Check with timezone-aware datetimes
     has_conflict = await service.has_schedule_conflict(
         user_id=user_id,
-        resource_id=resource_id,
+        room_id=room_id,
         start_time=datetime.now(timezone.utc) + timedelta(days=3),
         end_time=datetime.now(timezone.utc) + timedelta(days=7),
     )

@@ -9,7 +9,8 @@ from src.domain.entities.booking import BookingStatus
 
 class CreateBookingDTO(BaseModel):
     user_id: UUID
-    resource_id: UUID
+    hotel_id: UUID
+    room_id: UUID
     start_time: datetime
     end_time: datetime
     notes: str | None = None
@@ -70,7 +71,8 @@ class RejectBookingDTO(BaseModel):
 class BookingResponseDTO(BaseModel):
     id: UUID
     user_id: UUID
-    resource_id: UUID
+    hotel_id: UUID
+    room_id: UUID
     start_time: datetime
     end_time: datetime
     status: BookingStatus

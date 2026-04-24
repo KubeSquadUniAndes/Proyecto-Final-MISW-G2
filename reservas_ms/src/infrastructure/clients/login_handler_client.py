@@ -77,3 +77,21 @@ class LoginHandlerClient:
             raise PermissionError(f"Account is not active (status: {status})")
 
         return UUID(payload["sub"])
+
+    async def validate_with_role(self, token: str) -> dict:
+        """Full validation with role extraction.
+        Returns dict with user_id and role.
+        """
+        payload = self.decode_token_locally(token)
+        user_data = await self.get_user_status(token)
+
+        status = user_data.get("status", "")
+        if status == "blocked":
+            raise PermissionError("Your account has been blocked. Contact support.")
+        if status != "active":
+            raise PermissionError(f"Account is not active (status: {status})")
+
+        return {
+            "user_id": UUID(payload["sub"]),
+            "role": payload.get("role", "traveler"),
+        }

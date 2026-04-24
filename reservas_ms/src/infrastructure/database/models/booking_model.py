@@ -23,7 +23,8 @@ class BookingModel(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id = Column(UUID(as_uuid=True), nullable=False, index=True)
-    resource_id = Column(UUID(as_uuid=True), nullable=False, index=True)
+    hotel_id = Column(UUID(as_uuid=True), nullable=False, index=True)
+    room_id = Column(UUID(as_uuid=True), nullable=False, index=True)
     start_time = Column(DateTime(timezone=True), nullable=False)
     end_time = Column(DateTime(timezone=True), nullable=False)
     status = Column(

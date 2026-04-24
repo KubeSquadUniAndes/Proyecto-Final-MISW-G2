@@ -40,7 +40,7 @@ class ApproveBookingUseCase:
         #     raise ValueError("Booking hold has expired")
 
         # TODO: Validate admin has permission over the property
-        # This would require checking if admin_user_id owns/manages resource_id
+        # This would require checking if admin_user_id owns/manages hotel_id
 
         # Confirm booking
         booking.confirm()
@@ -61,7 +61,8 @@ class ApproveBookingUseCase:
         return BookingResponseDTO(
             id=updated.id,
             user_id=updated.user_id,
-            resource_id=updated.resource_id,
+            hotel_id=updated.hotel_id,
+            room_id=updated.room_id,
             start_time=updated.start_time,
             end_time=updated.end_time,
             status=updated.status,

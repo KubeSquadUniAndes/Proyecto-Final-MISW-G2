@@ -26,7 +26,7 @@ from src.infrastructure.database.base import get_db
 from src.infrastructure.database.repositories.sqlalchemy_booking_repository import (
     SQLAlchemyBookingRepository,
 )
-from src.infrastructure.http.middleware.auth_dependency import get_current_user_id
+from src.infrastructure.http.middleware.auth_dependency import get_current_user_id, get_current_user_role
 from src.infrastructure.http.schemas.booking_schema import (
     AvailabilityResponse,
     BookingResponse,
@@ -80,18 +80,18 @@ async def list_bookings(
     },
 )
 async def check_availability(
-    resource_id: UUID,
+    room_id: UUID,
     start_time: datetime,
     end_time: datetime,
     room_type: str | None = None,
     db: AsyncSession = Depends(get_db),
 ) -> AvailabilityResponse:
-    """Get all bookings for a resource in the specified date range."""
+    """Get all bookings for a room in the specified date range."""
     repo = _make_repo(db)
     use_case = CheckAvailabilityUseCase(repo)
     try:
         dto = AvailabilityQueryDTO(
-            resource_id=resource_id,
+            room_id=room_id,
             start_time=start_time,
             end_time=end_time,
             room_type=room_type,
@@ -164,7 +164,8 @@ async def create_booking(
     try:
         dto = CreateBookingDTO(
             user_id=user_id,
-            resource_id=body.resource_id,
+            hotel_id=body.hotel_id,
+            room_id=body.room_id,
             start_time=body.start_time,
             end_time=body.end_time,
             notes=body.notes,
@@ -268,6 +269,43 @@ async def cancel_booking(
         raise HTTPException(status_code=code, detail=detail)
 
 
+# ── GET /bookings/hotel/{hotel_id} ─────────────────────────────────────────────
+
+
+@router.get(
+    "/hotel/{hotel_id}",
+    response_model=list[BookingResponse],
+    summary="List all bookings for a hotel (hotel admin only)",
+    responses={
+        401: {"model": ErrorResponse},
+        403: {"model": ErrorResponse},
+    },
+)
+async def list_bookings_by_hotel(
+    hotel_id: UUID,
+    user_role: tuple[UUID, str] = Depends(get_current_user_role),
+    db: AsyncSession = Depends(get_db),
+) -> list[BookingResponse]:
+    """List all bookings for a specific hotel. Only accessible by hotel admins."""
+    user_id, role = user_role
+    
+    if role != "hotel":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only hotel administrators can access this endpoint"
+        )
+    
+    # TODO: Validate that the hotel_id belongs to this user
+    # This requires querying hospedajes_ms or having a hotel_id in the JWT
+    # For now, any user with role='hotel' can query any hotel
+    
+    repo = _make_repo(db)
+    from src.application.use_cases.list_bookings_by_hotel import ListBookingsByHotelUseCase
+    use_case = ListBookingsByHotelUseCase(repo)
+    results = await use_case.execute(hotel_id)
+    return [BookingResponse(**r.model_dump()) for r in results]
+
+
 # ── PATCH /bookings/{booking_id}/approve ──────────────────────────────────────
 
 
@@ -284,10 +322,18 @@ async def cancel_booking(
 )
 async def approve_booking(
     booking_id: UUID,
-    user_id: UUID = Depends(get_current_user_id),
+    user_role: tuple[UUID, str] = Depends(get_current_user_role),
     db: AsyncSession = Depends(get_db),
 ) -> BookingResponse:
     """Approve a pending booking and trigger payment processing."""
+    user_id, role = user_role
+    
+    if role != "hotel":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only hotel administrators can approve bookings"
+        )
+    
     repo = _make_repo(db)
     use_case = ApproveBookingUseCase(repo)
     try:
@@ -319,10 +365,18 @@ async def approve_booking(
 async def reject_booking(
     booking_id: UUID,
     body: RejectBookingRequest,
-    user_id: UUID = Depends(get_current_user_id),
+    user_role: tuple[UUID, str] = Depends(get_current_user_role),
     db: AsyncSession = Depends(get_db),
 ) -> BookingResponse:
     """Reject a pending booking and release inventory."""
+    user_id, role = user_role
+    
+    if role != "hotel":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only hotel administrators can reject bookings"
+        )
+    
     repo = _make_repo(db)
     use_case = RejectBookingUseCase(repo)
     try:

@@ -30,7 +30,8 @@ async def test_list_bookings_success():
     booking1 = Booking(
         id=booking1_id,
         user_id=user_id,
-        resource_id=uuid4(),
+        hotel_id=uuid4(),
+        room_id=uuid4(),
         start_time=datetime.utcnow() + timedelta(days=1),
         end_time=datetime.utcnow() + timedelta(days=3),
         total_price=Decimal("300.00"),
@@ -39,7 +40,8 @@ async def test_list_bookings_success():
     booking2 = Booking(
         id=booking2_id,
         user_id=user_id,
-        resource_id=uuid4(),
+        hotel_id=uuid4(),
+        room_id=uuid4(),
         start_time=datetime.utcnow() + timedelta(days=5),
         end_time=datetime.utcnow() + timedelta(days=7),
         total_price=Decimal("400.00"),
@@ -79,7 +81,8 @@ async def test_list_bookings_filters_by_user():
     booking1 = Booking(
         id=booking1_id,
         user_id=user1_id,
-        resource_id=uuid4(),
+        hotel_id=uuid4(),
+        room_id=uuid4(),
         start_time=datetime.utcnow() + timedelta(days=1),
         end_time=datetime.utcnow() + timedelta(days=3),
         total_price=Decimal("300.00"),
@@ -88,7 +91,8 @@ async def test_list_bookings_filters_by_user():
     booking2 = Booking(
         id=uuid4(),
         user_id=user2_id,
-        resource_id=uuid4(),
+        hotel_id=uuid4(),
+        room_id=uuid4(),
         start_time=datetime.utcnow() + timedelta(days=5),
         end_time=datetime.utcnow() + timedelta(days=7),
         total_price=Decimal("400.00"),

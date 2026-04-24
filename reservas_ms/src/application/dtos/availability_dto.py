@@ -9,7 +9,7 @@ from src.domain.entities.booking import BookingStatus
 
 
 class AvailabilityQueryDTO(BaseModel):
-    resource_id: UUID
+    room_id: UUID
     start_time: datetime
     end_time: datetime
     room_type: str | None = None
@@ -36,7 +36,7 @@ class BookingSummaryDTO(BaseModel):
 
 
 class AvailabilityResponseDTO(BaseModel):
-    resource_id: UUID
+    room_id: UUID
     query_range: dict
     filters: dict
     bookings: list[BookingSummaryDTO]

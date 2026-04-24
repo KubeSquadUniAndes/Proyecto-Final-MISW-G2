@@ -40,7 +40,7 @@ class RejectBookingUseCase:
         #     raise ValueError("Booking hold has expired")
 
         # TODO: Validate admin has permission over the property
-        # This would require checking if admin_user_id owns/manages resource_id
+        # This would require checking if admin_user_id owns/manages hotel_id
 
         # Reject booking (changes status to CANCELLED)
         booking.reject()
@@ -62,7 +62,7 @@ class RejectBookingUseCase:
         )
 
         # TODO: Release inventory in hospedajes_ms
-        # await hospedajes_client.release_room(resource_id, start_time, end_time)
+        # await hospedajes_client.release_room(room_id, start_time, end_time)
 
         # TODO: Send notification to traveler
         # await notification_client.send(user_id, "booking_rejected", data)
@@ -70,7 +70,8 @@ class RejectBookingUseCase:
         return BookingResponseDTO(
             id=updated.id,
             user_id=updated.user_id,
-            resource_id=updated.resource_id,
+            hotel_id=updated.hotel_id,
+            room_id=updated.room_id,
             start_time=updated.start_time,
             end_time=updated.end_time,
             status=updated.status,

@@ -26,9 +26,9 @@ class CheckAvailabilityUseCase:
 
         Returns bookings that overlap with the query range.
         """
-        # Get all bookings for the resource
-        all_bookings = await self._repo.get_by_resource_and_date_range(
-            resource_id=dto.resource_id,
+        # Get all bookings for the room
+        all_bookings = await self._repo.get_by_room_and_date_range(
+            room_id=dto.room_id,
             start_time=dto.start_time,
             end_time=dto.end_time,
         )
@@ -61,15 +61,15 @@ class CheckAvailabilityUseCase:
         status_counts = Counter(b.status.value for b in all_bookings)
 
         logger.info(
-            "availability_checked resource_id=%s range=%s-%s total=%d",
-            dto.resource_id,
+            "availability_checked room_id=%s range=%s-%s total=%d",
+            dto.room_id,
             dto.start_time,
             dto.end_time,
             len(all_bookings),
         )
 
         return AvailabilityResponseDTO(
-            resource_id=dto.resource_id,
+            room_id=dto.room_id,
             query_range={
                 "start_time": dto.start_time.isoformat(),
                 "end_time": dto.end_time.isoformat(),

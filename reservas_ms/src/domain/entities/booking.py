@@ -23,7 +23,8 @@ STATUS_DISPLAY = {
 @dataclass
 class Booking:
     user_id: UUID
-    resource_id: UUID
+    hotel_id: UUID
+    room_id: UUID
     start_time: datetime
     end_time: datetime
     id: UUID = field(default_factory=uuid4)

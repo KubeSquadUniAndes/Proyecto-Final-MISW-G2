@@ -34,7 +34,8 @@ async def test_cancel_booking_success():
     booking = Booking(
         id=booking_id,
         user_id=user_id,
-        resource_id=uuid4(),
+        hotel_id=uuid4(),
+        room_id=uuid4(),
         start_time=datetime.utcnow() + timedelta(days=1),
         end_time=datetime.utcnow() + timedelta(days=3),
         total_price=Decimal("300.00"),
@@ -74,7 +75,8 @@ async def test_cancel_booking_wrong_user():
     booking = Booking(
         id=booking_id,
         user_id=owner_id,
-        resource_id=uuid4(),
+        hotel_id=uuid4(),
+        room_id=uuid4(),
         start_time=datetime.utcnow() + timedelta(days=1),
         end_time=datetime.utcnow() + timedelta(days=3),
         total_price=Decimal("300.00"),
@@ -100,7 +102,8 @@ async def test_cancel_booking_not_cancellable():
     booking = Booking(
         id=booking_id,
         user_id=user_id,
-        resource_id=uuid4(),
+        hotel_id=uuid4(),
+        room_id=uuid4(),
         start_time=datetime.utcnow() + timedelta(days=1),
         end_time=datetime.utcnow() + timedelta(days=3),
         total_price=Decimal("300.00"),
