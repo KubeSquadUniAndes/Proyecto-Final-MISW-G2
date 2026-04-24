@@ -50,10 +50,10 @@ async def get_current_user_role(
     credentials: HTTPAuthorizationCredentials = Security(bearer_scheme),
 ) -> tuple[UUID, str]:
     """Validates JWT and returns (user_id, role).
-    
+
     Returns:
         tuple[UUID, str]: (user_id, role) where role is 'traveler' or 'hotel'
-    
+
     Raises:
         401: Invalid/expired token
         403: User blocked or inactive
