@@ -6,7 +6,9 @@ class Settings(BaseSettings):
     APP_VERSION: str = "0.1.0"
     DEBUG: bool = False
 
-    DATABASE_URL: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/hospedajes_db"
+    DATABASE_URL: str = (
+        "postgresql+asyncpg://postgres:postgres@localhost:5432/hospedajes_db"
+    )
     DB_ECHO: bool = False
 
     HOST: str = "0.0.0.0"  # nosec B104
@@ -15,6 +17,9 @@ class Settings(BaseSettings):
 
     JWT_SECRET_KEY: str = "change-me-in-production"
     JWT_ALGORITHM: str = "HS256"
+
+    USERS_MS_URL: str = "http://localhost:8004"
+    INTERNAL_API_KEY: str = "secure_internal_api"
 
     model_config = SettingsConfigDict(
         env_file=".env",

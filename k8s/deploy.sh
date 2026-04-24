@@ -15,7 +15,9 @@ FILES=(
   "03-gateway.yaml"
   "04-services.yaml"
   "05-destination-rules.yaml"
+  # "06-postgres.yaml"  ← NO aplicar en EKS, usar RDS
   "07-http-routes.yaml"
+  "14-external-secrets.yaml"
   "08-deployments.yaml"
   "09-hpa.yaml"
   "10-pdb.yaml"

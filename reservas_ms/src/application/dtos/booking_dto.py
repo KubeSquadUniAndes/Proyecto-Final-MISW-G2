@@ -1,4 +1,5 @@
 from datetime import datetime
+from decimal import Decimal
 from uuid import UUID
 
 from pydantic import BaseModel, field_validator
@@ -8,10 +9,20 @@ from src.domain.entities.booking import BookingStatus
 
 class CreateBookingDTO(BaseModel):
     user_id: UUID
-    resource_id: UUID
+    hotel_id: UUID
+    room_id: UUID
     start_time: datetime
     end_time: datetime
     notes: str | None = None
+    room_type: str | None = None
+    num_guests: int = 1
+    additional_guests: list | None = None
+    special_requests: str | None = None
+    price_per_night: Decimal | None = None
+    traveler_name: str | None = None
+    traveler_email: str | None = None
+    traveler_phone: str | None = None
+    traveler_document: str | None = None
 
     @field_validator("end_time")
     @classmethod
@@ -23,7 +34,7 @@ class CreateBookingDTO(BaseModel):
 
 class UpdateBookingDTO(BaseModel):
     booking_id: UUID
-    user_id: UUID  # used to verify ownership
+    user_id: UUID
     start_time: datetime | None = None
     end_time: datetime | None = None
     notes: str | None = None
@@ -41,14 +52,47 @@ class UpdateBookingDTO(BaseModel):
         return v
 
 
+class CancelBookingDTO(BaseModel):
+    booking_id: UUID
+    user_id: UUID
+
+
+class ApproveBookingDTO(BaseModel):
+    booking_id: UUID
+    admin_user_id: UUID
+
+
+class RejectBookingDTO(BaseModel):
+    booking_id: UUID
+    admin_user_id: UUID
+    rejection_reason: str
+
+
 class BookingResponseDTO(BaseModel):
     id: UUID
     user_id: UUID
-    resource_id: UUID
+    hotel_id: UUID
+    room_id: UUID
     start_time: datetime
     end_time: datetime
     status: BookingStatus
+    status_display: str
     notes: str | None
+    booking_code: str | None
+    room_type: str | None
+    num_guests: int
+    additional_guests: list | None
+    special_requests: str | None
+    price_per_night: Decimal | None
+    total_nights: int | None
+    total_price: Decimal | None
+    taxes: Decimal | None
+    final_price: Decimal | None
+    traveler_name: str | None
+    traveler_email: str | None
+    traveler_phone: str | None
+    traveler_document: str | None
+    cancellable: bool
     created_at: datetime
     updated_at: datetime
 

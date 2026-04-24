@@ -22,12 +22,12 @@ class BookingDomainService:
     async def has_schedule_conflict(
         self,
         user_id,
-        resource_id,
+        room_id,
         start_time: datetime,
         end_time: datetime,
         exclude_booking_id=None,
     ) -> bool:
-        """Checks whether a schedule conflict exists for the same resource."""
+        """Checks whether a schedule conflict exists for the same room."""
         bookings = await self._repo.list_by_user(user_id)
 
         # Normalize incoming datetimes
@@ -37,7 +37,7 @@ class BookingDomainService:
         for booking in bookings:
             if exclude_booking_id and booking.id == exclude_booking_id:
                 continue
-            if booking.resource_id != resource_id:
+            if booking.room_id != room_id:
                 continue
             if booking.status in (BookingStatus.CANCELLED, BookingStatus.COMPLETED):
                 continue

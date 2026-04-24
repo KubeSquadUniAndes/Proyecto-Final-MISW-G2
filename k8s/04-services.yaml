@@ -116,16 +116,11 @@ metadata:
     istio.io/use-waypoint: waypoint-private
 spec:
   type: ClusterIP
-  selector:
-    app: hospedajes-app
   ports:
   - name: http
     protocol: TCP
     port: 80
-    targetPort: 8000
----
-###################################
-# postgres service
+    targetPort: 8003
 ###################################
 apiVersion: v1
 kind: Service

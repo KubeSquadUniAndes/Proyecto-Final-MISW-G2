@@ -18,14 +18,19 @@ def user_id():
 
 
 @pytest.fixture
-def resource_id():
+def hotel_id():
+    return uuid4()
+
+
+@pytest.fixture
+def room_id():
     return uuid4()
 
 
 @pytest.fixture
 def valid_times():
     now = datetime.utcnow()
-    return now + timedelta(hours=1), now + timedelta(hours=3)
+    return now, now + timedelta(days=3)
 
 
 @pytest.fixture
@@ -43,22 +48,25 @@ def use_case(mock_repo):
 
 @pytest.mark.asyncio
 async def test_create_booking_success(
-    use_case, mock_repo, user_id, resource_id, valid_times
+    use_case, mock_repo, user_id, hotel_id, room_id, valid_times
 ):
     start_time, end_time = valid_times
 
     # Arrange
     expected_booking = Booking(
         user_id=user_id,
-        resource_id=resource_id,
+        hotel_id=hotel_id,
+        room_id=room_id,
         start_time=start_time,
         end_time=end_time,
+        booking_code="TH-2026-TEST1",
     )
     mock_repo.save.return_value = expected_booking
 
     dto = CreateBookingDTO(
         user_id=user_id,
-        resource_id=resource_id,
+        hotel_id=hotel_id,
+        room_id=room_id,
         start_time=start_time,
         end_time=end_time,
     )
@@ -68,21 +76,23 @@ async def test_create_booking_success(
 
     # Assert
     assert result.user_id == user_id
-    assert result.resource_id == resource_id
+    assert result.hotel_id == hotel_id
+    assert result.room_id == room_id
     assert result.status == BookingStatus.PENDING
     mock_repo.save.assert_called_once()
 
 
 @pytest.mark.asyncio
 async def test_create_booking_with_schedule_conflict(
-    use_case, mock_repo, user_id, resource_id, valid_times
+    use_case, mock_repo, user_id, hotel_id, room_id, valid_times
 ):
     start_time, end_time = valid_times
 
     # Arrange: an existing booking occupies the same slot
     existing_booking = Booking(
         user_id=user_id,
-        resource_id=resource_id,
+        hotel_id=hotel_id,
+        room_id=room_id,
         start_time=start_time,
         end_time=end_time,
     )
@@ -90,7 +100,8 @@ async def test_create_booking_with_schedule_conflict(
 
     dto = CreateBookingDTO(
         user_id=user_id,
-        resource_id=resource_id,
+        hotel_id=hotel_id,
+        room_id=room_id,
         start_time=start_time,
         end_time=end_time,
     )

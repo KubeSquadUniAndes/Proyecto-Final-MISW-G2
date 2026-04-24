@@ -31,6 +31,10 @@ jobs:
             test_path: src/tests/
             src_path: src
             mypy_path: src/domain src/application
+          - service: hospedajes_ms
+            test_path: tests/
+            src_path: src
+            mypy_path: src/domain src/application
 
     env:
       PYTHONPATH: ${{ github.workspace }}/${{ matrix.service }}
@@ -76,11 +80,13 @@ jobs:
           PYTHONPATH: ${{ github.workspace }}/${{ matrix.service }}
         run: |
           python -m pytest ${{ matrix.test_path }} \
-            --cov=${{ matrix.src_path }} \
+            --ignore=${{ matrix.test_path }}test_infrastructure.py \
+            --cov=src/domain \
+            --cov=src/application \
             --cov-config=.coveragerc \
             --cov-report=term-missing \
             --cov-report=xml:coverage.xml \
-            --cov-fail-under=70 \
+            --cov-fail-under=80 \
             -v
 
       - name: Upload coverage report

@@ -1,3 +1,5 @@
+from uuid import UUID
+
 import httpx
 
 from src.infrastructure.config.settings import settings
@@ -15,6 +17,7 @@ class LoginHandlerClient:
         password: str,
         full_name: str,
         role: str,
+        user_id: UUID | None = None,
     ) -> None:
         """
         Creates a user entry in login_handler_ms so they can log in.
@@ -26,6 +29,7 @@ class LoginHandlerClient:
             "password": password,
             "full_name": full_name,
             "role": role,
+            **({"user_id": str(user_id)} if user_id else {}),
         }
 
         async with httpx.AsyncClient(timeout=10.0) as client:

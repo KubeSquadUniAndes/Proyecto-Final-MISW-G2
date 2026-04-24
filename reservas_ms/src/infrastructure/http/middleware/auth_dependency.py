@@ -44,3 +44,38 @@ async def get_current_user_id(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail=str(exc),
         )
+
+
+async def get_current_user_role(
+    credentials: HTTPAuthorizationCredentials = Security(bearer_scheme),
+) -> tuple[UUID, str]:
+    """Validates JWT and returns (user_id, role).
+
+    Returns:
+        tuple[UUID, str]: (user_id, role) where role is 'traveler' or 'hotel'
+
+    Raises:
+        401: Invalid/expired token
+        403: User blocked or inactive
+        503: Login handler unreachable
+    """
+    token = credentials.credentials
+    try:
+        user_data = await _login_client.validate_with_role(token)
+        return user_data["user_id"], user_data["role"]
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=str(exc),
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    except PermissionError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=str(exc),
+        )
+    except ConnectionError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=str(exc),
+        )

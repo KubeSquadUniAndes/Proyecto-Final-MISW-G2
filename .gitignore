@@ -7,6 +7,9 @@
 
 *.DS_Store
 
+.env
+*.env
+
 /jmeter*
 test-report**
 

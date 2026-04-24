@@ -35,6 +35,7 @@ class UpdateRoomUseCase:
         updated = await self._repo.update(room)
         return RoomResponseDTO(
             id=updated.id,
+            hotel_id=updated.hotel_id,
             name=updated.name,
             room_type=updated.room_type,
             price=updated.price,

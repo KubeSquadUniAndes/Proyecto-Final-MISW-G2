@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.application.dtos.room_dto import CreateRoomDTO, UpdateRoomDTO
@@ -14,7 +14,11 @@ from src.infrastructure.database.base import get_db
 from src.infrastructure.database.repositories.sqlalchemy_room_repository import (
     SQLAlchemyRoomRepository,
 )
-from src.infrastructure.http.dependencies import require_hotel_role
+from src.infrastructure.http.dependencies import (
+    TokenClaims,
+    require_hotel_or_traveler_role,
+    require_hotel_role,
+)
 from src.infrastructure.http.schemas.room_schema import (
     CreateRoomRequest,
     ErrorResponse,
@@ -41,12 +45,18 @@ def _make_repo(db: AsyncSession) -> SQLAlchemyRoomRepository:
 async def create_room(
     body: CreateRoomRequest,
     db: AsyncSession = Depends(get_db),
-    _: UUID = Depends(require_hotel_role),
+    claims: TokenClaims = Depends(require_hotel_role),
 ):
     repo = _make_repo(db)
     use_case = CreateRoomUseCase(repo)
     try:
-        result = await use_case.execute(CreateRoomDTO(**body.model_dump()))
+        result = await use_case.execute(
+            CreateRoomDTO(
+                hotel_id=claims.user_id,
+                hotel_name=claims.full_name,
+                **body.model_dump(),
+            )
+        )
         return RoomResponse(**result.model_dump())
     except ValueError as exc:
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc))
@@ -58,12 +68,15 @@ async def create_room(
     summary="List all rooms",
 )
 async def list_rooms(
+    hotel_id: UUID | None = Query(
+        default=None, description="Filtrar habitaciones por hotel"
+    ),
     db: AsyncSession = Depends(get_db),
-    _: UUID = Depends(require_hotel_role),
+    _: TokenClaims = Depends(require_hotel_or_traveler_role),
 ):
     repo = _make_repo(db)
     use_case = ListRoomsUseCase(repo)
-    results = await use_case.execute()
+    results = await use_case.execute(hotel_id=hotel_id)
     return [RoomResponse(**r.model_dump()) for r in results]
 
 
@@ -74,7 +87,7 @@ async def list_rooms(
 )
 async def get_stats(
     db: AsyncSession = Depends(get_db),
-    _: UUID = Depends(require_hotel_role),
+    _: TokenClaims = Depends(require_hotel_role),
 ):
     repo = _make_repo(db)
     use_case = GetRoomStatsUseCase(repo)
@@ -91,7 +104,7 @@ async def get_stats(
 async def get_room(
     room_id: UUID,
     db: AsyncSession = Depends(get_db),
-    _: UUID = Depends(require_hotel_role),
+    _: TokenClaims = Depends(require_hotel_or_traveler_role),
 ):
     repo = _make_repo(db)
     use_case = GetRoomUseCase(repo)
@@ -112,7 +125,7 @@ async def update_room(
     room_id: UUID,
     body: UpdateRoomRequest,
     db: AsyncSession = Depends(get_db),
-    _: UUID = Depends(require_hotel_role),
+    _: TokenClaims = Depends(require_hotel_role),
 ):
     repo = _make_repo(db)
     use_case = UpdateRoomUseCase(repo)
@@ -132,7 +145,7 @@ async def update_room(
 async def delete_room(
     room_id: UUID,
     db: AsyncSession = Depends(get_db),
-    _: UUID = Depends(require_hotel_role),
+    _: TokenClaims = Depends(require_hotel_role),
 ):
     repo = _make_repo(db)
     use_case = DeleteRoomUseCase(repo)
