@@ -425,6 +425,355 @@
           }
         }
       ]
+    },
+    {
+      "name": "Hospedajes MS",
+      "item": [
+        {
+          "name": "Health Check",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/hospedajes/health"
+          }
+        },
+        {
+          "name": "Registrar usuario hotel",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const timestamp = Date.now();",
+                  "pm.environment.set('hotel_email', `hotel.${timestamp}@example.com`);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/users/api/v1/users/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"first_name\": \"Hotel\",\n  \"last_name\": \"Newman\",\n  \"email\": \"{{hotel_email}}\",\n  \"phone\": \"+57 300 111 2222\",\n  \"country\": \"Colombia\",\n  \"city\": \"Cartagena\",\n  \"birth_date\": \"1990-06-15\",\n  \"password\": \"{{test_password}}\",\n  \"user_type\": \"hotel\",\n  \"identification_type\": \"NIT\",\n  \"identification_number\": \"9999999999\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login hotel",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const body = pm.response.json();",
+                  "pm.environment.set('hotel_access_token', body.access_token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/login-handler/api/v1/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{hotel_email}}\",\n  \"password\": \"{{test_password}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Crear habitación",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Respuesta contiene campos requeridos', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('id');",
+                  "  pm.expect(body).to.have.property('name');",
+                  "  pm.expect(body).to.have.property('destination');",
+                  "  pm.expect(body.destination).to.eql('Cartagena');",
+                  "  pm.expect(body).to.have.property('room_type');",
+                  "  pm.expect(body).to.have.property('price');",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "  pm.environment.set('room_id', pm.response.json().id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{hotel_access_token}}" }
+            ],
+            "url": "{{base_url}}/hospedajes/api/v1/rooms",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Habitación Deluxe Newman\",\n  \"destination\": \"Cartagena\",\n  \"room_type\": \"doble\",\n  \"price\": \"250000\",\n  \"capacity\": 2,\n  \"beds\": \"1 cama doble\",\n  \"size\": 28.5,\n  \"status\": \"disponible\",\n  \"amenities\": \"WiFi, TV, AC\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Crear habitación - sin token (debe fallar)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 403 Forbidden', function () {",
+                  "  pm.response.to.have.status(403);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/hospedajes/api/v1/rooms",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Habitación sin auth\",\n  \"destination\": \"Bogotá\",\n  \"room_type\": \"individual\",\n  \"price\": \"100000\",\n  \"capacity\": 1,\n  \"beds\": \"1 cama sencilla\",\n  \"size\": 15.0,\n  \"amenities\": \"\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Listar habitaciones",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Retorna un array', function () {",
+                  "  pm.expect(pm.response.json()).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{hotel_access_token}}" }
+            ],
+            "url": "{{base_url}}/hospedajes/api/v1/rooms"
+          }
+        },
+        {
+          "name": "Buscar habitaciones disponibles",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Retorna un array', function () {",
+                  "  pm.expect(pm.response.json()).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{hotel_access_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/hospedajes/api/v1/rooms/search?checkin=2026-06-01T14:00:00&checkout=2026-06-05T12:00:00&destination=Cartagena&guests=2",
+              "host": ["{{base_url}}"],
+              "path": ["hospedajes", "api", "v1", "rooms", "search"],
+              "query": [
+                { "key": "checkin", "value": "2026-06-01T14:00:00" },
+                { "key": "checkout", "value": "2026-06-05T12:00:00" },
+                { "key": "destination", "value": "Cartagena" },
+                { "key": "guests", "value": "2" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Buscar habitaciones - fechas inválidas (debe fallar)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 422 Unprocessable Entity', function () {",
+                  "  pm.response.to.have.status(422);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{hotel_access_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/hospedajes/api/v1/rooms/search?checkin=2026-06-05T12:00:00&checkout=2026-06-01T14:00:00",
+              "host": ["{{base_url}}"],
+              "path": ["hospedajes", "api", "v1", "rooms", "search"],
+              "query": [
+                { "key": "checkin", "value": "2026-06-05T12:00:00" },
+                { "key": "checkout", "value": "2026-06-01T14:00:00" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Obtener habitación por ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('ID coincide', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.id).to.eql(pm.environment.get('room_id'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{hotel_access_token}}" }
+            ],
+            "url": "{{base_url}}/hospedajes/api/v1/rooms/{{room_id}}"
+          }
+        },
+        {
+          "name": "Actualizar habitación",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Destino actualizado', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.destination).to.eql('Santa Marta');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{hotel_access_token}}" }
+            ],
+            "url": "{{base_url}}/hospedajes/api/v1/rooms/{{room_id}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"destination\": \"Santa Marta\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Eliminar habitación",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Mensaje de confirmación', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('message');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{hotel_access_token}}" }
+            ],
+            "url": "{{base_url}}/hospedajes/api/v1/rooms/{{room_id}}"
+          }
+        },
+        {
+          "name": "Obtener habitación eliminada (debe fallar)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 404 Not Found', function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{hotel_access_token}}" }
+            ],
+            "url": "{{base_url}}/hospedajes/api/v1/rooms/{{room_id}}"
+          }
+        }
+      ]
     }
   ]
 }
