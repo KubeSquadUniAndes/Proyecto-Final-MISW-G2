@@ -21,6 +21,9 @@ class Settings(BaseSettings):
     USERS_MS_URL: str = "http://localhost:8004"
     INTERNAL_API_KEY: str = "secure_internal_api"
 
+    AWS_REGION: str = "us-east-1"
+    S3_BUCKET: str = "travelhub-images-780522923809"
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
