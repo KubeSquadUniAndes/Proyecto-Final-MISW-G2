@@ -5,9 +5,9 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from src.infrastructure.config.settings import settings
 from src.infrastructure.database.base import Base, engine
-from src.infrastructure.database.models import hotel_image_model, room_model  # noqa: F401
+from src.infrastructure.database.models import room_image_model, room_model  # noqa: F401
 from src.infrastructure.http.routes.health_router import router as health_router
-from src.infrastructure.http.routes.hotel_image_router import router as hotel_image_router
+from src.infrastructure.http.routes.room_image_router import router as room_image_router
 from src.infrastructure.http.routes.room_router import router as room_router
 
 
@@ -41,7 +41,7 @@ def create_app() -> FastAPI:
 
     app.include_router(health_router)
     app.include_router(room_router, prefix="/api/v1")
-    app.include_router(hotel_image_router, prefix="/api/v1")
+    app.include_router(room_image_router, prefix="/api/v1")
 
     return app
 
