@@ -347,6 +347,7 @@ jobs:
             --env-var base_url=${{ steps.nlb.outputs.base_url }} \
             -r cli,htmlextra \
             --reporter-htmlextra-export postman/report.html \
+            --insecure \
             --bail
 
       - name: Upload Newman report
