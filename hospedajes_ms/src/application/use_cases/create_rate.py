@@ -1,4 +1,4 @@
-from src.application.dtos.rate_dto import CreateRateDTO, DiscountResponseDTO, RateResponseDTO
+from src.application.dtos.rate_dto import CreateRateDTO, RateResponseDTO
 from src.domain.entities.rate import Rate
 from src.domain.repositories.rate_repository_port import RateRepositoryPort
 
