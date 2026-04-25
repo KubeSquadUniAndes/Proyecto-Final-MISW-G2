@@ -26,7 +26,9 @@ class UploadHotelImageUseCase:
         filename: str,
     ) -> HotelImageResponseDTO:
         if content_type not in ALLOWED_CONTENT_TYPES:
-            raise ValueError(f"Unsupported content type: {content_type}. Allowed: jpeg, png, webp, gif")
+            raise ValueError(
+                f"Unsupported content type: {content_type}. Allowed: jpeg, png, webp, gif"
+            )
         if len(data) > MAX_SIZE_BYTES:
             raise ValueError("File exceeds maximum size of 5 MB")
 
@@ -35,7 +37,9 @@ class UploadHotelImageUseCase:
 
         url = await self._storage.upload(key, data, content_type)
 
-        saved = await self._repo.save(HotelImage(hotel_id=hotel_id, url=url, s3_key=key))
+        saved = await self._repo.save(
+            HotelImage(hotel_id=hotel_id, url=url, s3_key=key)
+        )
 
         return HotelImageResponseDTO(
             id=saved.id,

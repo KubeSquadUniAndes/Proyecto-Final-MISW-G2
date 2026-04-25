@@ -14,7 +14,9 @@ class S3ImageStorage(ImageStoragePort):
                 Body=data,
                 ContentType=content_type,
             )
-        return f"https://{settings.S3_BUCKET}.s3.{settings.AWS_REGION}.amazonaws.com/{key}"
+        return (
+            f"https://{settings.S3_BUCKET}.s3.{settings.AWS_REGION}.amazonaws.com/{key}"
+        )
 
     async def delete(self, key: str) -> None:
         session = aioboto3.Session()

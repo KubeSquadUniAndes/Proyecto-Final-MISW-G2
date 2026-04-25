@@ -36,7 +36,9 @@ class UploadRoomImageUseCase:
             raise PermissionError("Room does not belong to this hotel")
 
         if content_type not in ALLOWED_CONTENT_TYPES:
-            raise ValueError(f"Unsupported content type: {content_type}. Allowed: jpeg, png, webp, gif")
+            raise ValueError(
+                f"Unsupported content type: {content_type}. Allowed: jpeg, png, webp, gif"
+            )
         if len(data) > MAX_SIZE_BYTES:
             raise ValueError("File exceeds maximum size of 5 MB")
 
@@ -45,7 +47,9 @@ class UploadRoomImageUseCase:
 
         url = await self._storage.upload(key, data, content_type)
 
-        saved = await self._image_repo.save(RoomImage(room_id=room_id, url=url, s3_key=key))
+        saved = await self._image_repo.save(
+            RoomImage(room_id=room_id, url=url, s3_key=key)
+        )
 
         return RoomImageResponseDTO(
             id=saved.id,
