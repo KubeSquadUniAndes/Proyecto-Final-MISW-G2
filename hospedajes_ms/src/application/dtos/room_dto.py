@@ -10,6 +10,7 @@ from src.domain.entities.room import RoomStatus, RoomType
 class CreateRoomDTO(BaseModel):
     hotel_id: UUID
     hotel_name: str | None = None
+    destination: str | None = None
     name: str
     room_type: RoomType
     price: Decimal
@@ -22,6 +23,7 @@ class CreateRoomDTO(BaseModel):
 
 class UpdateRoomDTO(BaseModel):
     name: str | None = None
+    destination: str | None = None
     room_type: RoomType | None = None
     price: Decimal | None = None
     capacity: int | None = None
@@ -35,6 +37,7 @@ class RoomResponseDTO(BaseModel):
     id: UUID
     hotel_id: UUID
     hotel_name: str | None = None
+    destination: str | None = None
     name: str
     room_type: RoomType
     price: Decimal

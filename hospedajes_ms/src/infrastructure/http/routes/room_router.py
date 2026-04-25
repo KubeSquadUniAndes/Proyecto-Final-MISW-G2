@@ -1,3 +1,4 @@
+from datetime import datetime
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -9,7 +10,9 @@ from src.application.use_cases.delete_room import DeleteRoomUseCase
 from src.application.use_cases.get_room import GetRoomUseCase
 from src.application.use_cases.get_room_stats import GetRoomStatsUseCase
 from src.application.use_cases.list_rooms import ListRoomsUseCase
+from src.application.use_cases.search_rooms import SearchRoomsDTO, SearchRoomsUseCase
 from src.application.use_cases.update_room import UpdateRoomUseCase
+from src.infrastructure.clients.reservas_client import ReservasClient
 from src.infrastructure.database.base import get_db
 from src.infrastructure.database.repositories.sqlalchemy_room_repository import (
     SQLAlchemyRoomRepository,
@@ -78,6 +81,36 @@ async def list_rooms(
     use_case = ListRoomsUseCase(repo)
     results = await use_case.execute(hotel_id=hotel_id)
     return [RoomResponse(**r.model_dump()) for r in results]
+
+
+@router.get(
+    "/search",
+    response_model=list[RoomResponse],
+    summary="Buscar habitaciones disponibles por destino, huéspedes y fechas",
+    responses={422: {"model": ErrorResponse}},
+)
+async def search_rooms(
+    checkin: datetime = Query(..., description="Fecha de check-in (ISO 8601)"),
+    checkout: datetime = Query(..., description="Fecha de check-out (ISO 8601)"),
+    destination: str | None = Query(default=None, description="Ciudad o destino"),
+    guests: int | None = Query(default=None, ge=1, description="Número de huéspedes"),
+    db: AsyncSession = Depends(get_db),
+    _: TokenClaims = Depends(require_hotel_or_traveler_role),
+):
+    repo = _make_repo(db)
+    use_case = SearchRoomsUseCase(repo, ReservasClient())
+    try:
+        results = await use_case.execute(
+            SearchRoomsDTO(
+                destination=destination,
+                guests=guests,
+                checkin=checkin,
+                checkout=checkout,
+            )
+        )
+        return [RoomResponse(**r.model_dump()) for r in results]
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc))
 
 
 @router.get(
