@@ -333,8 +333,17 @@ jobs:
         id: nlb
         run: |
           aws eks update-kubeconfig --region $AWS_REGION --name $EKS_CLUSTER
-          BASE_URL=$(kubectl get svc travelhub-gateway-istio -n workloads \
-            -o jsonpath='https://{.status.loadBalancer.ingress[0].hostname}')
+          echo "=== Services in workloads namespace ==="
+          kubectl get svc -n workloads
+          HOSTNAME=$(kubectl get svc travelhub-gateway-istio -n workloads \
+            -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+          echo "Hostname: $HOSTNAME"
+          if [ -z "$HOSTNAME" ]; then
+            echo "ERROR: Could not retrieve NLB hostname from travelhub-gateway-istio"
+            exit 1
+          fi
+          BASE_URL="https://$HOSTNAME"
+          echo "BASE_URL: $BASE_URL"
           echo "base_url=$BASE_URL" >> $GITHUB_OUTPUT
 
       - name: Install Newman
