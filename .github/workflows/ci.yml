@@ -115,6 +115,7 @@ jobs:
             --env-var base_url=${{ secrets.EKS_BASE_URL }} \
             -r cli,htmlextra \
             --reporter-htmlextra-export postman/report.html \
+            --insecure \
             --bail
 
       - name: Upload Newman report
