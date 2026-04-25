@@ -309,7 +309,8 @@ jobs:
           kubectl wait --for=condition=ready pod -l app=hospedajes-app -n workloads --timeout=120s
           echo "hospedajes_ms uses create_all on startup — tables already created"
           kubectl wait --for=condition=ready pod -l app=detector-anomalias-app -n workloads --timeout=120s
-          kubectl exec -n workloads deploy/detector-anomalias-deployment -- python /app/run_migrations.py
+          kubectl exec -n workloads deploy/detector-anomalias-deployment -- \
+            sh -c "env -u PYTHONPATH alembic -c /app/alembic.ini upgrade head"
           kubectl wait --for=condition=ready pod -l app=reservas-app -n workloads --timeout=120s
           kubectl exec -n workloads deploy/reservas-deployment -- \
             sh -c "cd /app && PYTHONPATH= alembic stamp head"
