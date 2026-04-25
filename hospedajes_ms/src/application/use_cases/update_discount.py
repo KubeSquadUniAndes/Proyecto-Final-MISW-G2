@@ -15,7 +15,9 @@ class UpdateDiscountUseCase:
         self._rate_repo = rate_repo
         self._discount_repo = discount_repo
 
-    async def execute(self, discount_id: UUID, dto: UpdateDiscountDTO) -> DiscountResponseDTO:
+    async def execute(
+        self, discount_id: UUID, dto: UpdateDiscountDTO
+    ) -> DiscountResponseDTO:
         discount = await self._discount_repo.get_by_id(discount_id)
         if not discount:
             raise ValueError(f"Discount {discount_id} not found")

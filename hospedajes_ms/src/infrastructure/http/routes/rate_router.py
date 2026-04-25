@@ -56,6 +56,7 @@ def _repos(db: AsyncSession):
 
 # ── Rates ──────────────────────────────────────────────────────────────────────
 
+
 @router.post(
     "",
     response_model=RateResponse,
@@ -115,7 +116,9 @@ async def get_effective_price(
     rate_repo, discount_repo = _repos(db)
     room_repo = SQLAlchemyRoomRepository(db)
     use_case = GetEffectivePriceUseCase(rate_repo, discount_repo, room_repo)
-    result = await use_case.execute(hotel_id=hotel_id, room_type=room_type, season=season)
+    result = await use_case.execute(
+        hotel_id=hotel_id, room_type=room_type, season=season
+    )
     return EffectivePriceResponse(
         room_type=result.room_type,
         season=result.season,
@@ -161,7 +164,9 @@ async def update_rate(
     rate_repo, _ = _repos(db)
     use_case = UpdateRateUseCase(rate_repo)
     try:
-        result = await use_case.execute(rate_id, UpdateRateDTO(base_price=body.base_price))
+        result = await use_case.execute(
+            rate_id, UpdateRateDTO(base_price=body.base_price)
+        )
         return _rate_response(result)
     except ValueError as exc:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail=str(exc))
@@ -188,6 +193,7 @@ async def delete_rate(
 
 
 # ── Discounts ──────────────────────────────────────────────────────────────────
+
 
 @router.post(
     "/{rate_id}/discounts",
@@ -294,6 +300,7 @@ async def delete_discount(
 
 # ── Helpers ────────────────────────────────────────────────────────────────────
 
+
 def _discount_response(dto) -> DiscountResponse:
     return DiscountResponse(
         id=dto.id,
@@ -317,7 +324,9 @@ def _rate_response(dto) -> RateResponse:
         season=dto.season,
         base_price=dto.base_price,
         final_price=dto.final_price,
-        active_discount=_discount_response(dto.active_discount) if dto.active_discount else None,
+        active_discount=_discount_response(dto.active_discount)
+        if dto.active_discount
+        else None,
         created_at=dto.created_at,
         updated_at=dto.updated_at,
     )

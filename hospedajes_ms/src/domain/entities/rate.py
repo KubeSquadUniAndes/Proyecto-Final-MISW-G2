@@ -51,7 +51,9 @@ class Rate:
     created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
 
-    def effective_price(self, discounts: list[Discount]) -> tuple[Decimal, "Discount | None"]:
+    def effective_price(
+        self, discounts: list[Discount]
+    ) -> tuple[Decimal, "Discount | None"]:
         active = next((d for d in discounts if d.is_active()), None)
         if active:
             return active.apply(self.base_price), active

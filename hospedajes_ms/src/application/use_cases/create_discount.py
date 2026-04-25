@@ -34,9 +34,7 @@ class CreateDiscountUseCase:
 
         final = discount.apply(rate.base_price)
         if final <= 0:
-            raise ValueError(
-                "Discount would result in a price of zero or less"
-            )
+            raise ValueError("Discount would result in a price of zero or less")
 
         saved = await self._discount_repo.save(discount)
         return DiscountResponseDTO(

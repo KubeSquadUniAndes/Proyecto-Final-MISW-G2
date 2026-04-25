@@ -15,9 +15,7 @@ class CreateRateUseCase:
             dto.hotel_id, dto.room_type, dto.season
         )
         if existing:
-            raise ValueError(
-                f"Rate for {dto.room_type} / {dto.season} already exists"
-            )
+            raise ValueError(f"Rate for {dto.room_type} / {dto.season} already exists")
 
         rate = Rate(
             hotel_id=dto.hotel_id,

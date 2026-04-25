@@ -15,17 +15,30 @@ class RateModel(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     hotel_id = Column(UUID(as_uuid=True), nullable=False, index=True)
     room_type = Column(
-        Enum(RoomType, name="rate_room_type_enum", values_callable=lambda x: [e.value for e in x]),
+        Enum(
+            RoomType,
+            name="rate_room_type_enum",
+            values_callable=lambda x: [e.value for e in x],
+        ),
         nullable=False,
     )
     season = Column(
-        Enum(SeasonType, name="season_type_enum", values_callable=lambda x: [e.value for e in x]),
+        Enum(
+            SeasonType,
+            name="season_type_enum",
+            values_callable=lambda x: [e.value for e in x],
+        ),
         nullable=False,
     )
     base_price = Column(Numeric(10, 2), nullable=False)
-    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    created_at = Column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
     updated_at = Column(
-        DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+        nullable=False,
     )
 
     def __repr__(self) -> str:
