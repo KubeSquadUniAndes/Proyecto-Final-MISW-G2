@@ -14,6 +14,7 @@ class Settings(BaseSettings):
 
     DATABASE_URL: str = "postgresql+asyncpg://postgres:postgres@travelhub-prod-postgres.ci3w0yecas02.us-east-1.rds.amazonaws.com:5432/users_db"
     LOGIN_HANDLER_MS_URL: str = "http://localhost:8000"
+    INTERNAL_API_KEY: str = "secure_internal_api"
 
     model_config = SettingsConfigDict(
         env_file=str(BASE_DIR / ".env"),

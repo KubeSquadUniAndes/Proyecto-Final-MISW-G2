@@ -31,6 +31,7 @@ def test_settings_defaults():
 
 def _make_room(**kwargs) -> Room:
     defaults = dict(
+        hotel_id=uuid4(),
         name="Room 101",
         room_type=RoomType.INDIVIDUAL,
         price=Decimal("100.00"),
@@ -128,6 +129,7 @@ async def test_create_room_use_case():
 
     uc = CreateRoomUseCase(mock_repo)
     dto = CreateRoomDTO(
+        hotel_id=uuid4(),
         name="Room 101",
         room_type=RoomType.INDIVIDUAL,
         price=Decimal("100.00"),
@@ -165,6 +167,22 @@ async def test_list_rooms_use_case():
     uc = ListRoomsUseCase(mock_repo)
     results = await uc.execute()
     assert len(results) == 3
+    mock_repo.list_all.assert_called_once_with(hotel_id=None)
+
+
+@pytest.mark.asyncio
+async def test_list_rooms_use_case_filter_by_hotel():
+    from src.application.use_cases.list_rooms import ListRoomsUseCase
+
+    hotel_id = uuid4()
+    rooms = [_make_room(name=f"Room {i}", hotel_id=hotel_id) for i in range(2)]
+    mock_repo = AsyncMock()
+    mock_repo.list_all.return_value = rooms
+
+    uc = ListRoomsUseCase(mock_repo)
+    results = await uc.execute(hotel_id=hotel_id)
+    assert len(results) == 2
+    mock_repo.list_all.assert_called_once_with(hotel_id=hotel_id)
 
 
 @pytest.mark.asyncio
@@ -248,6 +266,7 @@ async def test_create_room_success(app):
 
     mock_result = RoomResponseDTO(
         id=uuid4(),
+        hotel_id=uuid4(),
         name="Suite 1",
         room_type=RoomType.SUITE,
         price=Decimal("250.00"),
@@ -337,6 +356,41 @@ async def test_get_room_not_found(app):
                 headers={"Authorization": f"Bearer {_valid_token()}"},
             )
     assert resp.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_list_rooms_traveler_role(app):
+    """Traveler role can list rooms."""
+    import jwt as pyjwt
+    from datetime import timedelta
+
+    token = pyjwt.encode(
+        {
+            "sub": str(uuid4()),
+            "type": "access",
+            "role": "traveler",
+            "exp": datetime.now(timezone.utc) + timedelta(hours=1),
+            "iat": datetime.now(timezone.utc),
+        },
+        "change-me-in-production",
+        algorithm="HS256",
+    )
+    mock_session = AsyncMock()
+    mock_session.__aenter__ = AsyncMock(return_value=mock_session)
+    mock_session.__aexit__ = AsyncMock(return_value=False)
+
+    with patch("src.infrastructure.database.base.AsyncSessionLocal", return_value=mock_session), \
+         patch("src.infrastructure.http.routes.room_router.ListRoomsUseCase") as MockUC:
+        mock_uc = AsyncMock()
+        mock_uc.execute.return_value = []
+        MockUC.return_value = mock_uc
+
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+            resp = await client.get(
+                "/api/v1/rooms",
+                headers={"Authorization": f"Bearer {token}"},
+            )
+    assert resp.status_code == 200
 
 
 @pytest.mark.asyncio

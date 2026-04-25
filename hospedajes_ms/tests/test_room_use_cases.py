@@ -1,7 +1,7 @@
 """Unit tests for hospedajes_ms use cases and entities."""
 
 from decimal import Decimal
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 import pytest
 
@@ -25,8 +25,11 @@ class MockRoomRepository:
     async def get_by_id(self, room_id):
         return self.rooms.get(room_id)
 
-    async def list_all(self):
-        return list(self.rooms.values())
+    async def list_all(self, hotel_id=None):
+        rooms = list(self.rooms.values())
+        if hotel_id is not None:
+            rooms = [r for r in rooms if r.hotel_id == hotel_id]
+        return rooms
 
     async def count_by_status(self, status):
         return len([r for r in self.rooms.values() if r.status == status])
@@ -48,6 +51,7 @@ async def test_create_room_success():
     use_case = CreateRoomUseCase(repo)
 
     dto = CreateRoomDTO(
+        hotel_id=uuid4(),
         name="Suite 101",
         room_type=RoomType.SUITE,
         price=Decimal("150.00"),
@@ -73,6 +77,7 @@ async def test_create_room_negative_price():
     use_case = CreateRoomUseCase(repo)
 
     dto = CreateRoomDTO(
+        hotel_id=uuid4(),
         name="Room 1",
         room_type=RoomType.INDIVIDUAL,
         price=Decimal("-10.00"),
@@ -94,6 +99,7 @@ async def test_create_room_invalid_capacity():
     use_case = CreateRoomUseCase(repo)
 
     dto = CreateRoomDTO(
+        hotel_id=uuid4(),
         name="Room 1",
         room_type=RoomType.INDIVIDUAL,
         price=Decimal("50.00"),
@@ -115,6 +121,7 @@ async def test_create_room_invalid_size():
     use_case = CreateRoomUseCase(repo)
 
     dto = CreateRoomDTO(
+        hotel_id=uuid4(),
         name="Room 1",
         room_type=RoomType.INDIVIDUAL,
         price=Decimal("50.00"),

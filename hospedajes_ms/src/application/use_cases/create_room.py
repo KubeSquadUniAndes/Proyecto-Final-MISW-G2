@@ -18,6 +18,8 @@ class CreateRoomUseCase:
             raise ValueError("Size must be positive")
 
         room = Room(
+            hotel_id=dto.hotel_id,
+            hotel_name=dto.hotel_name,
             name=dto.name,
             room_type=dto.room_type,
             price=dto.price,
@@ -30,6 +32,8 @@ class CreateRoomUseCase:
         saved = await self._repo.save(room)
         return RoomResponseDTO(
             id=saved.id,
+            hotel_id=saved.hotel_id,
+            hotel_name=saved.hotel_name,
             name=saved.name,
             room_type=saved.room_type,
             price=saved.price,

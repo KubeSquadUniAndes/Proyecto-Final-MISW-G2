@@ -47,6 +47,7 @@ class RegisterUserUseCase:
             password=dto.password,  # plain password — login_handler_ms hashes it
             full_name=saved.full_name(),
             role=saved.user_type.value,
+            user_id=saved.id,
         )
 
         return UserResponseDTO(

@@ -1,9 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from uuid import UUID
+
+from fastapi import APIRouter, Depends, Header, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.application.dtos.user_dto import RegisterUserDTO, UserResponseDTO
 from src.application.use_cases.register_user import RegisterUserUseCase
 from src.infrastructure.clients.login_handler_client import LoginHandlerClient
+from src.infrastructure.config.settings import settings
 from src.infrastructure.database.database import get_db
 from src.infrastructure.database.repositories.sqlalchemy_user_repository import (
     SQLAlchemyUserRepository,
@@ -22,6 +25,25 @@ def get_register_use_case(db: AsyncSession = Depends(get_db)) -> RegisterUserUse
         password_service=password_service,
         login_handler_client=login_handler_client,
     )
+
+
+@router.get(
+    "/{user_id}",
+    response_model=UserResponseDTO,
+    summary="Get user by ID (internal)",
+)
+async def get_user_by_id(
+    user_id: UUID,
+    x_internal_api_key: str = Header(..., alias="X-Internal-Api-Key"),
+    db: AsyncSession = Depends(get_db),
+) -> UserResponseDTO:
+    if x_internal_api_key != settings.INTERNAL_API_KEY:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid internal API key")
+    repo = SQLAlchemyUserRepository(db)
+    user = await repo.find_by_id(user_id)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    return UserResponseDTO.model_validate(user)
 
 
 @router.post(

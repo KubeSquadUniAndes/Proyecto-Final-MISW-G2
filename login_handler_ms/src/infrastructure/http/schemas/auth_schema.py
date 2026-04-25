@@ -11,6 +11,7 @@ class RegisterRequest(BaseModel):
     password: str
     full_name: str | None = None
     role: UserRole | None = None
+    user_id: UUID | None = None
 
     @field_validator("password")
     @classmethod
