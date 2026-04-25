@@ -9,6 +9,7 @@ from src.domain.entities.room import RoomStatus, RoomType
 
 class CreateRoomRequest(BaseModel):
     name: str
+    destination: str | None = None
     room_type: RoomType
     price: Decimal
     capacity: int
@@ -41,6 +42,7 @@ class CreateRoomRequest(BaseModel):
 
 class UpdateRoomRequest(BaseModel):
     name: str | None = None
+    destination: str | None = None
     room_type: RoomType | None = None
     price: Decimal | None = None
     capacity: int | None = None
@@ -54,6 +56,7 @@ class RoomResponse(BaseModel):
     id: UUID
     hotel_id: UUID
     hotel_name: str | None = None
+    destination: str | None = None
     name: str
     room_type: RoomType
     price: Decimal

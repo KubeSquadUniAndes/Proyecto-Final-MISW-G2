@@ -20,6 +20,7 @@ class CreateRoomUseCase:
         room = Room(
             hotel_id=dto.hotel_id,
             hotel_name=dto.hotel_name,
+            destination=dto.destination,
             name=dto.name,
             room_type=dto.room_type,
             price=dto.price,
@@ -34,6 +35,7 @@ class CreateRoomUseCase:
             id=saved.id,
             hotel_id=saved.hotel_id,
             hotel_name=saved.hotel_name,
+            destination=saved.destination,
             name=saved.name,
             room_type=saved.room_type,
             price=saved.price,
