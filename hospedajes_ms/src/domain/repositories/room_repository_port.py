@@ -15,6 +15,13 @@ class RoomRepositoryPort(ABC):
     async def list_all(self, hotel_id: UUID | None = None) -> list[Room]: ...
 
     @abstractmethod
+    async def search(
+        self,
+        destination: str | None = None,
+        min_capacity: int | None = None,
+    ) -> list[Room]: ...
+
+    @abstractmethod
     async def update(self, room: Room) -> Room: ...
 
     @abstractmethod

@@ -23,6 +23,16 @@ output "rds_port" {
   value = module.rds.port
 }
 
+output "s3_bucket_name" {
+  description = "S3 bucket for hotel images"
+  value       = module.s3.bucket_name
+}
+
+output "s3_bucket_url" {
+  description = "Base URL for hotel images"
+  value       = module.s3.bucket_url
+}
+
 output "configure_kubectl" {
   description = "Run this command to configure kubectl"
   value       = "aws eks update-kubeconfig --region ${var.aws_region} --name ${module.eks.cluster_name}"

@@ -29,6 +29,7 @@ class Room:
     amenities: str
     hotel_id: UUID = field(default_factory=uuid4)
     hotel_name: str | None = None
+    destination: str | None = None
     id: UUID = field(default_factory=uuid4)
     created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
