@@ -15,3 +15,14 @@ spec:
     allowedRoutes:
       namespaces:
         from: Same
+  - name: https
+    port: 443
+    protocol: HTTPS
+    tls:
+      mode: Terminate
+      certificateRefs:
+      - name: travelhub-tls-cert
+        kind: Secret
+    allowedRoutes:
+      namespaces:
+        from: Same
