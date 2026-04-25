@@ -94,6 +94,7 @@ class SQLAlchemyRoomRepository(RoomRepositoryPort):
             raise ValueError(f"Room {room.id} not found")
 
         model.name = room.name
+        model.destination = room.destination
         model.room_type = room.room_type
         model.price = room.price
         model.capacity = room.capacity
