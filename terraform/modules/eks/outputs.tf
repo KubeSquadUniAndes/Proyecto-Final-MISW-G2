@@ -17,3 +17,12 @@ output "node_security_group_id" {
 output "cluster_security_group_id" {
   value = aws_eks_cluster.main.vpc_config[0].cluster_security_group_id
 }
+
+output "external_secrets_role_arn" {
+  value       = aws_iam_role.external_secrets.arn
+  description = "IAM Role ARN for External Secrets Operator (IRSA)"
+}
+
+output "oidc_provider_arn" {
+  value = aws_iam_openid_connect_provider.eks.arn
+}
