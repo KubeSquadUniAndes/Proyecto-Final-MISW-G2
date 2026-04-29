@@ -19,6 +19,9 @@ def make_dto(**overrides) -> RegisterUserDTO:
         "city": "Bogotá",
         "birth_date": date(1995, 6, 15),
         "password": "SecurePass123!",
+        "user_type": "traveler",
+        "identification_type": "CC",
+        "identification_number": "1234567890",
     }
     defaults.update(overrides)
     return RegisterUserDTO(**defaults)
@@ -35,6 +38,9 @@ def make_user(dto: RegisterUserDTO) -> User:
         city=dto.city,
         birth_date=dto.birth_date,
         hashed_password="hashed_password",
+        user_type=dto.user_type,
+        identification_type=dto.identification_type,
+        identification_number=dto.identification_number,
     )
 
 
@@ -53,10 +59,18 @@ def mock_password_service():
 
 
 @pytest.fixture
-def use_case(mock_repo, mock_password_service):
+def mock_login_handler_client():
+    client = AsyncMock()
+    client.register_credentials.return_value = None
+    return client
+
+
+@pytest.fixture
+def use_case(mock_repo, mock_password_service, mock_login_handler_client):
     return RegisterUserUseCase(
         user_repository=mock_repo,
         password_service=mock_password_service,
+        login_handler_client=mock_login_handler_client,
     )
 
 

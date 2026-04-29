@@ -74,6 +74,16 @@ module "eks" {
   cluster_version = var.cluster_version
 }
 
+# ── S3 Images Bucket ──────────────────────────────────────────────────────────
+module "s3" {
+  source = "../../modules/s3"
+
+  project        = var.project
+  environment    = var.environment
+  bucket_name    = "travelhub-images"
+  node_role_name = module.eks.node_role_name
+}
+
 # ── RDS PostgreSQL ────────────────────────────────────────────────────────────
 module "rds" {
   source = "../../modules/rds"

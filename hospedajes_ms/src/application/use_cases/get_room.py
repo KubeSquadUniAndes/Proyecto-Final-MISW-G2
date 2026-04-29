@@ -14,6 +14,8 @@ class GetRoomUseCase:
             raise ValueError(f"Room {room_id} not found")
         return RoomResponseDTO(
             id=room.id,
+            hotel_id=room.hotel_id,
+            hotel_name=room.hotel_name,
             name=room.name,
             room_type=room.room_type,
             price=room.price,

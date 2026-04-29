@@ -26,3 +26,6 @@ output "external_secrets_role_arn" {
 output "oidc_provider_arn" {
   value = aws_iam_openid_connect_provider.eks.arn
 }
+output "node_role_name" {
+  value = aws_iam_role.eks_nodes.name
+}

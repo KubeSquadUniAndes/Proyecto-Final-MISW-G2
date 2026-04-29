@@ -1,16 +1,17 @@
 """Unit tests for hospedajes_ms use cases and entities."""
 
 from decimal import Decimal
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 import pytest
 
-from src.application.dtos.room_dto import CreateRoomDTO
+from src.application.dtos.room_dto import CreateRoomDTO, UpdateRoomDTO
 from src.application.use_cases.create_room import CreateRoomUseCase
 from src.application.use_cases.delete_room import DeleteRoomUseCase
 from src.application.use_cases.get_room import GetRoomUseCase
 from src.application.use_cases.get_room_stats import GetRoomStatsUseCase
 from src.application.use_cases.list_rooms import ListRoomsUseCase
+from src.application.use_cases.update_room import UpdateRoomUseCase
 from src.domain.entities.room import Room, RoomStatus, RoomType
 
 
@@ -25,8 +26,15 @@ class MockRoomRepository:
     async def get_by_id(self, room_id):
         return self.rooms.get(room_id)
 
-    async def list_all(self):
-        return list(self.rooms.values())
+    async def list_all(self, hotel_id=None):
+        rooms = list(self.rooms.values())
+        if hotel_id is not None:
+            rooms = [r for r in rooms if r.hotel_id == hotel_id]
+        return rooms
+
+    async def update(self, room):
+        self.rooms[room.id] = room
+        return room
 
     async def count_by_status(self, status):
         return len([r for r in self.rooms.values() if r.status == status])
@@ -48,6 +56,7 @@ async def test_create_room_success():
     use_case = CreateRoomUseCase(repo)
 
     dto = CreateRoomDTO(
+        hotel_id=uuid4(),
         name="Suite 101",
         room_type=RoomType.SUITE,
         price=Decimal("150.00"),
@@ -73,6 +82,7 @@ async def test_create_room_negative_price():
     use_case = CreateRoomUseCase(repo)
 
     dto = CreateRoomDTO(
+        hotel_id=uuid4(),
         name="Room 1",
         room_type=RoomType.INDIVIDUAL,
         price=Decimal("-10.00"),
@@ -94,6 +104,7 @@ async def test_create_room_invalid_capacity():
     use_case = CreateRoomUseCase(repo)
 
     dto = CreateRoomDTO(
+        hotel_id=uuid4(),
         name="Room 1",
         room_type=RoomType.INDIVIDUAL,
         price=Decimal("50.00"),
@@ -115,6 +126,7 @@ async def test_create_room_invalid_size():
     use_case = CreateRoomUseCase(repo)
 
     dto = CreateRoomDTO(
+        hotel_id=uuid4(),
         name="Room 1",
         room_type=RoomType.INDIVIDUAL,
         price=Decimal("50.00"),
@@ -353,3 +365,69 @@ async def test_delete_room_not_found():
 
     with pytest.raises(ValueError, match="not found"):
         await use_case.execute(uuid4())
+
+
+@pytest.mark.asyncio
+async def test_update_room_success():
+    """Test successful room update."""
+    repo = MockRoomRepository()
+    use_case = UpdateRoomUseCase(repo)
+
+    room_id = uuid4()
+    room = Room(
+        id=room_id,
+        name="Room 101",
+        room_type=RoomType.INDIVIDUAL,
+        price=Decimal("100.00"),
+        capacity=2,
+        beds="1 Double",
+        size=25.0,
+        status=RoomStatus.DISPONIBLE,
+        amenities="WiFi",
+    )
+    repo.rooms[room_id] = room
+
+    dto = UpdateRoomDTO(name="Room 101 Updated", price=Decimal("120.00"))
+    result = await use_case.execute(room_id, dto)
+
+    assert result.name == "Room 101 Updated"
+    assert result.price == Decimal("120.00")
+    assert result.capacity == 2  # unchanged
+
+
+@pytest.mark.asyncio
+async def test_update_room_not_found():
+    """Test update fails when room doesn't exist."""
+    repo = MockRoomRepository()
+    use_case = UpdateRoomUseCase(repo)
+
+    with pytest.raises(ValueError, match="not found"):
+        await use_case.execute(uuid4(), UpdateRoomDTO(name="New Name"))
+
+
+@pytest.mark.asyncio
+async def test_update_room_partial_fields():
+    """Test that only provided fields are updated."""
+    repo = MockRoomRepository()
+    use_case = UpdateRoomUseCase(repo)
+
+    room_id = uuid4()
+    room = Room(
+        id=room_id,
+        name="Original",
+        room_type=RoomType.DOBLE,
+        price=Decimal("80.00"),
+        capacity=2,
+        beds="2 Single",
+        size=30.0,
+        status=RoomStatus.DISPONIBLE,
+        amenities="WiFi, TV",
+    )
+    repo.rooms[room_id] = room
+
+    dto = UpdateRoomDTO(status=RoomStatus.MANTENIMIENTO)
+    result = await use_case.execute(room_id, dto)
+
+    assert result.status == RoomStatus.MANTENIMIENTO
+    assert result.name == "Original"  # unchanged
+    assert result.price == Decimal("80.00")  # unchanged

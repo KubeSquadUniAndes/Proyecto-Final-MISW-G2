@@ -309,7 +309,8 @@ jobs:
           kubectl wait --for=condition=ready pod -l app=hospedajes-app -n workloads --timeout=120s
           echo "hospedajes_ms uses create_all on startup — tables already created"
           kubectl wait --for=condition=ready pod -l app=detector-anomalias-app -n workloads --timeout=120s
-          kubectl exec -n workloads deploy/detector-anomalias-deployment -- python /app/run_migrations.py
+          kubectl exec -n workloads deploy/detector-anomalias-deployment -- \
+            sh -c "env -u PYTHONPATH alembic -c /app/alembic.ini upgrade head"
           kubectl wait --for=condition=ready pod -l app=reservas-app -n workloads --timeout=120s
           kubectl exec -n workloads deploy/reservas-deployment -- \
             sh -c "cd /app && PYTHONPATH= alembic stamp head"
@@ -329,14 +330,6 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Get NLB endpoint
-        id: nlb
-        run: |
-          aws eks update-kubeconfig --region $AWS_REGION --name $EKS_CLUSTER
-          BASE_URL=$(kubectl get svc travelhub-gateway-istio -n workloads \
-            -o jsonpath='https://{.status.loadBalancer.ingress[0].hostname}')
-          echo "base_url=$BASE_URL" >> $GITHUB_OUTPUT
-
       - name: Install Newman
         run: npm install -g newman newman-reporter-htmlextra
 
@@ -344,9 +337,10 @@ jobs:
         run: |
           newman run postman/travelhub-collection.json \
             -e postman/travelhub-environment.json \
-            --env-var base_url=${{ steps.nlb.outputs.base_url }} \
+            --env-var base_url=${{ secrets.EKS_BASE_URL }} \
             -r cli,htmlextra \
             --reporter-htmlextra-export postman/report.html \
+            --insecure \
             --bail
 
       - name: Upload Newman report

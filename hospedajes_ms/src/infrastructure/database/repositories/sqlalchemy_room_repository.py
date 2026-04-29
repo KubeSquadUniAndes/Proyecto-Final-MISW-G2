@@ -16,6 +16,9 @@ class SQLAlchemyRoomRepository(RoomRepositoryPort):
     def _to_domain(self, model: RoomModel) -> Room:
         return Room(
             id=model.id,
+            hotel_id=model.hotel_id,
+            hotel_name=model.hotel_name,
+            destination=model.destination,
             name=model.name,
             room_type=RoomType(model.room_type),
             price=Decimal(str(model.price)),
@@ -31,6 +34,9 @@ class SQLAlchemyRoomRepository(RoomRepositoryPort):
     def _to_model(self, room: Room) -> RoomModel:
         return RoomModel(
             id=room.id,
+            hotel_id=room.hotel_id,
+            hotel_name=room.hotel_name,
+            destination=room.destination,
             name=room.name,
             room_type=room.room_type,
             price=room.price,
@@ -57,10 +63,26 @@ class SQLAlchemyRoomRepository(RoomRepositoryPort):
         model = result.scalar_one_or_none()
         return self._to_domain(model) if model else None
 
-    async def list_all(self) -> list[Room]:
-        result = await self._session.execute(
-            select(RoomModel).order_by(RoomModel.created_at.desc())
-        )
+    async def list_all(self, hotel_id: UUID | None = None) -> list[Room]:
+        query = select(RoomModel).order_by(RoomModel.created_at.desc())
+        if hotel_id is not None:
+            query = query.where(RoomModel.hotel_id == hotel_id)
+        result = await self._session.execute(query)
+        return [self._to_domain(m) for m in result.scalars().all()]
+
+    async def search(
+        self,
+        destination: str | None = None,
+        min_capacity: int | None = None,
+    ) -> list[Room]:
+        query = select(RoomModel).where(RoomModel.status == RoomStatus.DISPONIBLE)
+        if destination is not None:
+            query = query.where(
+                func.lower(RoomModel.destination).contains(destination.lower())
+            )
+        if min_capacity is not None:
+            query = query.where(RoomModel.capacity >= min_capacity)
+        result = await self._session.execute(query)
         return [self._to_domain(m) for m in result.scalars().all()]
 
     async def update(self, room: Room) -> Room:
@@ -72,6 +94,7 @@ class SQLAlchemyRoomRepository(RoomRepositoryPort):
             raise ValueError(f"Room {room.id} not found")
 
         model.name = room.name
+        model.destination = room.destination
         model.room_type = room.room_type
         model.price = room.price
         model.capacity = room.capacity

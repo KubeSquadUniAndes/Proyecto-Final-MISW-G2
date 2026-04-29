@@ -37,6 +37,15 @@ output "secrets_arns" {
     internal_api_key = module.secrets.internal_api_key_arn
   }
 }
+output "s3_bucket_name" {
+  description = "S3 bucket for hotel images"
+  value       = module.s3.bucket_name
+}
+
+output "s3_bucket_url" {
+  description = "Base URL for hotel images"
+  value       = module.s3.bucket_url
+}
 
 output "configure_kubectl" {
   description = "Run this command to configure kubectl"

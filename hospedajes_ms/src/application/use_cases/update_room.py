@@ -16,6 +16,8 @@ class UpdateRoomUseCase:
 
         if dto.name is not None:
             room.name = dto.name
+        if dto.destination is not None:
+            room.destination = dto.destination
         if dto.room_type is not None:
             room.room_type = dto.room_type
         if dto.price is not None:
@@ -35,6 +37,9 @@ class UpdateRoomUseCase:
         updated = await self._repo.update(room)
         return RoomResponseDTO(
             id=updated.id,
+            hotel_id=updated.hotel_id,
+            hotel_name=updated.hotel_name,
+            destination=updated.destination,
             name=updated.name,
             room_type=updated.room_type,
             price=updated.price,

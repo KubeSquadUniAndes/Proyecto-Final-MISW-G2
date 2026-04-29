@@ -30,6 +30,8 @@ class LoginUseCase:
             raise PermissionError("User account is inactive")
 
         extra_claims = {"role": user.role.value} if user.role else {}
+        if user.full_name:
+            extra_claims["full_name"] = user.full_name
         access_token = self._jwt.create_access_token(user.id, extra_claims=extra_claims)
         raw_refresh, expires_at = self._jwt.create_refresh_token(user.id)
 
