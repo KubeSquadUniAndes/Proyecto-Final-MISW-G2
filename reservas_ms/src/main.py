@@ -5,20 +5,20 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from src.infrastructure.config.settings import settings
 from src.infrastructure.database.base import Base, engine
-from src.infrastructure.http.routes.health_router import router as health_router
 from src.infrastructure.http.routes.booking_router import router as booking_router
-from src.infrastructure.http.routes.payment_confirmation_router import router as payment_confirmation_router
+from src.infrastructure.http.routes.health_router import router as health_router
+from src.infrastructure.http.routes.payment_confirmation_router import (
+    router as payment_confirmation_router,
+)
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Manages the application lifecycle."""
-    # Startup: create tables if they don't exist (use Alembic in production)
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     print(f"✅ {settings.APP_NAME} v{settings.APP_VERSION} started")
     yield
-    # Shutdown
     await engine.dispose()
     print(f"🛑 {settings.APP_NAME} stopped")
 
@@ -39,16 +39,14 @@ def create_app() -> FastAPI:
         lifespan=lifespan,
     )
 
-    # CORS
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"],  # Restrict in production
+        allow_origins=["*"],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
     )
 
-    # Routers
     app.include_router(health_router)
     app.include_router(booking_router, prefix="/api/v1")
     app.include_router(payment_confirmation_router, prefix="/api/v1")
