@@ -6,6 +6,9 @@ from src.infrastructure.http.routes.health_router import router as health_router
 from src.infrastructure.http.routes.notification_router import (
     router as notification_router,
 )
+from src.infrastructure.http.routes.reservation_notification_router import (
+    router as reservation_notification_router,
+)
 
 
 def create_app() -> FastAPI:
@@ -13,9 +16,8 @@ def create_app() -> FastAPI:
         title=settings.APP_NAME,
         version=settings.APP_VERSION,
         description=(
-            "Simple notification microservice — receives anomaly alerts and dispatches them "
-            "via Email (SMTP) and Slack webhook.\n\n"
-            "**Called by:** `detector_anomalias_ms`\n\n"
+            "Notification microservice — dispatches alerts and reservation confirmations.\n\n"
+            "**Called by:** `detector_anomalias_ms`, `reservas_ms`\n\n"
             "**Channels:** Email · Slack"
         ),
         docs_url="/docs",
@@ -32,6 +34,7 @@ def create_app() -> FastAPI:
 
     app.include_router(health_router)
     app.include_router(notification_router, prefix="/api/v1")
+    app.include_router(reservation_notification_router, prefix="/api/v1")
 
     print(f"✅ {settings.APP_NAME} v{settings.APP_VERSION} started")
     return app
