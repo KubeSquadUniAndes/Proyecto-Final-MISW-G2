@@ -12,7 +12,9 @@ logger = logging.getLogger(__name__)
 
 
 class SendReservationConfirmationUseCase:
-    async def execute(self, dto: ReservationConfirmationDTO) -> ReservationConfirmationResultDTO:
+    async def execute(
+        self, dto: ReservationConfirmationDTO
+    ) -> ReservationConfirmationResultDTO:
         logger.info(
             "sending_reservation_confirmation reservation_code=%s guest_email=%s",
             dto.reservation_code,
