@@ -4,7 +4,6 @@ from fastapi import APIRouter, Depends, HTTPException, Header, status
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.domain.entities.booking import BookingStatus
 from src.infrastructure.database.base import get_db
 from src.infrastructure.database.repositories.sqlalchemy_booking_repository import SQLAlchemyBookingRepository
 from src.infrastructure.config.settings import settings
