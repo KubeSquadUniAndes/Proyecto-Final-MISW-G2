@@ -44,6 +44,7 @@ class SQLAlchemyBookingRepository(BookingRepositoryPort):
             total_price=Decimal(str(model.total_price)) if model.total_price else None,
             taxes=Decimal(str(model.taxes)) if model.taxes else None,
             final_price=Decimal(str(model.final_price)) if model.final_price else None,
+            payment_id=model.payment_id,
             traveler_name=d.get("traveler_name"),
             traveler_email=d.get("traveler_email"),
             traveler_phone=d.get("traveler_phone"),
@@ -127,6 +128,7 @@ class SQLAlchemyBookingRepository(BookingRepositoryPort):
             total_price=booking.total_price,
             taxes=booking.taxes,
             final_price=booking.final_price,
+            payment_id=booking.payment_id,
             traveler_name=encrypted.get("traveler_name"),
             traveler_email=encrypted.get("traveler_email"),
             traveler_phone=encrypted.get("traveler_phone"),
@@ -147,8 +149,11 @@ class SQLAlchemyBookingRepository(BookingRepositoryPort):
         model = result.scalar_one_or_none()
         if not model:
             return None
+        print(f"DEBUG get_by_id: model.payment_id = {model.payment_id}")
         decrypted = await self._decrypt_row(model)
-        return self._to_domain(model, decrypted)
+        booking = self._to_domain(model, decrypted)
+        print(f"DEBUG get_by_id: booking.payment_id = {booking.payment_id}")
+        return booking
 
     async def list_by_user(self, user_id: UUID) -> list[Booking]:
         result = await self._session.execute(
@@ -191,6 +196,7 @@ class SQLAlchemyBookingRepository(BookingRepositoryPort):
         model.end_time = booking.end_time
         model.updated_at = booking.updated_at
         model.special_requests = booking.special_requests
+        model.payment_id = booking.payment_id
 
         if booking.traveler_name:
             encrypted = await self._encrypt_sensitive(booking)

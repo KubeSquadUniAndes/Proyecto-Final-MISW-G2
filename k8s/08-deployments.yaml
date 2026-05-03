@@ -506,3 +506,91 @@ spec:
           initialDelaySeconds: 10
           periodSeconds: 30
           failureThreshold: 3
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pagos-deployment
+  namespace: workloads
+  labels:
+    app: pagos-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pagos-app
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: pagos-app
+        version: v1
+    spec:
+      nodeSelector:
+        role: workloads
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - pagos-app
+              topologyKey: kubernetes.io/hostname
+      terminationGracePeriodSeconds: 30
+      initContainers:
+      - name: wait-for-postgres
+        image: postgres:alpine3.22
+        env:
+        - name: RDS_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: rds-config
+              key: RDS_HOST
+        - name: RDS_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: rds-config
+              key: RDS_PORT
+        command: ["sh", "-c", "until pg_isready -h $RDS_HOST -p $RDS_PORT -U postgres; do echo 'waiting for RDS...'; sleep 2; done"]
+      containers:
+      - name: pagosms
+        image: 780522923809.dkr.ecr.us-east-1.amazonaws.com/travelhub/pagosms:latest
+        imagePullPolicy: Always
+        envFrom:
+          - configMapRef:
+              name: pagos-ms-config
+          - secretRef:
+              name: pagos-ms-secret
+        ports:
+        - containerPort: 8000
+          name: http
+        resources:
+          requests:
+            cpu: "50m"
+            memory: "128Mi"
+          limits:
+            cpu: "250m"
+            memory: "256Mi"
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          failureThreshold: 3
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 30
+          failureThreshold: 3

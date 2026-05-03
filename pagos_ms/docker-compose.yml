@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: pagos-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: payments_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  pagos_ms:
+    build: .
+    container_name: pagos_ms
+    ports:
+      - "8004:8000"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@postgres:5432/payments_db
+      AES_ENCRYPTION_KEY: ebb9c223f7a78f929a3505b3bcdcccd957121330d3a7ee5b3acd591e269e9871
+      RESERVAS_MS_URL: http://host.docker.internal:8000
+      NOTIFICACIONES_MS_URL: http://host.docker.internal:8003
+      INTERNAL_API_KEY: change-internal-key-in-production
+      DEBUG: "true"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - .:/app
+
+volumes:
+  postgres_data:
