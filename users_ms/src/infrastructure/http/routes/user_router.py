@@ -1,6 +1,7 @@
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Header, HTTPException, status
+from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.application.dtos.user_dto import RegisterUserDTO, UserResponseDTO
@@ -14,6 +15,11 @@ from src.infrastructure.database.repositories.sqlalchemy_user_repository import 
 from src.infrastructure.security.bcrypt_password_service import BcryptPasswordService
 
 router = APIRouter(prefix="/api/v1/users", tags=["users"])
+
+
+class FcmTokenRequest(BaseModel):
+    fcm_token: str
+    platform: str = "android"
 
 
 def get_register_use_case(db: AsyncSession = Depends(get_db)) -> RegisterUserUseCase:
@@ -69,3 +75,49 @@ async def register_user(
             status_code=status.HTTP_502_BAD_GATEWAY,
             detail=str(e),
         )
+
+
+@router.post(
+    "/fcm-token",
+    status_code=status.HTTP_200_OK,
+    summary="Register or update FCM token for push notifications",
+)
+async def register_fcm_token(
+    body: FcmTokenRequest,
+    authorization: str = Header(..., alias="Authorization"),
+    db: AsyncSession = Depends(get_db),
+) -> dict:
+    import jwt
+    try:
+        token = authorization.removeprefix("Bearer ").strip()
+        payload = jwt.decode(
+            token,
+            settings.JWT_SECRET_KEY,
+            algorithms=[settings.JWT_ALGORITHM],
+        )
+        user_id = UUID(payload["sub"])
+    except Exception:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+
+    repo = SQLAlchemyUserRepository(db)
+    updated = await repo.update_fcm_token(user_id, body.fcm_token)
+    if not updated:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    return {"message": "FCM token registered successfully"}
+
+
+@router.get(
+    "/{user_id}/fcm-token",
+    status_code=status.HTTP_200_OK,
+    summary="Get FCM token for a user (internal)",
+)
+async def get_fcm_token(
+    user_id: UUID,
+    x_internal_api_key: str = Header(..., alias="X-Internal-Api-Key"),
+    db: AsyncSession = Depends(get_db),
+) -> dict:
+    if x_internal_api_key != settings.INTERNAL_API_KEY:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid internal API key")
+    repo = SQLAlchemyUserRepository(db)
+    token = await repo.get_fcm_token(user_id)
+    return {"fcm_token": token}

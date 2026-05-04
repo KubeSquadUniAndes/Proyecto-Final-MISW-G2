@@ -21,6 +21,8 @@ from src.application.use_cases.reject_booking import RejectBookingUseCase
 from src.application.use_cases.update_booking import UpdateBookingUseCase
 from src.domain.services.booking_domain_service import BookingDomainService
 from src.infrastructure.clients.anomaly_detector_client import AnomalyDetectorClient
+from src.infrastructure.clients.notificaciones_client import NotificacionesClient
+from src.infrastructure.clients.users_client import UsersClient
 from src.infrastructure.config.settings import settings
 from src.infrastructure.database.base import get_db
 from src.infrastructure.database.repositories.sqlalchemy_booking_repository import (
@@ -44,6 +46,16 @@ router = APIRouter(prefix="/bookings", tags=["Bookings"])
 _anomaly_client = AnomalyDetectorClient(
     base_url=settings.DETECTOR_ANOMALIAS_MS_URL,
     api_key=settings.DETECTOR_ANOMALIAS_MS_API_KEY,
+)
+
+_notificaciones_client = NotificacionesClient(
+    base_url=settings.NOTIFICACIONES_MS_URL,
+    api_key=settings.NOTIFICACIONES_MS_API_KEY,
+)
+
+_users_client = UsersClient(
+    base_url=settings.USERS_MS_URL,
+    api_key=settings.USERS_MS_INTERNAL_API_KEY,
 )
 
 
@@ -183,6 +195,21 @@ async def create_booking(
             traveler_document=body.traveler_document,
         )
         result = await use_case.execute(dto)
+        try:
+            fcm_token = await _users_client.get_fcm_token(user_id)
+            if fcm_token:
+                await _notificaciones_client.send_booking_notification(
+                    fcm_token=fcm_token,
+                    booking_id=str(result.id),
+                    booking_code=result.booking_code or "",
+                    hotel_name=str(result.hotel_id),
+                    check_in=result.start_time.strftime("%Y-%m-%d"),
+                    check_out=result.end_time.strftime("%Y-%m-%d"),
+                    status=result.status_display or result.status,
+                    event_type="created",
+                )
+        except Exception:
+            pass
         return BookingResponse(**result.model_dump())
     except ValueError as exc:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc))
@@ -222,6 +249,22 @@ async def update_booking(
             notes=body.notes,
         )
         result = await use_case.execute(dto)
+        try:
+            fcm_token = await _users_client.get_fcm_token(user_id)
+            if fcm_token:
+                await _notificaciones_client.send_booking_notification(
+                    fcm_token=fcm_token,
+                    booking_id=str(result.id),
+                    booking_code=result.booking_code or "",
+                    hotel_name=str(result.hotel_id),
+                    check_in=result.start_time.strftime("%Y-%m-%d"),
+                    check_out=result.end_time.strftime("%Y-%m-%d"),
+                    status=result.status_display or result.status,
+                    event_type="modified",
+                    change_summary="Fechas o datos de tu reserva fueron actualizados",
+                )
+        except Exception:
+            pass
         return BookingResponse(**result.model_dump())
     except ValueError as exc:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc))
@@ -257,6 +300,21 @@ async def cancel_booking(
     try:
         dto = CancelBookingDTO(booking_id=booking_id, user_id=user_id)
         result = await use_case.execute(dto)
+        try:
+            fcm_token = await _users_client.get_fcm_token(user_id)
+            if fcm_token:
+                await _notificaciones_client.send_booking_notification(
+                    fcm_token=fcm_token,
+                    booking_id=str(result.id),
+                    booking_code=result.booking_code or "",
+                    hotel_name=str(result.hotel_id),
+                    check_in=result.start_time.strftime("%Y-%m-%d"),
+                    check_out=result.end_time.strftime("%Y-%m-%d"),
+                    status=result.status_display or result.status,
+                    event_type="status_changed",
+                )
+        except Exception:
+            pass
         return BookingResponse(**result.model_dump())
     except LookupError as exc:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc))
@@ -345,6 +403,21 @@ async def approve_booking(
     try:
         dto = ApproveBookingDTO(booking_id=booking_id, admin_user_id=user_id)
         result = await use_case.execute(dto)
+        try:
+            fcm_token = await _users_client.get_fcm_token(result.user_id)
+            if fcm_token:
+                await _notificaciones_client.send_booking_notification(
+                    fcm_token=fcm_token,
+                    booking_id=str(result.id),
+                    booking_code=result.booking_code or "",
+                    hotel_name=str(result.hotel_id),
+                    check_in=result.start_time.strftime("%Y-%m-%d"),
+                    check_out=result.end_time.strftime("%Y-%m-%d"),
+                    status=result.status_display or result.status,
+                    event_type="status_changed",
+                )
+        except Exception:
+            pass
         return BookingResponse(**result.model_dump())
     except LookupError as exc:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc))
@@ -392,6 +465,21 @@ async def reject_booking(
             rejection_reason=body.rejection_reason,
         )
         result = await use_case.execute(dto)
+        try:
+            fcm_token = await _users_client.get_fcm_token(result.user_id)
+            if fcm_token:
+                await _notificaciones_client.send_booking_notification(
+                    fcm_token=fcm_token,
+                    booking_id=str(result.id),
+                    booking_code=result.booking_code or "",
+                    hotel_name=str(result.hotel_id),
+                    check_in=result.start_time.strftime("%Y-%m-%d"),
+                    check_out=result.end_time.strftime("%Y-%m-%d"),
+                    status=result.status_display or result.status,
+                    event_type="status_changed",
+                )
+        except Exception:
+            pass
         return BookingResponse(**result.model_dump())
     except LookupError as exc:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc))

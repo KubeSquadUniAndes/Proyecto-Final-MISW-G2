@@ -29,6 +29,7 @@ class User:
     identification_type: IdentificationType
     identification_number: str
     id: UUID = field(default_factory=uuid4)
+    fcm_token: str | None = None
     created_at: datetime = field(default_factory=datetime.utcnow)
     updated_at: datetime = field(default_factory=datetime.utcnow)
 
