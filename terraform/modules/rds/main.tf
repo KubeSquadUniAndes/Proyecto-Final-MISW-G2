@@ -13,6 +13,7 @@ variable "eks_cluster_security_group" {
 variable "db_password" {
   type      = string
   sensitive = true
+  description = "RDS master password — passed from secrets module output"
 }
 
 # ── Subnet Group ──────────────────────────────────────────────────────────────
@@ -53,7 +54,7 @@ resource "aws_db_instance" "main" {
   instance_class = "db.t3.micro"
 
   allocated_storage     = 20
-  max_allocated_storage = 100
+  max_allocated_storage = 30  # reduced from 100 — sufficient for this workload
   storage_encrypted     = true
 
   db_name  = "postgres"
@@ -63,13 +64,13 @@ resource "aws_db_instance" "main" {
   db_subnet_group_name   = aws_db_subnet_group.main.name
   vpc_security_group_ids = [aws_security_group.rds.id]
 
-  multi_az               = false   # set true for production HA
+  multi_az               = false
   publicly_accessible    = false
   deletion_protection    = true
   skip_final_snapshot    = false
   final_snapshot_identifier = "${var.project}-${var.environment}-final-snapshot"
 
-  backup_retention_period = 7
+  backup_retention_period = 1  # reduced from 7 — academic environment
   backup_window           = "03:00-04:00"
   maintenance_window      = "Mon:04:00-Mon:05:00"
 
@@ -79,8 +80,37 @@ resource "aws_db_instance" "main" {
   }
 }
 
+# ── Databases ─────────────────────────────────────────────────────────────────
+# Creates all required databases via a provisioner after RDS is ready.
+# Uses a null_resource so databases are idempotent (CREATE IF NOT EXISTS).
+resource "null_resource" "create_databases" {
+  depends_on = [aws_db_instance.main]
+
+  provisioner "local-exec" {
+    command = <<-EOT
+      export PGPASSWORD='${var.db_password}'
+      for db in bookings_db auth_db users_db anomalies_db hospedajes_db; do
+        psql -h ${aws_db_instance.main.address} -U postgres -tc \
+          "SELECT 1 FROM pg_database WHERE datname = '$db'" | grep -q 1 || \
+          psql -h ${aws_db_instance.main.address} -U postgres -c "CREATE DATABASE $db;"
+      done
+      psql -h ${aws_db_instance.main.address} -U postgres -d bookings_db \
+        -c "CREATE EXTENSION IF NOT EXISTS pgcrypto;"
+    EOT
+  }
+
+  triggers = {
+    rds_id = aws_db_instance.main.id
+  }
+}
+
 output "endpoint" {
   value     = aws_db_instance.main.endpoint
+  sensitive = true
+}
+
+output "address" {
+  value     = aws_db_instance.main.address
   sensitive = true
 }
 

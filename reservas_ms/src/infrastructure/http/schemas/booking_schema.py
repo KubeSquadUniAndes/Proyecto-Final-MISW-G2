@@ -67,9 +67,10 @@ class BookingResponse(BaseModel):
     price_per_night: Decimal | None
     total_nights: int | None
     total_price: Decimal | None
-    taxes: Decimal | None
-    final_price: Decimal | None
-    traveler_name: str | None
+    taxes: Decimal | None = None
+    final_price: Decimal | None = None
+    payment_id: UUID | None = None
+    traveler_name: str | None = None
     traveler_email: str | None
     traveler_phone: str | None
     traveler_document: str | None

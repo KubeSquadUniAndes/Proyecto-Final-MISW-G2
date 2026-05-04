@@ -22,8 +22,27 @@ variable "cluster_version" {
   default     = "1.35"
 }
 
+# ── Sensitive ── passed via TF_VAR_* env vars in CI/CD, never in tfvars ────────────
 variable "db_password" {
-  description = "Master password for RDS PostgreSQL"
+  description = "RDS master password — set via TF_VAR_db_password"
+  type        = string
+  sensitive   = true
+}
+
+variable "jwt_secret" {
+  description = "JWT signing secret — set via TF_VAR_jwt_secret"
+  type        = string
+  sensitive   = true
+}
+
+variable "aes_encryption_key" {
+  description = "AES-256 key for pgcrypto — set via TF_VAR_aes_encryption_key"
+  type        = string
+  sensitive   = true
+}
+
+variable "internal_api_key" {
+  description = "Internal service-to-service API key — set via TF_VAR_internal_api_key"
   type        = string
   sensitive   = true
 }

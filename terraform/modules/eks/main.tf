@@ -85,7 +85,57 @@ resource "aws_eks_cluster" "main" {
   }
 }
 
-# ── VPC CNI Addon — enable prefix delegation for more pods per node ───────────
+# ── OIDC Provider for IRSA ────────────────────────────────────────────────────
+data "tls_certificate" "eks" {
+  url = aws_eks_cluster.main.identity[0].oidc[0].issuer
+}
+
+resource "aws_iam_openid_connect_provider" "eks" {
+  client_id_list  = ["sts.amazonaws.com"]
+  thumbprint_list = [data.tls_certificate.eks.certificates[0].sha1_fingerprint]
+  url             = aws_eks_cluster.main.identity[0].oidc[0].issuer
+}
+
+# ── IAM Role for External Secrets Operator (IRSA) ────────────────────────────
+resource "aws_iam_role" "external_secrets" {
+  name = "${var.project}-${var.environment}-external-secrets-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Principal = {
+        Federated = aws_iam_openid_connect_provider.eks.arn
+      }
+      Action = "sts:AssumeRoleWithWebIdentity"
+      Condition = {
+        StringEquals = {
+          "${replace(aws_iam_openid_connect_provider.eks.url, "https://", "")}:sub" = "system:serviceaccount:workloads:external-secrets-sa"
+          "${replace(aws_iam_openid_connect_provider.eks.url, "https://", "")}:aud" = "sts.amazonaws.com"
+        }
+      }
+    }]
+  })
+}
+
+resource "aws_iam_role_policy" "external_secrets" {
+  name = "${var.project}-${var.environment}-external-secrets-policy"
+  role = aws_iam_role.external_secrets.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Action = [
+        "secretsmanager:GetSecretValue",
+        "secretsmanager:DescribeSecret"
+      ]
+      Resource = "arn:aws:secretsmanager:${var.aws_region}:${data.aws_caller_identity.current.account_id}:secret:travelhub/*"
+    }]
+  })
+}
+
+# ── VPC CNI Addon ─────────────────────────────────────────────────────────────
 resource "aws_eks_addon" "vpc_cni" {
   cluster_name                = aws_eks_cluster.main.name
   addon_name                  = "vpc-cni"
@@ -101,13 +151,13 @@ resource "aws_eks_addon" "vpc_cni" {
   depends_on = [aws_eks_cluster.main]
 }
 
-# ── Node Group: Workloads (microservices + istio) ─────────────────────────────
+# ── Node Group: Workloads ─────────────────────────────────────────────────────
 resource "aws_eks_node_group" "workloads" {
   cluster_name    = aws_eks_cluster.main.name
   node_group_name = "${var.project}-${var.environment}-workloads"
   node_role_arn   = aws_iam_role.eks_nodes.arn
   subnet_ids      = var.private_subnets
-  instance_types  = ["t3.large"]
+  instance_types  = ["t3.medium"]  # reduced from t3.large — sufficient for 6 FastAPI microservices
 
   scaling_config {
     desired_size = 1
@@ -131,20 +181,20 @@ resource "aws_eks_node_group" "workloads" {
   ]
 
   tags = {
-    Project                                                          = var.project
-    Environment                                                      = var.environment
-    "k8s.io/cluster-autoscaler/enabled"                              = "true"
-    "k8s.io/cluster-autoscaler/${var.project}-${var.environment}"    = "owned"
+    Project                                                       = var.project
+    Environment                                                   = var.environment
+    "k8s.io/cluster-autoscaler/enabled"                           = "true"
+    "k8s.io/cluster-autoscaler/${var.project}-${var.environment}" = "owned"
   }
 }
 
-# ── Node Group: Observability (Prometheus, Grafana, Kiali, Jaeger) ────────────
+# ── Node Group: Observability ─────────────────────────────────────────────────
 resource "aws_eks_node_group" "observability" {
   cluster_name    = aws_eks_cluster.main.name
   node_group_name = "${var.project}-${var.environment}-observability"
   node_role_arn   = aws_iam_role.eks_nodes.arn
   subnet_ids      = var.private_subnets
-  instance_types  = ["t3.micro"]
+  instance_types  = ["t3.small"]  # upgraded from t3.micro — Prometheus+Grafana+Kiali+Jaeger need >512MB
 
   scaling_config {
     desired_size = 1

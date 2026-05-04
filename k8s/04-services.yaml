@@ -138,3 +138,24 @@ spec:
     protocol: TCP
     port: 5432
     targetPort: 5432
+---
+###################################
+# pagos service
+###################################
+apiVersion: v1
+kind: Service
+metadata:
+  name: pagos-service
+  namespace: workloads
+  labels:
+    app: pagos-app
+    istio.io/use-waypoint: waypoint-private
+spec:
+  type: ClusterIP
+  selector:
+    app: pagos-app
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: 8000

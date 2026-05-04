@@ -88,6 +88,7 @@ class BookingResponseDTO(BaseModel):
     total_price: Decimal | None
     taxes: Decimal | None
     final_price: Decimal | None
+    payment_id: UUID | None = None
     traveler_name: str | None
     traveler_email: str | None
     traveler_phone: str | None

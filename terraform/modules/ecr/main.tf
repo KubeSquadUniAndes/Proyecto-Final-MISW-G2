@@ -23,8 +23,8 @@ resource "aws_ecr_repository" "services" {
 
 # Keep only the last 10 images to save storage costs
 resource "aws_ecr_lifecycle_policy" "services" {
-  for_each   = aws_ecr_repository.services
-  repository = each.value.name
+  for_each   = toset(var.services)
+  repository = "${var.project}/${each.value}"
 
   policy = jsonencode({
     rules = [{

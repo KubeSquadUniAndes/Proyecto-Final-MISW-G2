@@ -2,5 +2,5 @@ aws_region      = "us-east-1"
 project         = "travelhub"
 environment     = "prod"
 cluster_version = "1.35"
-# db_password is set via TF_VAR_db_password environment variable — never commit this file with a real password
-db_password = "SecurePass123!"
+# All secrets (db_password, jwt_secret, aes_key) are managed by AWS Secrets Manager.
+# See terraform/envs/prod/main.tf for the required secret names.

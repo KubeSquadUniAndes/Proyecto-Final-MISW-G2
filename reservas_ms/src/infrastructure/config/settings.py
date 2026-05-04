@@ -31,6 +31,7 @@ class Settings(BaseSettings):
     LOGIN_HANDLER_MS_URL: str = "http://login_handler_ms:8001"
     DETECTOR_ANOMALIAS_MS_URL: str = "http://detector_anomalias_ms:8002"
     DETECTOR_ANOMALIAS_MS_API_KEY: str = "change-internal-key-in-production"
+    INTERNAL_API_KEY: str = "change-internal-key-in-production"
 
     model_config = SettingsConfigDict(
         env_file=".env",

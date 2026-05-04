@@ -40,6 +40,7 @@ def _build_response(booking: Booking) -> BookingResponseDTO:
         total_price=booking.total_price,
         taxes=booking.taxes,
         final_price=booking.final_price,
+        payment_id=booking.payment_id,
         traveler_name=booking.traveler_name,
         traveler_email=booking.traveler_email,
         traveler_phone=booking.traveler_phone,
