@@ -4,8 +4,8 @@ from typing import Optional
 
 from src.domain.entities.payment import Payment
 from src.domain.repositories.payment_repository_port import PaymentRepositoryPort
-from src.infrastructure.clients.reservas_client import ReservasClient
 from src.infrastructure.clients.notificaciones_client import NotificacionesClient
+from src.infrastructure.clients.reservas_client import ReservasClient
 from src.infrastructure.config.settings import settings
 
 
@@ -28,7 +28,7 @@ class ConfirmPaymentUseCase:
     ) -> Payment:
         """
         Confirm payment and update booking status with retry logic.
-        
+
         Criteria:
         - Update payment status to CONFIRMED
         - Store provider transaction ID and timestamp
@@ -37,20 +37,17 @@ class ConfirmPaymentUseCase:
         - Complete in < 500ms
         """
         start_time = datetime.utcnow()
-        
-        # Find payment
+
         payment = await self.payment_repository.find_by_booking_id(booking_id)
         if not payment:
             raise ValueError(f"Payment for booking {booking_id} not found")
 
-        # Confirm payment
         payment.confirm(
             provider_transaction_id=provider_transaction_id,
             payment_timestamp=payment_timestamp or datetime.utcnow(),
         )
         payment = await self.payment_repository.update(payment)
 
-        # Update booking with retry logic
         success = False
         for attempt in range(settings.MAX_RETRY_ATTEMPTS):
             success = await self.reservas_client.update_booking_status(
@@ -64,13 +61,16 @@ class ConfirmPaymentUseCase:
             await self.payment_repository.update(payment)
 
         if not success:
-            # Generate alert for manual review
-            print(f"⚠️ ALERT: Failed to update booking {booking_id} after {settings.MAX_RETRY_ATTEMPTS} attempts")
+            print(
+                f"⚠️ ALERT: Failed to update booking {booking_id} "
+                f"after {settings.MAX_RETRY_ATTEMPTS} attempts"
+            )
             payment.fail()
             await self.payment_repository.update(payment)
-            raise Exception(f"Failed to update booking after {settings.MAX_RETRY_ATTEMPTS} retries")
+            raise Exception(
+                f"Failed to update booking after {settings.MAX_RETRY_ATTEMPTS} retries"
+            )
 
-        # Send confirmation email (fire and forget)
         if payment.cardholder_email:
             await self.notificaciones_client.send_payment_confirmation(
                 booking_id=booking_id,
@@ -79,9 +79,11 @@ class ConfirmPaymentUseCase:
                 currency=payment.currency,
             )
 
-        # Check timing
         elapsed = (datetime.utcnow() - start_time).total_seconds() * 1000
         if elapsed > settings.PAYMENT_TIMEOUT_MS:
-            print(f"⚠️ Payment confirmation took {elapsed}ms (target: {settings.PAYMENT_TIMEOUT_MS}ms)")
+            print(
+                f"⚠️ Payment confirmation took {elapsed}ms "
+                f"(target: {settings.PAYMENT_TIMEOUT_MS}ms)"
+            )
 
         return payment
