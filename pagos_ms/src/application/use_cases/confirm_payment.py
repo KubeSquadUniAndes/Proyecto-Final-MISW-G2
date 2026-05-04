@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from typing import Optional
 
-from src.domain.entities.payment import Payment, PaymentStatus
+from src.domain.entities.payment import Payment
 from src.domain.repositories.payment_repository_port import PaymentRepositoryPort
 from src.infrastructure.clients.reservas_client import ReservasClient
 from src.infrastructure.clients.notificaciones_client import NotificacionesClient

@@ -1,6 +1,5 @@
 import uuid
 import httpx
-from typing import Optional
 
 from src.infrastructure.config.settings import settings
 

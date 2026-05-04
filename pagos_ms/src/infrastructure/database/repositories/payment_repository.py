@@ -4,7 +4,7 @@ import uuid
 from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.domain.entities.payment import Payment, PaymentStatus, PaymentProvider, PaymentMethod
+from src.domain.entities.payment import Payment
 from src.domain.repositories.payment_repository_port import PaymentRepositoryPort
 from src.infrastructure.database.models.payment_model import PaymentModel
 from src.infrastructure.config.settings import settings
