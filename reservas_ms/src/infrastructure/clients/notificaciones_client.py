@@ -26,13 +26,12 @@ class NotificacionesClient:
         event_type: str,
         change_summary: str | None = None,
     ) -> bool:
-        """Sends a push notification for a booking event. Returns True on success.
-        Never raises — logs errors and returns False on failure.
+        """Send a push notification for a booking event.
+
+        Returns True on success. Never raises — logs errors and returns False.
         """
         if not fcm_token:
-            logger.warning(
-                "fcm_skipped — no token for booking_code=%s", booking_code
-            )
+            logger.warning("fcm_skipped — no token for booking_code=%s", booking_code)
             return False
 
         url = f"{self._base_url}/api/v1/notifications/booking"
