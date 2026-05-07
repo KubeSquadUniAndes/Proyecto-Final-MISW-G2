@@ -28,5 +28,9 @@ class UsersClient:
                     return response.json().get("fcm_token")
                 return None
         except Exception as exc:
-            logger.warning("users_ms_fcm_token_unavailable user_id=%s error=%s", user_id, exc)
+            logger.warning(
+                "users_ms_fcm_token_unavailable user_id=%s error=%s",
+                user_id,
+                exc,
+            )
             return None

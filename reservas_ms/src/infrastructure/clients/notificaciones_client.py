@@ -30,7 +30,9 @@ class NotificacionesClient:
         Never raises — logs errors and returns False on failure.
         """
         if not fcm_token:
-            logger.warning("fcm_skipped — no token for booking_code=%s", booking_code)
+            logger.warning(
+                "fcm_skipped — no token for booking_code=%s", booking_code
+            )
             return False
 
         url = f"{self._base_url}/api/v1/notifications/booking"
@@ -53,8 +55,16 @@ class NotificacionesClient:
                     headers={"x-api-key": self._api_key},
                 )
                 response.raise_for_status()
-                logger.info("fcm_notification_sent booking_code=%s event=%s", booking_code, event_type)
+                logger.info(
+                    "fcm_notification_sent booking_code=%s event=%s",
+                    booking_code,
+                    event_type,
+                )
                 return True
         except Exception as exc:
-            logger.error("fcm_notification_failed booking_code=%s error=%s", booking_code, exc)
+            logger.error(
+                "fcm_notification_failed booking_code=%s error=%s",
+                booking_code,
+                exc,
+            )
             return False
