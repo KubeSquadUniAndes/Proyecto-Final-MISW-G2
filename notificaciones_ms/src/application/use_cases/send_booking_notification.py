@@ -18,7 +18,9 @@ TITLES = {
 class SendBookingNotificationUseCase:
     """Sends a push notification to the traveler's device via FCM."""
 
-    async def execute(self, dto: BookingNotificationDTO) -> BookingNotificationResultDTO:
+    async def execute(
+        self, dto: BookingNotificationDTO
+    ) -> BookingNotificationResultDTO:
         title = TITLES.get(dto.event_type, "TravelHub — Reserva")
         body = self._build_body(dto)
 
@@ -59,7 +61,4 @@ class SendBookingNotificationUseCase:
                 f"Nuevo estado: {dto.status}"
             )
         summary = dto.change_summary or "Datos actualizados"
-        return (
-            f"Reserva {dto.booking_code} en {dto.hotel_name}\n"
-            f"{summary}"
-        )
+        return f"Reserva {dto.booking_code} en {dto.hotel_name}\n" f"{summary}"

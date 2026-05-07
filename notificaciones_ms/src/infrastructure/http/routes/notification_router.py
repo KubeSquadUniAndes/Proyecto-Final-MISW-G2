@@ -1,10 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException, Header, status
+from fastapi import APIRouter, Depends, Header, HTTPException, status
 
 from src.application.dtos.notification_dto import (
     BookingNotificationDTO,
     SendNotificationDTO,
 )
-from src.application.use_cases.send_booking_notification import SendBookingNotificationUseCase
+from src.application.use_cases.send_booking_notification import (
+    SendBookingNotificationUseCase,
+)
 from src.application.use_cases.send_notification import SendNotificationUseCase
 from src.infrastructure.config.settings import settings
 from src.infrastructure.http.schemas.notification_schema import (

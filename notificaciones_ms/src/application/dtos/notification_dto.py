@@ -1,5 +1,6 @@
-from uuid import UUID
 from datetime import datetime
+from uuid import UUID
+
 from pydantic import BaseModel
 
 
@@ -35,6 +36,7 @@ class NotificationResultDTO(BaseModel):
 
 class BookingNotificationDTO(BaseModel):
     """DTO for booking push notifications via FCM."""
+
     fcm_token: str
     booking_id: str
     booking_code: str

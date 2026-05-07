@@ -9,15 +9,18 @@ _firebase_initialized = False
 
 
 def _init_firebase() -> bool:
-    global _firebase_initialized
+    global _firebase_initialized  # noqa: PLW0603
     if _firebase_initialized:
         return True
     try:
         import firebase_admin
         from firebase_admin import credentials
+
         path = settings.FIREBASE_SERVICE_ACCOUNT_PATH
         if not os.path.exists(path):
-            logger.warning("fcm_not_configured — service account file not found: %s", path)
+            logger.warning(
+                "fcm_not_configured — service account file not found: %s", path
+            )
             return False
         cred = credentials.Certificate(path)
         firebase_admin.initialize_app(cred)
@@ -28,7 +31,9 @@ def _init_firebase() -> bool:
         return False
 
 
-async def send_fcm(fcm_token: str, title: str, body: str, data: dict | None = None) -> bool:
+async def send_fcm(
+    fcm_token: str, title: str, body: str, data: dict | None = None
+) -> bool:
     """Sends a push notification via Firebase FCM. Returns True on success."""
     if not fcm_token:
         logger.warning("fcm_skipped — no token provided")
@@ -39,6 +44,7 @@ async def send_fcm(fcm_token: str, title: str, body: str, data: dict | None = No
 
     try:
         from firebase_admin import messaging
+
         message = messaging.Message(
             notification=messaging.Notification(title=title, body=body),
             data={k: str(v) for k, v in (data or {}).items()},
