@@ -3,7 +3,9 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-from src.application.dtos.hotel_booking_notification_dto import HotelBookingNotificationDTO
+from src.application.dtos.hotel_booking_notification_dto import (
+    HotelBookingNotificationDTO,
+)
 from src.infrastructure.config.settings import settings
 
 logger = logging.getLogger(__name__)
@@ -12,7 +14,9 @@ logger = logging.getLogger(__name__)
 async def send_hotel_booking_email(dto: HotelBookingNotificationDTO) -> bool:
     """Sends a new booking notification email to the hotel. Returns True on success."""
     if not settings.SMTP_USER or not settings.SMTP_PASSWORD:
-        logger.warning("smtp_not_configured — skipping hotel booking notification email")
+        logger.warning(
+            "smtp_not_configured — skipping hotel booking notification email"
+        )
         return False
 
     subject = f"Nueva reserva pendiente — {dto.booking_code}"
@@ -42,11 +46,11 @@ async def send_hotel_booking_email(dto: HotelBookingNotificationDTO) -> bool:
         </tr>
         <tr style="background:#f2f2f2;">
             <td><b>Check-in</b></td>
-            <td>{dto.check_in.strftime('%d/%m/%Y')}</td>
+            <td>{dto.check_in.strftime("%d/%m/%Y")}</td>
         </tr>
         <tr>
             <td><b>Check-out</b></td>
-            <td>{dto.check_out.strftime('%d/%m/%Y')}</td>
+            <td>{dto.check_out.strftime("%d/%m/%Y")}</td>
         </tr>
         <tr style="background:#f2f2f2;">
             <td><b>Número de huéspedes</b></td>

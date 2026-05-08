@@ -10,7 +10,9 @@ logger = logging.getLogger(__name__)
 
 
 class SendHotelBookingNotificationUseCase:
-    async def execute(self, dto: HotelBookingNotificationDTO) -> HotelBookingNotificationResultDTO:
+    async def execute(
+        self, dto: HotelBookingNotificationDTO
+    ) -> HotelBookingNotificationResultDTO:
         logger.info(
             "sending_hotel_booking_notification booking_code=%s hotel_email=%s",
             dto.booking_code,
