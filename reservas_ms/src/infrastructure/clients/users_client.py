@@ -49,5 +49,7 @@ class UsersClient:
                     return data.get("email")
                 return None
         except Exception as exc:
-            logger.warning("users_ms_email_unavailable user_id=%s error=%s", user_id, exc)
+            logger.warning(
+                "users_ms_email_unavailable user_id=%s error=%s", user_id, exc
+            )
             return None

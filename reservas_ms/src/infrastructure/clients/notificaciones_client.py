@@ -104,5 +104,7 @@ class NotificacionesClient:
                 logger.info("hotel_notification_sent booking_code=%s", booking_code)
                 return True
         except Exception as exc:
-            logger.error("hotel_notification_failed booking_code=%s error=%s", booking_code, exc)
+            logger.error(
+                "hotel_notification_failed booking_code=%s error=%s", booking_code, exc
+            )
             return False
