@@ -308,6 +308,66 @@
           }
         },
         {
+          "name": "Registrar FCM Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Mensaje de confirmación', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.message).to.eql('FCM token registered successfully');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": "{{base_url}}/users/api/v1/users/fcm-token",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fcm_token\": \"newman-test-fcm-token-{{$timestamp}}\",\n  \"platform\": \"android\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Obtener FCM Token (internal)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Retorna fcm_token', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('fcm_token');",
+                  "  pm.expect(body.fcm_token).to.not.be.null;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-Internal-Api-Key", "value": "{{internal_api_key}}" }
+            ],
+            "url": "{{base_url}}/users/api/v1/users/{{user_id}}/fcm-token"
+          }
+        },
+        {
           "name": "Block User - API key válida",
           "event": [
             {

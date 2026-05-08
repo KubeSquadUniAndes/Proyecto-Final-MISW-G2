@@ -10,6 +10,9 @@
 .env
 *.env
 
+*firebase-service-account.json
+*-adminsdk-*.json
+
 /jmeter*
 test-report**
 

@@ -28,6 +28,10 @@ class Settings(BaseSettings):
     SLACK_WEBHOOK_URL: str = ""
     SLACK_CHANNEL: str = "#security-alerts"
 
+    # Firebase FCM
+    FIREBASE_SERVICE_ACCOUNT_PATH: str = "firebase-service-account.json"
+    NOTIFICACIONES_MS_URL: str = "http://notificaciones-ms:8003"
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
