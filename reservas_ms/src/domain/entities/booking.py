@@ -40,6 +40,7 @@ class Booking:
     total_price: Decimal | None = None
     taxes: Decimal | None = None
     final_price: Decimal | None = None
+    payment_id: UUID | None = None
     traveler_name: str | None = None
     traveler_email: str | None = None
     traveler_phone: str | None = None

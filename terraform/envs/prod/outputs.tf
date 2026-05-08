@@ -23,6 +23,20 @@ output "rds_port" {
   value = module.rds.port
 }
 
+output "external_secrets_role_arn" {
+  description = "IAM Role ARN for External Secrets Operator — use in ExternalSecret manifests"
+  value       = module.eks.external_secrets_role_arn
+}
+
+output "secrets_arns" {
+  description = "ARNs of all secrets in Secrets Manager"
+  value = {
+    rds_password     = module.secrets.rds_password_arn
+    jwt_secret       = module.secrets.jwt_secret_arn
+    aes_key          = module.secrets.aes_key_arn
+    internal_api_key = module.secrets.internal_api_key_arn
+  }
+}
 output "s3_bucket_name" {
   description = "S3 bucket for hotel images"
   value       = module.s3.bucket_name

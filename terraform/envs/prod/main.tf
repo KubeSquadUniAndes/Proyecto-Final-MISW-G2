@@ -6,24 +6,42 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 5.0"
     }
-    kubernetes = {
-      source  = "hashicorp/kubernetes"
-      version = "~> 2.27"
+    tls = {
+      source  = "hashicorp/tls"
+      version = "~> 4.0"
     }
   }
 
-  # Uncomment after creating the S3 bucket and DynamoDB table for state
-  # backend "s3" {
-  #   bucket         = "travelhub-terraform-state"
-  #   key            = "prod/terraform.tfstate"
-  #   region         = "us-east-1"
-  #   dynamodb_table = "travelhub-terraform-locks"
-  #   encrypt        = true
-  # }
+  backend "s3" {
+    bucket  = "travelhub-tfstate-universidad"
+    key     = "terraform/state.tfstate"
+    region  = "us-east-1"
+    encrypt = true
+  }
 }
 
 provider "aws" {
   region = var.aws_region
+}
+
+# ── Secrets Manager — app secrets ─────────────────────────────────────────────
+# These secrets must be created manually before running terraform:
+#   aws secretsmanager create-secret --name travelhub/rds/password --secret-string "..."
+#   aws secretsmanager create-secret --name travelhub/app/jwt-secret --secret-string "..."
+#   aws secretsmanager create-secret --name travelhub/reservas/aes-key --secret-string "..."
+
+# ── Secrets Manager ──────────────────────────────────────────────────────────
+# Sensitive values are passed via environment variables in the CI/CD pipeline:
+#   TF_VAR_db_password, TF_VAR_jwt_secret, TF_VAR_aes_encryption_key, TF_VAR_internal_api_key
+module "secrets" {
+  source = "../../modules/secrets"
+
+  project            = var.project
+  environment        = var.environment
+  db_password        = var.db_password
+  jwt_secret         = var.jwt_secret
+  aes_encryption_key = var.aes_encryption_key
+  internal_api_key   = var.internal_api_key
 }
 
 # ── VPC ───────────────────────────────────────────────────────────────────────
@@ -48,12 +66,12 @@ module "ecr" {
 module "eks" {
   source = "../../modules/eks"
 
-  project          = var.project
-  environment      = var.environment
-  aws_region       = var.aws_region
-  vpc_id           = module.vpc.vpc_id
-  private_subnets  = module.vpc.private_subnet_ids
-  cluster_version  = var.cluster_version
+  project         = var.project
+  environment     = var.environment
+  aws_region      = var.aws_region
+  vpc_id          = module.vpc.vpc_id
+  private_subnets = module.vpc.private_subnet_ids
+  cluster_version = var.cluster_version
 }
 
 # ── S3 Images Bucket ──────────────────────────────────────────────────────────

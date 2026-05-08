@@ -30,8 +30,11 @@ async def get_db() -> AsyncSession:
     async with AsyncSessionLocal() as session:
         try:
             yield session
+            print("DEBUG: About to commit session")
             await session.commit()
-        except Exception:
+            print("DEBUG: Session committed successfully")
+        except Exception as e:
+            print(f"DEBUG: Exception during commit: {e}")
             await session.rollback()
             raise
         finally:

@@ -27,6 +27,7 @@ class SQLAlchemyUserRepository(UserRepositoryPort):
             user_type=user.user_type,
             identification_type=user.identification_type,
             identification_number=user.identification_number,
+            fcm_token=user.fcm_token,
             created_at=user.created_at,
             updated_at=user.updated_at,
         )
@@ -64,6 +65,24 @@ class SQLAlchemyUserRepository(UserRepositoryPort):
             user_type=model.user_type,
             identification_type=model.identification_type,
             identification_number=model.identification_number,
+            fcm_token=model.fcm_token,
             created_at=model.created_at,
             updated_at=model.updated_at,
         )
+
+    async def update_fcm_token(self, user_id: UUID, fcm_token: str) -> bool:
+        result = await self._session.execute(
+            select(UserModel).where(UserModel.id == user_id)
+        )
+        model = result.scalar_one_or_none()
+        if not model:
+            return False
+        model.fcm_token = fcm_token
+        await self._session.commit()
+        return True
+
+    async def get_fcm_token(self, user_id: UUID) -> str | None:
+        result = await self._session.execute(
+            select(UserModel.fcm_token).where(UserModel.id == user_id)
+        )
+        return result.scalar_one_or_none()
