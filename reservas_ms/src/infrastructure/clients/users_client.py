@@ -34,3 +34,22 @@ class UsersClient:
                 exc,
             )
             return None
+
+    async def get_user_email(self, user_id: UUID) -> str | None:
+        """Returns the email for a user, or None if not found."""
+        url = f"{self._base_url}/api/v1/users/{user_id}"
+        try:
+            async with httpx.AsyncClient(timeout=3.0) as client:
+                response = await client.get(
+                    url,
+                    headers={"X-Internal-Api-Key": self._api_key},
+                )
+                if response.status_code == 200:
+                    data = response.json()
+                    return data.get("email")
+                return None
+        except Exception as exc:
+            logger.warning(
+                "users_ms_email_unavailable user_id=%s error=%s", user_id, exc
+            )
+            return None

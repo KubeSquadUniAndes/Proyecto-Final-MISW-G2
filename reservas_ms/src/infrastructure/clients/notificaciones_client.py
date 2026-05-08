@@ -67,3 +67,44 @@ class NotificacionesClient:
                 exc,
             )
             return False
+
+    async def notify_hotel_new_booking(
+        self,
+        hotel_email: str,
+        hotel_name: str,
+        guest_name: str,
+        check_in: str,
+        check_out: str,
+        num_guests: int,
+        booking_code: str,
+        room_type: str,
+        total_amount: float,
+    ) -> bool:
+        """Notify hotel via email about a new booking. Never raises."""
+        url = f"{self._base_url}/api/v1/notifications/hotel/new-booking"
+        payload = {
+            "hotel_email": hotel_email,
+            "hotel_name": hotel_name,
+            "guest_name": guest_name,
+            "check_in": check_in,
+            "check_out": check_out,
+            "num_guests": num_guests,
+            "booking_code": booking_code,
+            "room_type": room_type,
+            "total_amount": total_amount,
+        }
+        try:
+            async with httpx.AsyncClient(timeout=5.0) as client:
+                response = await client.post(
+                    url,
+                    json=payload,
+                    headers={"x-api-key": self._api_key},
+                )
+                response.raise_for_status()
+                logger.info("hotel_notification_sent booking_code=%s", booking_code)
+                return True
+        except Exception as exc:
+            logger.error(
+                "hotel_notification_failed booking_code=%s error=%s", booking_code, exc
+            )
+            return False
