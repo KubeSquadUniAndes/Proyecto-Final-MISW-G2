@@ -210,6 +210,22 @@ async def create_booking(
                 )
         except Exception:
             pass
+        try:
+            hotel_email = await _users_client.get_user_email(body.hotel_id)
+            if hotel_email:
+                await _notificaciones_client.notify_hotel_new_booking(
+                    hotel_email=hotel_email,
+                    hotel_name=str(body.hotel_id),
+                    guest_name=body.traveler_name or "Viajero",
+                    check_in=result.start_time.strftime("%Y-%m-%d"),
+                    check_out=result.end_time.strftime("%Y-%m-%d"),
+                    num_guests=body.num_guests or 1,
+                    booking_code=result.booking_code or "",
+                    room_type=body.room_type or "standard",
+                    total_amount=float(result.final_price) if result.final_price else 0,
+                )
+        except Exception:
+            pass
         return BookingResponse(**result.model_dump())
     except ValueError as exc:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc))

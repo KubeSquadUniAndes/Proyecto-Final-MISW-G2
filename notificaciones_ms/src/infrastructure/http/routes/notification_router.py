@@ -1,11 +1,17 @@
 from fastapi import APIRouter, Depends, Header, HTTPException, status
 
+from src.application.dtos.hotel_booking_notification_dto import (
+    HotelBookingNotificationDTO,
+)
 from src.application.dtos.notification_dto import (
     BookingNotificationDTO,
     SendNotificationDTO,
 )
 from src.application.use_cases.send_booking_notification import (
     SendBookingNotificationUseCase,
+)
+from src.application.use_cases.send_hotel_booking_notification import (
+    SendHotelBookingNotificationUseCase,
 )
 from src.application.use_cases.send_notification import SendNotificationUseCase
 from src.infrastructure.config.settings import settings
@@ -64,5 +70,25 @@ async def send_booking_notification(
     _: None = Depends(require_internal_api_key),
 ) -> dict:
     use_case = SendBookingNotificationUseCase()
+    result = await use_case.execute(body)
+    return result.model_dump()
+
+
+@router.post(
+    "/hotel/new-booking",
+    status_code=status.HTTP_200_OK,
+    summary="Notify hotel about a new booking",
+    description=(
+        "Called by **reservas_ms** when a traveler creates a booking. "
+        "Sends an email to the hotel with booking details and a link to accept/reject.\n\n"
+        "Requires `X-Api-Key` header."
+    ),
+    responses={403: {"model": ErrorResponse, "description": "Invalid API key"}},
+)
+async def notify_hotel_new_booking(
+    body: HotelBookingNotificationDTO,
+    _: None = Depends(require_internal_api_key),
+) -> dict:
+    use_case = SendHotelBookingNotificationUseCase()
     result = await use_case.execute(body)
     return result.model_dump()

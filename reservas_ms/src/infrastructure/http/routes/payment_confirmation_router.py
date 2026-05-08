@@ -40,6 +40,8 @@ async def confirm_booking_payment(
         )
 
     booking.payment_id = UUID(request.payment_id)
+    if request.status:
+        booking.status = request.status
     await repository.update(booking)
 
     return {
