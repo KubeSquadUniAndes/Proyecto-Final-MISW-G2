@@ -308,6 +308,11 @@ spec:
               name: notificaciones-ms-config
           - secretRef:
               name: notificaciones-ms-secret
+        volumeMounts:
+        - name: firebase-sa
+          mountPath: /app/firebase-service-account.json
+          subPath: firebase-service-account.json
+          readOnly: true
         ports:
         - containerPort: 8000
           name: http
@@ -332,6 +337,10 @@ spec:
           initialDelaySeconds: 10
           periodSeconds: 30
           failureThreshold: 3
+      volumes:
+      - name: firebase-sa
+        secret:
+          secretName: firebase-service-account
 ---
 apiVersion: apps/v1
 kind: Deployment
