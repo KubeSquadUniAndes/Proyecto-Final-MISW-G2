@@ -13,7 +13,11 @@ logger = logging.getLogger(__name__)
 class ApproveBookingUseCase:
     """Approve a pending booking and trigger payment processing."""
 
-    def __init__(self, repository: BookingRepositoryPort, notificaciones_client: NotificacionesClient | None = None) -> None:
+    def __init__(
+        self,
+        repository: BookingRepositoryPort,
+        notificaciones_client: NotificacionesClient | None = None,
+    ) -> None:
         self._repo = repository
         self._notificaciones_client = notificaciones_client
 
@@ -49,7 +53,9 @@ class ApproveBookingUseCase:
 
         # Send reservation confirmation email
         if self._notificaciones_client and updated.traveler_email:
-            logger.info("Sending reservation confirmation email to %s", updated.traveler_email)
+            logger.info(
+                "Sending reservation confirmation email to %s", updated.traveler_email
+            )
             await self._notificaciones_client.send_reservation_confirmation(
                 reservation_code=str(updated.booking_code or updated.id),
                 guest_name=updated.traveler_name or "Guest",
@@ -63,7 +69,11 @@ class ApproveBookingUseCase:
                 property_contact="+57 1 234 5678",
             )
         else:
-            logger.warning("Skipping notification: client=%s, email=%s", self._notificaciones_client, updated.traveler_email)
+            logger.warning(
+                "Skipping notification: client=%s, email=%s",
+                self._notificaciones_client,
+                updated.traveler_email,
+            )
 
         return BookingResponseDTO(
             id=updated.id,

@@ -7,7 +7,7 @@ from email.mime.text import MIMEText
 
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.units import cm
 from reportlab.platypus import (
     HRFlowable,
@@ -40,7 +40,6 @@ def _build_pdf(dto: PaymentVoucherDTO) -> bytes:
         bottomMargin=2 * cm,
     )
 
-    styles = getSampleStyleSheet()
     brand = ParagraphStyle(
         "brand",
         fontSize=22,
@@ -163,7 +162,9 @@ def _build_pdf(dto: PaymentVoucherDTO) -> bytes:
         ["Impuestos", f"${dto.taxes:,.2f}"],
         ["Descuentos aplicados", f"-${dto.discounts:,.2f}"],
     ]
-    price_table = Table(price_data + [["TOTAL PAGADO", f"${dto.total_amount:,.2f}"]], colWidths=col_w)
+    price_table = Table(
+        price_data + [["TOTAL PAGADO", f"${dto.total_amount:,.2f}"]], colWidths=col_w
+    )
     price_style = [
         ("FONTNAME", (0, 0), (-1, -2), "Helvetica"),
         ("FONTNAME", (0, 0), (0, -2), "Helvetica-Bold"),
@@ -288,7 +289,11 @@ async def send_payment_voucher_email(dto: PaymentVoucherDTO) -> bool:
     try:
         pdf_bytes = _build_pdf(dto)
     except Exception as exc:
-        logger.error("payment_voucher_pdf_error reservation_code=%s error=%s", dto.reservation_code, exc)
+        logger.error(
+            "payment_voucher_pdf_error reservation_code=%s error=%s",
+            dto.reservation_code,
+            exc,
+        )
         return False
 
     msg = MIMEMultipart("mixed")

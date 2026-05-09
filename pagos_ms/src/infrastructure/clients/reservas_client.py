@@ -11,14 +11,22 @@ class ReservasClient:
         self.api_key = settings.INTERNAL_API_KEY
 
     async def update_booking_status(
-        self, booking_id: uuid.UUID, status: str, payment_id: uuid.UUID, payment_status: str = "confirmed"
+        self,
+        booking_id: uuid.UUID,
+        status: str,
+        payment_id: uuid.UUID,
+        payment_status: str = "confirmed",
     ) -> bool:
         """Register payment_id and payment_status on the booking. Does NOT change booking status."""
         async with httpx.AsyncClient(timeout=5.0) as client:
             try:
                 response = await client.patch(
                     f"{self.base_url}/api/v1/bookings/{booking_id}/payment-confirm",
-                    json={"status": status, "payment_id": str(payment_id), "payment_status": payment_status},
+                    json={
+                        "status": status,
+                        "payment_id": str(payment_id),
+                        "payment_status": payment_status,
+                    },
                     headers={"X-Internal-API-Key": self.api_key},
                 )
                 return response.status_code == 200

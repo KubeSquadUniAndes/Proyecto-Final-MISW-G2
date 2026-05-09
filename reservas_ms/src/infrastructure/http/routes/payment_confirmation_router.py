@@ -21,7 +21,9 @@ class PaymentConfirmRequest(BaseModel):
 
 def _require_internal_key(x_internal_api_key: str = Header(...)) -> None:
     if x_internal_api_key != settings.INTERNAL_API_KEY:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid API key")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Invalid API key"
+        )
 
 
 @router.patch("/bookings/{booking_id}/payment-confirm")
@@ -68,7 +70,9 @@ async def get_booking_internal(
     booking = await repository.get_by_id(booking_id)
 
     if not booking:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Booking not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Booking not found"
+        )
 
     return {
         "booking_code": booking.booking_code or str(booking.id),
@@ -78,7 +82,9 @@ async def get_booking_internal(
         "num_guests": booking.num_guests,
         "check_in": booking.start_time.strftime("%Y-%m-%d"),
         "check_out": booking.end_time.strftime("%Y-%m-%d"),
-        "price_per_night": float(booking.price_per_night) if booking.price_per_night else 0.0,
+        "price_per_night": float(booking.price_per_night)
+        if booking.price_per_night
+        else 0.0,
         "total_nights": booking.total_nights or 0,
         "subtotal": float(booking.total_price) if booking.total_price else 0.0,
         "taxes": float(booking.taxes) if booking.taxes else 0.0,

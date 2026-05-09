@@ -1,7 +1,12 @@
 import logging
 
-from src.application.dtos.payment_voucher_dto import PaymentVoucherDTO, PaymentVoucherResultDTO
-from src.infrastructure.channels.payment_voucher_email_channel import send_payment_voucher_email
+from src.application.dtos.payment_voucher_dto import (
+    PaymentVoucherDTO,
+    PaymentVoucherResultDTO,
+)
+from src.infrastructure.channels.payment_voucher_email_channel import (
+    send_payment_voucher_email,
+)
 
 logger = logging.getLogger(__name__)
 

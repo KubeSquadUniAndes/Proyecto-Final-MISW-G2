@@ -144,10 +144,15 @@ class NotificacionesClient:
                     headers={"X-Api-Key": self._api_key},
                 )
                 response.raise_for_status()
-                logger.info("reservation_confirmation_sent reservation_code=%s", reservation_code)
+                logger.info(
+                    "reservation_confirmation_sent reservation_code=%s",
+                    reservation_code,
+                )
                 return True
         except Exception as exc:
             logger.error(
-                "reservation_confirmation_failed reservation_code=%s error=%s", reservation_code, exc
+                "reservation_confirmation_failed reservation_code=%s error=%s",
+                reservation_code,
+                exc,
             )
             return False
