@@ -1,7 +1,7 @@
 """Add payment_id to bookings
 
 Revision ID: 003_add_payment_id
-Revises: 002_add_hotel_id_to_bookings
+Revises: 002
 Create Date: 2026-05-03 21:15:00.000000
 
 """
@@ -13,7 +13,7 @@ from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 revision: str = '003_add_payment_id'
-down_revision: Union[str, None] = '002_add_hotel_id_to_bookings'
+down_revision: Union[str, None] = '002'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
