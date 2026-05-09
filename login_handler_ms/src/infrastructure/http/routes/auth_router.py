@@ -174,3 +174,20 @@ async def block_user(
         return MessageResponse(**result.model_dump())
     except ValueError as exc:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail=str(exc))
+
+
+@router.get(
+    "/users/{user_id}/email",
+    summary="Get user email by ID (internal)",
+    responses={404: {"model": ErrorResponse}},
+)
+async def get_user_email(
+    user_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    _: None = Depends(require_internal_api_key),
+):
+    user_repo, _ = _make_repos(db)
+    user = await user_repo.find_by_id(user_id)
+    if not user:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="User not found")
+    return {"email": user.email, "full_name": user.full_name}
