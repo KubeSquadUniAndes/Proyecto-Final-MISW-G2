@@ -47,6 +47,7 @@ class BookingModel(Base):
     final_price = Column(Numeric(10, 2), nullable=True)
     # Payment
     payment_id = Column(UUID(as_uuid=True), nullable=True, index=True)
+    payment_status = Column(String(50), nullable=True)
     # Sensitive fields — stored as bytea encrypted with pgcrypto AES-256
     traveler_name = Column(LargeBinary, nullable=True)
     traveler_email = Column(LargeBinary, nullable=True)

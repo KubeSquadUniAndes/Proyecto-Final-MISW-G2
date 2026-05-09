@@ -55,7 +55,7 @@ class ConfirmPaymentUseCase:
         for attempt in range(settings.MAX_RETRY_ATTEMPTS):
             success = await self.reservas_client.update_booking_status(
                 booking_id=booking_id,
-                status="confirmed",
+                status="",
                 payment_id=payment.id,
             )
             if success:
@@ -70,14 +70,37 @@ class ConfirmPaymentUseCase:
             await self.payment_repository.update(payment)
             raise Exception(f"Failed to update booking after {settings.MAX_RETRY_ATTEMPTS} retries")
 
-        # Send confirmation email (fire and forget)
+        # Send payment voucher email (fire and forget)
         if payment.cardholder_email:
-            await self.notificaciones_client.send_payment_confirmation(
-                booking_id=booking_id,
-                email=payment.cardholder_email,
-                amount=payment.amount,
-                currency=payment.currency,
-            )
+            booking_details = await self.reservas_client.get_booking_details(booking_id)
+            if booking_details:
+                payment_method_label = payment.payment_method.value.replace("_", " ").title()
+                if payment.card_last_four:
+                    payment_method_label = f"{payment_method_label} •••• {payment.card_last_four}"
+
+                voucher_payload = {
+                    "guest_name": payment.cardholder_name or booking_details.get("traveler_name", ""),
+                    "guest_email": payment.cardholder_email,
+                    "reservation_code": booking_details.get("booking_code", str(booking_id)),
+                    "property_name": "Hotel TravelHub",
+                    "property_address": "Ver detalle en la aplicación",
+                    "check_in": booking_details.get("check_in", ""),
+                    "check_out": booking_details.get("check_out", ""),
+                    "room_type": booking_details.get("room_type", ""),
+                    "num_guests": booking_details.get("num_guests", 1),
+                    "transaction_id": payment.provider_transaction_id or "",
+                    "paid_at": (payment.payment_timestamp or datetime.utcnow()).isoformat(),
+                    "payment_method": payment_method_label,
+                    "nightly_rate": booking_details.get("price_per_night", 0.0),
+                    "num_nights": booking_details.get("total_nights", 0),
+                    "subtotal": booking_details.get("subtotal", 0.0),
+                    "taxes": booking_details.get("taxes", 0.0),
+                    "discounts": booking_details.get("discounts", 0.0),
+                    "total_amount": booking_details.get("total_amount", payment.amount),
+                }
+                await self.notificaciones_client.send_payment_voucher(voucher_payload)
+            else:
+                print(f"⚠️ Could not fetch booking details for voucher — booking_id={booking_id}")
 
         # Check timing
         elapsed = (datetime.utcnow() - start_time).total_seconds() * 1000

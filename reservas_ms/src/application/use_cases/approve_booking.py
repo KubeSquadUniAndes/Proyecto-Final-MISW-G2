@@ -5,6 +5,7 @@ import logging
 from src.application.dtos.booking_dto import ApproveBookingDTO, BookingResponseDTO
 from src.domain.entities.booking import BookingStatus
 from src.domain.repositories.booking_repository_port import BookingRepositoryPort
+from src.infrastructure.clients.notificaciones_client import NotificacionesClient
 
 logger = logging.getLogger(__name__)
 
@@ -12,8 +13,9 @@ logger = logging.getLogger(__name__)
 class ApproveBookingUseCase:
     """Approve a pending booking and trigger payment processing."""
 
-    def __init__(self, repository: BookingRepositoryPort) -> None:
+    def __init__(self, repository: BookingRepositoryPort, notificaciones_client: NotificacionesClient | None = None) -> None:
         self._repo = repository
+        self._notificaciones_client = notificaciones_client
 
     async def execute(self, dto: ApproveBookingDTO) -> BookingResponseDTO:
         """
@@ -35,13 +37,6 @@ class ApproveBookingUseCase:
                 "Only pending bookings can be approved."
             )
 
-        # TODO: Validate hold expiration (if hold_until field exists)
-        # if booking.hold_until and datetime.utcnow() > booking.hold_until:
-        #     raise ValueError("Booking hold has expired")
-
-        # TODO: Validate admin has permission over the property
-        # This would require checking if admin_user_id owns/manages hotel_id
-
         # Confirm booking
         booking.confirm()
         updated = await self._repo.update(booking)
@@ -52,11 +47,23 @@ class ApproveBookingUseCase:
             dto.admin_user_id,
         )
 
-        # TODO: Trigger payment processing
-        # await payment_client.process_payment(booking_id, amount)
-
-        # TODO: Send notification to traveler
-        # await notification_client.send(user_id, "booking_approved", data)
+        # Send reservation confirmation email
+        if self._notificaciones_client and updated.traveler_email:
+            logger.info("Sending reservation confirmation email to %s", updated.traveler_email)
+            await self._notificaciones_client.send_reservation_confirmation(
+                reservation_code=str(updated.booking_code or updated.id),
+                guest_name=updated.traveler_name or "Guest",
+                guest_email=updated.traveler_email,
+                property_name="Hotel",
+                property_address="Address",
+                check_in=updated.start_time.strftime("%Y-%m-%d"),
+                check_out=updated.end_time.strftime("%Y-%m-%d"),
+                num_guests=updated.num_guests,
+                total_amount=float(updated.final_price) if updated.final_price else 0.0,
+                property_contact="+57 1 234 5678",
+            )
+        else:
+            logger.warning("Skipping notification: client=%s, email=%s", self._notificaciones_client, updated.traveler_email)
 
         return BookingResponseDTO(
             id=updated.id,

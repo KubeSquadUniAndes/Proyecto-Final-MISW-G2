@@ -108,3 +108,46 @@ class NotificacionesClient:
                 "hotel_notification_failed booking_code=%s error=%s", booking_code, exc
             )
             return False
+
+    async def send_reservation_confirmation(
+        self,
+        reservation_code: str,
+        guest_name: str,
+        guest_email: str,
+        property_name: str,
+        property_address: str,
+        check_in: str,
+        check_out: str,
+        num_guests: int,
+        total_amount: float,
+        property_contact: str,
+    ) -> bool:
+        """Send reservation confirmation email. Never raises."""
+        url = f"{self._base_url}/api/v1/notifications/reservations/confirmation"
+        payload = {
+            "reservation_code": reservation_code,
+            "guest_name": guest_name,
+            "guest_email": guest_email,
+            "property_name": property_name,
+            "property_address": property_address,
+            "check_in": check_in,
+            "check_out": check_out,
+            "num_guests": num_guests,
+            "total_amount": total_amount,
+            "property_contact": property_contact,
+        }
+        try:
+            async with httpx.AsyncClient(timeout=5.0) as client:
+                response = await client.post(
+                    url,
+                    json=payload,
+                    headers={"X-Api-Key": self._api_key},
+                )
+                response.raise_for_status()
+                logger.info("reservation_confirmation_sent reservation_code=%s", reservation_code)
+                return True
+        except Exception as exc:
+            logger.error(
+                "reservation_confirmation_failed reservation_code=%s error=%s", reservation_code, exc
+            )
+            return False

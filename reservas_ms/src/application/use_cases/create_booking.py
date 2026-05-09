@@ -14,6 +14,21 @@ TAX_RATE = Decimal("0.19")
 MAX_CODE_RETRIES = 3
 
 
+_PAYMENT_STATUS_DISPLAY = {
+    "pending": "Pendiente de pago",
+    "processing": "Procesando pago",
+    "confirmed": "Pago confirmado",
+    "failed": "Pago fallido",
+    "refunded": "Pago reembolsado",
+}
+
+
+def _payment_status_display(payment_status: str | None) -> str | None:
+    if payment_status is None:
+        return None
+    return _PAYMENT_STATUS_DISPLAY.get(payment_status, payment_status)
+
+
 def _generate_booking_code() -> str:
     suffix = "".join(random.choices(string.ascii_uppercase + string.digits, k=5))
     return f"TH-2026-{suffix}"
@@ -41,6 +56,8 @@ def _build_response(booking: Booking) -> BookingResponseDTO:
         taxes=booking.taxes,
         final_price=booking.final_price,
         payment_id=booking.payment_id,
+        payment_status=booking.payment_status,
+        payment_status_display=_payment_status_display(booking.payment_status),
         traveler_name=booking.traveler_name,
         traveler_email=booking.traveler_email,
         traveler_phone=booking.traveler_phone,
