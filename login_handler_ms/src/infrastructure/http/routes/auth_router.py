@@ -187,7 +187,7 @@ async def get_user_email(
     _: None = Depends(require_internal_api_key),
 ):
     user_repo, _ = _make_repos(db)
-    user = await user_repo.find_by_id(user_id)
+    user = await user_repo.get_by_id(user_id)
     if not user:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="User not found")
     return {"email": user.email, "full_name": user.full_name}
