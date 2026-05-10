@@ -368,67 +368,6 @@
           }
         },
         {
-          "name": "Block User - API key válida",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status 200', function () {",
-                  "  pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test('Mensaje de confirmación', function () {",
-                  "  const body = pm.response.json();",
-                  "  pm.expect(body).to.have.property('message');",
-                  "});"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "X-Api-Key", "value": "{{internal_api_key}}" }
-            ],
-            "url": "{{base_url}}/login-handler/api/v1/auth/block-user",
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"user_id\": \"{{user_id}}\",\n  \"reason\": \"Newman test block\"\n}"
-            }
-          }
-        },
-        {
-          "name": "Login - usuario bloqueado (debe fallar)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status 403 Forbidden', function () {",
-                  "  pm.response.to.have.status(403);",
-                  "});",
-                  "",
-                  "pm.test('Indica que la cuenta está bloqueada', function () {",
-                  "  const body = pm.response.json();",
-                  "  pm.expect(body.detail).to.include('blocked');",
-                  "});"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": "{{base_url}}/login-handler/api/v1/auth/login",
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"{{test_email}}\",\n  \"password\": \"{{test_password}}\"\n}"
-            }
-          }
-        },
-        {
           "name": "Block User - API key inválida (debe fallar)",
           "event": [
             {
@@ -452,35 +391,6 @@
             "body": {
               "mode": "raw",
               "raw": "{\n  \"user_id\": \"{{user_id}}\",\n  \"reason\": \"test\"\n}"
-            }
-          }
-        },
-        {
-          "name": "Logout",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status 200', function () {",
-                  "  pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test('Mensaje de confirmación', function () {",
-                  "  const body = pm.response.json();",
-                  "  pm.expect(body).to.have.property('message');",
-                  "});"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": "{{base_url}}/login-handler/api/v1/auth/logout",
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"refresh_token\": \"{{refresh_token}}\"\n}"
             }
           }
         }
@@ -566,6 +476,34 @@
               "mode": "raw",
               "raw": "{\n  \"email\": \"{{hotel_email}}\",\n  \"password\": \"{{test_password}}\"\n}"
             }
+          }
+        },
+        {
+          "name": "Obtener perfil hotel",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Retorna id del hotel', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('id');",
+                  "  pm.environment.set('hotel_id', body.id);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{hotel_access_token}}" }
+            ],
+            "url": "{{base_url}}/login-handler/api/v1/auth/me"
           }
         },
         {
@@ -683,12 +621,12 @@
               { "key": "Authorization", "value": "Bearer {{hotel_access_token}}" }
             ],
             "url": {
-              "raw": "{{base_url}}/hospedajes/api/v1/rooms/search?checkin=2026-06-01T14:00:00&checkout=2026-06-05T12:00:00&destination=Cartagena&guests=2",
+              "raw": "{{base_url}}/hospedajes/api/v1/rooms/search?checkin=2027-06-01T14:00:00&checkout=2027-06-05T12:00:00&destination=Cartagena&guests=2",
               "host": ["{{base_url}}"],
               "path": ["hospedajes", "api", "v1", "rooms", "search"],
               "query": [
-                { "key": "checkin", "value": "2026-06-01T14:00:00" },
-                { "key": "checkout", "value": "2026-06-05T12:00:00" },
+                { "key": "checkin", "value": "2027-06-01T14:00:00" },
+                { "key": "checkout", "value": "2027-06-05T12:00:00" },
                 { "key": "destination", "value": "Cartagena" },
                 { "key": "guests", "value": "2" }
               ]
@@ -715,12 +653,12 @@
               { "key": "Authorization", "value": "Bearer {{hotel_access_token}}" }
             ],
             "url": {
-              "raw": "{{base_url}}/hospedajes/api/v1/rooms/search?checkin=2026-06-05T12:00:00&checkout=2026-06-01T14:00:00",
+              "raw": "{{base_url}}/hospedajes/api/v1/rooms/search?checkin=2027-06-05T12:00:00&checkout=2027-06-01T14:00:00",
               "host": ["{{base_url}}"],
               "path": ["hospedajes", "api", "v1", "rooms", "search"],
               "query": [
-                { "key": "checkin", "value": "2026-06-05T12:00:00" },
-                { "key": "checkout", "value": "2026-06-01T14:00:00" }
+                { "key": "checkin", "value": "2027-06-05T12:00:00" },
+                { "key": "checkout", "value": "2027-06-01T14:00:00" }
               ]
             }
           }
@@ -781,6 +719,534 @@
             "body": {
               "mode": "raw",
               "raw": "{\n  \"destination\": \"Santa Marta\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reservas MS",
+      "item": [
+        {
+          "name": "Health Check",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/reservas/health"
+          }
+        },
+        {
+          "name": "Crear reserva",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Reserva creada con campos requeridos', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('id');",
+                  "  pm.expect(body).to.have.property('booking_code');",
+                  "  pm.expect(body).to.have.property('status');",
+                  "  pm.expect(body.status).to.eql('pending');",
+                  "  pm.expect(body).to.have.property('payment_id');",
+                  "  pm.expect(body.payment_id).to.be.null;",
+                  "});",
+                  "",
+                  "pm.test('booking_code tiene formato TH-YYYY-', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.booking_code).to.match(/^TH-\\d{4}-/);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "  const body = pm.response.json();",
+                  "  pm.environment.set('booking_id', body.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": "{{base_url}}/reservas/api/v1/bookings/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"hotel_id\": \"{{hotel_id}}\",\n  \"room_id\": \"{{room_id}}\",\n  \"start_time\": \"2027-08-10T15:00:00Z\",\n  \"end_time\": \"2027-08-14T11:00:00Z\",\n  \"room_type\": \"Doble\",\n  \"num_guests\": 2,\n  \"price_per_night\": 250000.00,\n  \"traveler_name\": \"Newman Test\",\n  \"traveler_email\": \"{{test_email}}\",\n  \"traveler_phone\": \"+57 300 000 0000\",\n  \"traveler_document\": \"1111111111\",\n  \"notes\": \"Prueba E2E Newman\",\n  \"special_requests\": \"Late check-in\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Crear reserva - sin token (debe fallar)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 403 Forbidden', function () {",
+                  "  pm.response.to.have.status(403);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/reservas/api/v1/bookings/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"hotel_id\": \"{{hotel_id}}\",\n  \"room_id\": \"{{room_id}}\",\n  \"start_time\": \"2027-09-01T15:00:00Z\",\n  \"end_time\": \"2027-09-05T11:00:00Z\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Listar reservas del viajero",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Retorna un array con al menos una reserva', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.be.an('array');",
+                  "  pm.expect(body.length).to.be.greaterThan(0);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": "{{base_url}}/reservas/api/v1/bookings/"
+          }
+        },
+        {
+          "name": "Obtener reserva por ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('ID coincide y estado es pending', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.id).to.eql(pm.environment.get('booking_id'));",
+                  "  pm.expect(body.status).to.eql('pending');",
+                  "  pm.expect(body).to.have.property('payment_status');",
+                  "  pm.expect(body).to.have.property('status_display');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": "{{base_url}}/reservas/api/v1/bookings/{{booking_id}}"
+          }
+        },
+        {
+          "name": "Obtener reserva inexistente (debe fallar)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 404 Not Found', function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": "{{base_url}}/reservas/api/v1/bookings/00000000-0000-0000-0000-000000000000"
+          }
+        },
+        {
+          "name": "Aprobar reserva (hotel admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Estado cambia a confirmed', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.status).to.eql('confirmed');",
+                  "  pm.expect(body.id).to.eql(pm.environment.get('booking_id'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{hotel_access_token}}" }
+            ],
+            "url": "{{base_url}}/reservas/api/v1/bookings/{{booking_id}}/approve",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          }
+        },
+        {
+          "name": "Aprobar reserva ya confirmada (debe fallar)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 4xx - no se puede aprobar dos veces', function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([400, 409]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{hotel_access_token}}" }
+            ],
+            "url": "{{base_url}}/reservas/api/v1/bookings/{{booking_id}}/approve",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pagos MS",
+      "item": [
+        {
+          "name": "Health Check",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/pagos/health"
+          }
+        },
+        {
+          "name": "Crear pago",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Pago creado con campos requeridos', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('id');",
+                  "  pm.expect(body).to.have.property('booking_id');",
+                  "  pm.expect(body).to.have.property('status');",
+                  "  pm.expect(body.status).to.eql('pending');",
+                  "  pm.expect(body.booking_id).to.eql(pm.environment.get('booking_id'));",
+                  "});",
+                  "",
+                  "pm.test('Monto es correcto', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.amount).to.eql(1000000);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/pagos/api/v1/payments",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"booking_id\": \"{{booking_id}}\",\n  \"amount\": 1000000,\n  \"currency\": \"COP\",\n  \"payment_provider\": \"mock\",\n  \"payment_method\": \"credit_card\",\n  \"card_last_four\": \"4242\",\n  \"cardholder_name\": \"Newman Test\",\n  \"cardholder_email\": \"{{test_email}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Obtener pago por reserva",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Pago corresponde a la reserva', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.booking_id).to.eql(pm.environment.get('booking_id'));",
+                  "  pm.expect(body.status).to.eql('pending');",
+                  "  pm.expect(body).to.have.property('payment_provider');",
+                  "  pm.expect(body).to.have.property('payment_method');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/pagos/api/v1/payments/{{booking_id}}"
+          }
+        },
+        {
+          "name": "Obtener pago de reserva inexistente (debe fallar)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 404 Not Found', function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/pagos/api/v1/payments/00000000-0000-0000-0000-000000000000"
+          }
+        },
+        {
+          "name": "Confirmar pago",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Pago confirmado', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.status).to.eql('confirmed');",
+                  "  pm.expect(body.booking_id).to.eql(pm.environment.get('booking_id'));",
+                  "  pm.expect(body).to.have.property('provider_transaction_id');",
+                  "  pm.expect(body.provider_transaction_id).to.not.be.null;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/pagos/api/v1/payments/{{booking_id}}/confirm",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"provider_transaction_id\": \"newman-txn-{{$timestamp}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Obtener pago confirmado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Estado es confirmed y tiene transaction ID', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.status).to.eql('confirmed');",
+                  "  pm.expect(body.provider_transaction_id).to.not.be.null;",
+                  "  pm.expect(body).to.have.property('payment_timestamp');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/pagos/api/v1/payments/{{booking_id}}"
+          }
+        },
+        {
+          "name": "Verificar payment_status en reserva",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Reserva refleja pago confirmado', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.id).to.eql(pm.environment.get('booking_id'));",
+                  "  pm.expect(body).to.have.property('payment_id');",
+                  "  pm.expect(body.payment_id).to.not.be.null;",
+                  "  pm.expect(body).to.have.property('payment_status');",
+                  "  pm.expect(body.payment_status).to.eql('confirmed');",
+                  "  pm.expect(body.status).to.eql('confirmed');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": "{{base_url}}/reservas/api/v1/bookings/{{booking_id}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Limpiar datos",
+      "item": [
+        {
+          "name": "Block User - API key válida",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Mensaje de confirmación', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('message');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-Api-Key", "value": "{{internal_api_key}}" }
+            ],
+            "url": "{{base_url}}/login-handler/api/v1/auth/block-user",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": \"{{user_id}}\",\n  \"reason\": \"Newman test block\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login - usuario bloqueado (debe fallar)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 403 Forbidden', function () {",
+                  "  pm.response.to.have.status(403);",
+                  "});",
+                  "",
+                  "pm.test('Indica que la cuenta está bloqueada', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.detail).to.include('blocked');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/login-handler/api/v1/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{test_email}}\",\n  \"password\": \"{{test_password}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Mensaje de confirmación', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('message');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/login-handler/api/v1/auth/logout",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh_token\": \"{{refresh_token}}\"\n}"
             }
           }
         },
