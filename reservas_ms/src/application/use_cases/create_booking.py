@@ -165,7 +165,10 @@ class CreateBookingUseCase:
         # 7. Publish room availability event (fire-and-forget)
         if self._availability_publisher:
             try:
-                from src.domain.events.room_availability_event import RoomAvailabilityEvent
+                from src.domain.events.room_availability_event import (
+                    RoomAvailabilityEvent,
+                )
+
                 event = RoomAvailabilityEvent(
                     event_type="booking_created",
                     booking_id=saved.id,

@@ -4,7 +4,9 @@ import logging
 import aioboto3
 
 from src.domain.events.room_availability_event import RoomAvailabilityEvent
-from src.domain.ports.room_availability_publisher_port import RoomAvailabilityPublisherPort
+from src.domain.ports.room_availability_publisher_port import (
+    RoomAvailabilityPublisherPort,
+)
 
 logger = logging.getLogger(__name__)
 

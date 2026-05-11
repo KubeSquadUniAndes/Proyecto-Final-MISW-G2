@@ -29,8 +29,16 @@ class SearchRoomsUseCase:
             raise ValueError("checkin must be before checkout")
 
         # Normalize to UTC so reservas_ms gets timezone-aware datetimes
-        checkin = dto.checkin.replace(tzinfo=timezone.utc) if dto.checkin.tzinfo is None else dto.checkin
-        checkout = dto.checkout.replace(tzinfo=timezone.utc) if dto.checkout.tzinfo is None else dto.checkout
+        checkin = (
+            dto.checkin.replace(tzinfo=timezone.utc)
+            if dto.checkin.tzinfo is None
+            else dto.checkin
+        )
+        checkout = (
+            dto.checkout.replace(tzinfo=timezone.utc)
+            if dto.checkout.tzinfo is None
+            else dto.checkout
+        )
 
         rooms = await self._room_repo.search(
             destination=dto.destination,
@@ -44,7 +52,9 @@ class SearchRoomsUseCase:
                 is_avail = True
             else:
                 # PARCIAL/OCUPADA: the room has bookings; ask reservas_ms for actual overlap
-                is_avail = await self._reservas_client.is_available(room.id, checkin, checkout)
+                is_avail = await self._reservas_client.is_available(
+                    room.id, checkin, checkout
+                )
 
             if is_avail:
                 available.append(

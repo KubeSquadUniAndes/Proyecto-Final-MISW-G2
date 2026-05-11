@@ -13,7 +13,7 @@ class RoomType(str, Enum):
 
 class RoomStatus(str, Enum):
     DISPONIBLE = "disponible"
-    PARCIAL = "parcial"       # has at least one active booking in any date range
+    PARCIAL = "parcial"  # has at least one active booking in any date range
     OCUPADA = "ocupada"
     MANTENIMIENTO = "mantenimiento"
 

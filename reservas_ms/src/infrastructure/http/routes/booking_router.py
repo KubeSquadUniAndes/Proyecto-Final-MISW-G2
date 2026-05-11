@@ -263,7 +263,9 @@ async def update_booking(
     repo = _make_repo(db)
     domain_service = BookingDomainService(repo)
     use_case = UpdateBookingUseCase(
-        repo, domain_service, anomaly_client=_anomaly_client,
+        repo,
+        domain_service,
+        anomaly_client=_anomaly_client,
         availability_publisher=_availability_publisher,
     )
     try:

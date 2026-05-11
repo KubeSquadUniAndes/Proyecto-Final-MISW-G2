@@ -12,9 +12,7 @@ class RoomAvailabilityEvent:
     status: str  # booking status value: pending, confirmed, cancelled, completed
     start_time: datetime
     end_time: datetime
-    published_at: datetime = field(
-        default_factory=lambda: datetime.now(timezone.utc)
-    )
+    published_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
     trace_id: str = field(default_factory=lambda: str(uuid4()))
 
     def to_dict(self) -> dict:

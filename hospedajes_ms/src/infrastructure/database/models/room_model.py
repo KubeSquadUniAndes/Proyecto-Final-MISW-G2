@@ -1,6 +1,16 @@
 import uuid
 
-from sqlalchemy import ARRAY, Column, DateTime, Enum, Float, Integer, Numeric, String, Text
+from sqlalchemy import (
+    ARRAY,
+    Column,
+    DateTime,
+    Enum,
+    Float,
+    Integer,
+    Numeric,
+    String,
+    Text,
+)
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 

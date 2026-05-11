@@ -78,7 +78,10 @@ class UpdateBookingUseCase:
         # Publish room availability event (fire-and-forget)
         if self._availability_publisher:
             try:
-                from src.domain.events.room_availability_event import RoomAvailabilityEvent
+                from src.domain.events.room_availability_event import (
+                    RoomAvailabilityEvent,
+                )
+
                 event = RoomAvailabilityEvent(
                     event_type="booking_updated",
                     booking_id=updated.id,
@@ -91,7 +94,9 @@ class UpdateBookingUseCase:
                 await self._availability_publisher.publish(event)
             except Exception as exc:
                 logger.error(
-                    "availability_publish_failed booking_id=%s error=%s", updated.id, exc
+                    "availability_publish_failed booking_id=%s error=%s",
+                    updated.id,
+                    exc,
                 )
 
         return _build_response(updated)

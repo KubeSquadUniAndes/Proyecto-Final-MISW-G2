@@ -6,7 +6,9 @@ from uuid import UUID
 
 import aioboto3
 
-from src.application.use_cases.update_room_availability import UpdateRoomAvailabilityUseCase
+from src.application.use_cases.update_room_availability import (
+    UpdateRoomAvailabilityUseCase,
+)
 from src.infrastructure.config.settings import settings
 from src.infrastructure.database.base import AsyncSessionLocal
 from src.infrastructure.database.repositories.sqlalchemy_room_repository import (
@@ -15,7 +17,7 @@ from src.infrastructure.database.repositories.sqlalchemy_room_repository import 
 
 logger = logging.getLogger(__name__)
 
-_POLL_WAIT_SECONDS = 20   # SQS long-poll (max 20s); reduces empty-receive API calls
+_POLL_WAIT_SECONDS = 20  # SQS long-poll (max 20s); reduces empty-receive API calls
 _MAX_MESSAGES = 10
 _VISIBILITY_TIMEOUT = 60  # seconds — must be >= max processing time per message
 
