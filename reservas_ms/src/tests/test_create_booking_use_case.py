@@ -1,7 +1,6 @@
 """Tests for the CreateBooking use case using mocks."""
 
 from datetime import datetime, timedelta
-from decimal import Decimal
 from unittest.mock import AsyncMock
 from uuid import uuid4
 

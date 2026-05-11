@@ -1,14 +1,14 @@
 """Tests for the UpdateBooking use case."""
 
 from datetime import datetime, timedelta
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import AsyncMock
 from uuid import uuid4
 
 import pytest
 
 from src.application.dtos.booking_dto import UpdateBookingDTO
 from src.application.use_cases.update_booking import UpdateBookingUseCase
-from src.domain.entities.booking import Booking, BookingStatus
+from src.domain.entities.booking import Booking
 from src.domain.services.booking_domain_service import BookingDomainService
 
 
