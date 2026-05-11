@@ -98,9 +98,9 @@ vars.put(&quot;randomIdentificacion&quot;, ids[idIdx])
           </HeaderManager>
           <hashTree/>
           <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="POST Create User ${userIndex}">
-            <stringProp name="HTTPSampler.domain">localhost</stringProp>
-            <stringProp name="HTTPSampler.port">80</stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.domain">k8s-workload-travelhu-f26ddf980b-5888409b6dd7c4c7.elb.us-east-1.amazonaws.com</stringProp>
+            <stringProp name="HTTPSampler.port">443</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding">UTF-8</stringProp>
             <stringProp name="HTTPSampler.path">/hospedajes/users</stringProp>
             <stringProp name="HTTPSampler.method">POST</stringProp>
@@ -190,9 +190,9 @@ if (id != null) {
           </HeaderManager>
           <hashTree/>
           <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET User ${currentUserId}">
-            <stringProp name="HTTPSampler.domain">localhost</stringProp>
-            <stringProp name="HTTPSampler.port">80</stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.domain">k8s-workload-travelhu-f26ddf980b-5888409b6dd7c4c7.elb.us-east-1.amazonaws.com</stringProp>
+            <stringProp name="HTTPSampler.port">443</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding">UTF-8</stringProp>
             <stringProp name="HTTPSampler.path">/users/${currentUserId}</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>

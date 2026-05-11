@@ -6,9 +6,7 @@ class Settings(BaseSettings):
     APP_VERSION: str = "0.1.0"
     DEBUG: bool = False
 
-    DATABASE_URL: str = (
-        "postgresql+asyncpg://postgres:postgres@localhost:5432/hospedajes_db"
-    )
+    DATABASE_URL: str = "postgresql+asyncpg://postgres:SecurePass123!@travelhub-prod-postgres.ci3w0yecas02.us-east-1.rds.amazonaws.com:5432/hospedajes_db?ssl=require"
     DB_ECHO: bool = False
 
     HOST: str = "0.0.0.0"  # nosec B104
@@ -24,6 +22,7 @@ class Settings(BaseSettings):
 
     AWS_REGION: str = "us-east-1"
     S3_BUCKET: str = "travelhub-images-780522923809"
+    SQS_QUEUE_URL: str = ""  # set via env var in k8s; empty disables consumer
 
     model_config = SettingsConfigDict(
         env_file=".env",

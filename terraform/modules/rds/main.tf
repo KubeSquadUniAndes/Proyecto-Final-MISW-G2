@@ -69,6 +69,7 @@ resource "aws_db_instance" "main" {
   deletion_protection    = true
   skip_final_snapshot    = false
   final_snapshot_identifier = "${var.project}-${var.environment}-final-snapshot"
+  apply_immediately      = true
 
   backup_retention_period = 1  # reduced from 7 — academic environment
   backup_window           = "03:00-04:00"
@@ -87,6 +88,7 @@ resource "null_resource" "create_databases" {
   depends_on = [aws_db_instance.main]
 
   provisioner "local-exec" {
+    on_failure = continue
     command = <<-EOT
       export PGPASSWORD='${var.db_password}'
       for db in bookings_db auth_db users_db anomalies_db hospedajes_db; do

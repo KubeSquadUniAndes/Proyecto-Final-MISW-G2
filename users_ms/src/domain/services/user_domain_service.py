@@ -1,4 +1,3 @@
-from src.domain.entities.user import User
 from src.domain.repositories.user_repository_port import UserRepositoryPort
 
 

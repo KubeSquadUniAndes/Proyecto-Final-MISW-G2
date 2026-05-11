@@ -1,3 +1,4 @@
+import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -9,6 +10,11 @@ from src.infrastructure.http.routes.booking_router import router as booking_rout
 from src.infrastructure.http.routes.health_router import router as health_router
 from src.infrastructure.http.routes.payment_confirmation_router import (
     router as payment_confirmation_router,
+)
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(name)s %(message)s",
 )
 
 

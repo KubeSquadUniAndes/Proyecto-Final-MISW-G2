@@ -74,10 +74,12 @@ class CreateBookingUseCase:
         booking_repo: BookingRepositoryPort,
         domain_service: BookingDomainService,
         anomaly_client=None,
+        availability_publisher=None,
     ) -> None:
         self._repo = booking_repo
         self._domain_service = domain_service
         self._anomaly_client = anomaly_client
+        self._availability_publisher = availability_publisher
 
     async def execute(self, dto: CreateBookingDTO) -> BookingResponseDTO:
         # 1. Calculate pricing
@@ -160,5 +162,27 @@ class CreateBookingUseCase:
         # 6. Persist booking
         saved = await self._repo.save(booking)
 
-        # 7. Return response
+        # 7. Publish room availability event (fire-and-forget)
+        if self._availability_publisher:
+            try:
+                from src.domain.events.room_availability_event import (
+                    RoomAvailabilityEvent,
+                )
+
+                event = RoomAvailabilityEvent(
+                    event_type="booking_created",
+                    booking_id=saved.id,
+                    room_id=saved.room_id,
+                    hotel_id=saved.hotel_id,
+                    status=saved.status.value,
+                    start_time=saved.start_time,
+                    end_time=saved.end_time,
+                )
+                await self._availability_publisher.publish(event)
+            except Exception as exc:
+                logger.error(
+                    "availability_publish_failed booking_id=%s error=%s", saved.id, exc
+                )
+
+        # 8. Return response
         return _build_response(saved)

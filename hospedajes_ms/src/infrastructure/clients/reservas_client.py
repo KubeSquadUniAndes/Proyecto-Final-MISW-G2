@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from uuid import UUID
 
 import httpx
@@ -34,6 +34,12 @@ class ReservasClient:
         Returns True if the room has no pending/confirmed bookings
         overlapping the given date range.
         """
+        # Ensure timezone-aware datetimes so reservas_ms receives unambiguous ISO strings
+        if checkin.tzinfo is None:
+            checkin = checkin.replace(tzinfo=timezone.utc)
+        if checkout.tzinfo is None:
+            checkout = checkout.replace(tzinfo=timezone.utc)
+
         url = f"{self._base_url}/bookings/availability"
         params = {
             "room_id": str(room_id),
@@ -45,8 +51,14 @@ class ReservasClient:
                 resp = await client.get(url, params=params)
                 resp.raise_for_status()
                 data = resp.json()
+        except httpx.TimeoutException:
+            # Network timeout — fail open (prefer showing room over hiding it)
+            return True
+        except httpx.HTTPStatusError:
+            # 4xx/5xx from reservas_ms — fail closed (treat as unavailable to be safe)
+            return False
         except httpx.HTTPError:
-            # If reservas_ms is unreachable, treat room as available (fail open)
+            # Other network/transport errors — fail open
             return True
 
         bookings = data.get("bookings", [])
