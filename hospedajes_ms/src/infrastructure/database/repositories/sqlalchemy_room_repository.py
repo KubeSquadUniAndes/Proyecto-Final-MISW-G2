@@ -27,6 +27,7 @@ class SQLAlchemyRoomRepository(RoomRepositoryPort):
             size=float(model.size),
             status=RoomStatus(model.status),
             amenities=model.amenities or "",
+            booking_ids=list(model.booking_ids) if model.booking_ids else [],
             created_at=model.created_at,
             updated_at=model.updated_at,
         )
@@ -45,6 +46,7 @@ class SQLAlchemyRoomRepository(RoomRepositoryPort):
             size=room.size,
             status=room.status,
             amenities=room.amenities,
+            booking_ids=room.booking_ids,
             created_at=room.created_at,
             updated_at=room.updated_at,
         )
@@ -75,7 +77,10 @@ class SQLAlchemyRoomRepository(RoomRepositoryPort):
         destination: str | None = None,
         min_capacity: int | None = None,
     ) -> list[Room]:
-        query = select(RoomModel).where(RoomModel.status == RoomStatus.DISPONIBLE)
+        # Exclude rooms under maintenance; DISPONIBLE and PARCIAL are both searchable
+        query = select(RoomModel).where(
+            RoomModel.status != RoomStatus.MANTENIMIENTO,
+        )
         if destination is not None:
             query = query.where(
                 func.lower(RoomModel.destination).contains(destination.lower())
@@ -102,6 +107,7 @@ class SQLAlchemyRoomRepository(RoomRepositoryPort):
         model.size = room.size
         model.status = room.status
         model.amenities = room.amenities
+        model.booking_ids = room.booking_ids
         model.updated_at = room.updated_at
 
         await self._session.flush()

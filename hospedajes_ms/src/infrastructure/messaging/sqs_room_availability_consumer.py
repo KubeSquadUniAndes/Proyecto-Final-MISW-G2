@@ -66,7 +66,14 @@ async def _process_message(event: dict) -> None:
         try:
             repo = SQLAlchemyRoomRepository(session)
             use_case = UpdateRoomAvailabilityUseCase(repo)
-            await use_case.execute(room_id, booking_status, start_time, end_time, trace_id=trace_id)
+            await use_case.execute(
+                room_id,
+                booking_id=booking_id,
+                booking_status=booking_status,
+                start_time=start_time,
+                end_time=end_time,
+                trace_id=trace_id,
+            )
             await session.commit()
             logger.info(
                 "sqs_message_processed event_type=%s booking_id=%s room_id=%s trace_id=%s",

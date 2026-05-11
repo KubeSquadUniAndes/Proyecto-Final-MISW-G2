@@ -293,7 +293,7 @@ docker push 780522923809.dkr.ecr.us-east-1.amazonaws.com/travelhub/hospedajesms:
 1. Install Kiali, Jaeger, Prometheus, and Grafana:
 
 ```bash
-for ADDON in kiali jaeger prometheus grafana
+for ADDON in kiali jaeger prometheus grafana, loki
 do
 ADDON_URL="https://raw.githubusercontent.com/istio/istio/release-1.29.1/samples/addons/$ADDON.yaml"
     kubectl apply --server-side -f $ADDON_URL

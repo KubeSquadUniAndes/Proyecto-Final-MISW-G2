@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import Column, DateTime, Enum, Float, Integer, Numeric, String, Text
+from sqlalchemy import ARRAY, Column, DateTime, Enum, Float, Integer, Numeric, String, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 
@@ -38,6 +38,8 @@ class RoomModel(Base):
         default=RoomStatus.DISPONIBLE,
     )
     amenities = Column(Text, nullable=True)
+    # PostgreSQL text[] — stores booking UUID strings that reference this room
+    booking_ids = Column(ARRAY(String), nullable=False, server_default="{}")
     created_at = Column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )

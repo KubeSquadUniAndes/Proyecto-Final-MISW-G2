@@ -10,11 +10,13 @@ class GetRoomStatsUseCase:
     async def execute(self) -> RoomStatsDTO:
         total = await self._repo.count_total()
         disponibles = await self._repo.count_by_status(RoomStatus.DISPONIBLE)
+        parciales = await self._repo.count_by_status(RoomStatus.PARCIAL)
         ocupadas = await self._repo.count_by_status(RoomStatus.OCUPADA)
         mantenimiento = await self._repo.count_by_status(RoomStatus.MANTENIMIENTO)
         return RoomStatsDTO(
             total=total,
             disponibles=disponibles,
+            parciales=parciales,
             ocupadas=ocupadas,
             mantenimiento=mantenimiento,
         )

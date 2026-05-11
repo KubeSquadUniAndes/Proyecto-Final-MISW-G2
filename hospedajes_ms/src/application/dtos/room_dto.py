@@ -46,6 +46,7 @@ class RoomResponseDTO(BaseModel):
     size: float
     status: RoomStatus
     amenities: str
+    booking_ids: list[str] = []
     created_at: datetime
     updated_at: datetime
 
@@ -55,5 +56,6 @@ class RoomResponseDTO(BaseModel):
 class RoomStatsDTO(BaseModel):
     total: int
     disponibles: int
+    parciales: int
     ocupadas: int
     mantenimiento: int

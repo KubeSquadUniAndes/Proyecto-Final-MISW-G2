@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime, timezone
+from datetime import datetime
 from uuid import UUID
 
 from src.domain.repositories.room_repository_port import RoomRepositoryPort
@@ -17,6 +17,7 @@ class UpdateRoomAvailabilityUseCase:
     async def execute(
         self,
         room_id: UUID,
+        booking_id: str,
         booking_status: str,
         start_time: datetime,
         end_time: datetime,
@@ -31,42 +32,22 @@ class UpdateRoomAvailabilityUseCase:
             )
             return
 
-        now = datetime.now(timezone.utc)
-
-        # Normalize naive datetimes that arrive from reservas_ms
-        if start_time.tzinfo is None:
-            start_time = start_time.replace(tzinfo=timezone.utc)
-        if end_time.tzinfo is None:
-            end_time = end_time.replace(tzinfo=timezone.utc)
-
         if booking_status in _OCCUPY_STATUSES:
-            if start_time <= now <= end_time:
-                room.mark_occupied()
-                await self._repo.update(room)
-                logger.info(
-                    "room_marked_occupied room_id=%s hotel_id=%s trace_id=%s start=%s end=%s",
-                    room_id,
-                    room.hotel_id,
-                    trace_id,
-                    start_time.isoformat(),
-                    end_time.isoformat(),
-                )
-            else:
-                logger.info(
-                    "room_availability_skipped room_id=%s trace_id=%s reason=booking_not_active_now now=%s start=%s end=%s",
-                    room_id,
-                    trace_id,
-                    now.isoformat(),
-                    start_time.isoformat(),
-                    end_time.isoformat(),
-                )
-        elif booking_status in _FREE_STATUSES:
-            room.mark_available()
-            await self._repo.update(room)
+            room.add_booking(booking_id)
             logger.info(
-                "room_marked_available room_id=%s hotel_id=%s trace_id=%s",
+                "room_booking_added room_id=%s booking_id=%s new_status=%s trace_id=%s",
                 room_id,
-                room.hotel_id,
+                booking_id,
+                room.status,
+                trace_id,
+            )
+        elif booking_status in _FREE_STATUSES:
+            room.remove_booking(booking_id)
+            logger.info(
+                "room_booking_removed room_id=%s booking_id=%s new_status=%s trace_id=%s",
+                room_id,
+                booking_id,
+                room.status,
                 trace_id,
             )
         else:
@@ -76,3 +57,6 @@ class UpdateRoomAvailabilityUseCase:
                 room_id,
                 trace_id,
             )
+            return
+
+        await self._repo.update(room)
