@@ -56,6 +56,6 @@ class RoomResponseDTO(BaseModel):
 class RoomStatsDTO(BaseModel):
     total: int
     disponibles: int
-    parciales: int
+    parciales: int = 0
     ocupadas: int
     mantenimiento: int

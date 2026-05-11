@@ -59,6 +59,10 @@ class Room:
 
     # ── Manual status helpers ─────────────────────────────────────────────────
 
+    def mark_available(self) -> None:
+        self.status = RoomStatus.DISPONIBLE
+        self.updated_at = datetime.now(timezone.utc)
+
     def mark_occupied(self) -> None:
         self.status = RoomStatus.OCUPADA
         self.updated_at = datetime.now(timezone.utc)
