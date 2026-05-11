@@ -76,4 +76,6 @@ class Payment:
         self.updated_at = datetime.utcnow()
 
     def __repr__(self) -> str:
-        return f"<Payment id={self.id} booking_id={self.booking_id} status={self.status}>"
+        return (
+            f"<Payment id={self.id} booking_id={self.booking_id} status={self.status}>"
+        )

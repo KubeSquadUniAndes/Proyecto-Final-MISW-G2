@@ -23,7 +23,7 @@ from src.infrastructure.http.schemas.reservation_notification_schema import (
 
 def test_reservation_confirmation_dto_valid():
     dto = ReservationConfirmationDTO(
-        reservation_code=uuid4(),
+        reservation_code=str(uuid4()),
         guest_name="Ana López",
         guest_email="ana@example.com",
         property_name="Hostal Medellín",
@@ -56,7 +56,7 @@ def test_reservation_confirmation_result_dto_failure():
 
 def test_reservation_confirmation_request_valid():
     r = ReservationConfirmationRequest(
-        reservation_code=uuid4(),
+        reservation_code=str(uuid4()),
         guest_name="Carlos Ruiz",
         guest_email="carlos@example.com",
         property_name="Apart Hotel",
@@ -88,7 +88,7 @@ def test_reservation_confirmation_response_with_errors():
 @pytest.fixture
 def reservation_dto():
     return ReservationConfirmationDTO(
-        reservation_code=uuid4(),
+        reservation_code=str(uuid4()),
         guest_name="Juan Pérez",
         guest_email="juan@example.com",
         property_name="Hotel Bogotá Plaza",

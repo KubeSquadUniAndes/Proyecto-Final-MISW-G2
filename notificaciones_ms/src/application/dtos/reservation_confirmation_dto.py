@@ -1,11 +1,10 @@
 from datetime import date
-from uuid import UUID
 
 from pydantic import BaseModel
 
 
 class ReservationConfirmationDTO(BaseModel):
-    reservation_code: UUID
+    reservation_code: str
     guest_name: str
     guest_email: str
     property_name: str

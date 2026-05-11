@@ -30,6 +30,7 @@ class Settings(BaseSettings):
     RESERVAS_MS_URL: str = "http://reservas_ms:8000"
     NOTIFICACIONES_MS_URL: str = "http://notificaciones_ms:8003"
     INTERNAL_API_KEY: str = "change-internal-key-in-production"
+    NOTIFICACIONES_MS_API_KEY: str = "secure_internal_api"
 
     # Payment retry config
     MAX_RETRY_ATTEMPTS: int = 3

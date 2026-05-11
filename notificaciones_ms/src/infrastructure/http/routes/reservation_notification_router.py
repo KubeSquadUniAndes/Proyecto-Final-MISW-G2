@@ -1,13 +1,19 @@
 from fastapi import APIRouter, Depends, HTTPException, Header, status
 
 from src.application.dtos.reservation_confirmation_dto import ReservationConfirmationDTO
+from src.application.dtos.payment_voucher_dto import PaymentVoucherDTO
 from src.application.use_cases.send_reservation_confirmation import (
     SendReservationConfirmationUseCase,
 )
+from src.application.use_cases.send_payment_voucher import SendPaymentVoucherUseCase
 from src.infrastructure.config.settings import settings
 from src.infrastructure.http.schemas.reservation_notification_schema import (
     ReservationConfirmationRequest,
     ReservationConfirmationResponse,
+)
+from src.infrastructure.http.schemas.payment_voucher_schema import (
+    PaymentVoucherRequest,
+    PaymentVoucherResponse,
 )
 
 router = APIRouter(prefix="/notifications", tags=["Reservations"])
@@ -42,3 +48,27 @@ async def send_reservation_confirmation(
     dto = ReservationConfirmationDTO(**body.model_dump())
     result = await use_case.execute(dto)
     return ReservationConfirmationResponse(**result.model_dump())
+
+
+@router.post(
+    "/payment/voucher",
+    response_model=PaymentVoucherResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Send payment voucher email with PDF attachment",
+    description=(
+        "Called by **reservas_ms** (or the payment service) after a payment is confirmed. "
+        "Sends an HTML email with a downloadable PDF voucher to the traveler.\n\n"
+        "The same endpoint can be used to **resend** the voucher on demand.\n\n"
+        "Requires `X-Api-Key` header. Email/PDF errors are logged but do not affect "
+        "the payment or reservation status."
+    ),
+    responses={403: {"description": "Invalid API key"}},
+)
+async def send_payment_voucher(
+    body: PaymentVoucherRequest,
+    _: None = Depends(require_internal_api_key),
+) -> PaymentVoucherResponse:
+    use_case = SendPaymentVoucherUseCase()
+    dto = PaymentVoucherDTO(**body.model_dump())
+    result = await use_case.execute(dto)
+    return PaymentVoucherResponse(**result.model_dump())

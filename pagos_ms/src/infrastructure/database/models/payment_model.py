@@ -38,11 +38,11 @@ class PaymentModel(Base):
     card_last_four = Column(String(4), nullable=True)
     retry_count = Column(Integer, nullable=False, default=0)
     payment_timestamp = Column(DateTime(timezone=True), nullable=True)
-    
+
     # Sensitive fields — encrypted with pgcrypto AES-256
     cardholder_name = Column(LargeBinary, nullable=True)
     cardholder_email = Column(LargeBinary, nullable=True)
-    
+
     created_at = Column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )

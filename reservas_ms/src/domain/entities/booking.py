@@ -13,7 +13,7 @@ class BookingStatus(str, Enum):
 
 
 STATUS_DISPLAY = {
-    BookingStatus.PENDING: "Pendiente de pago",
+    BookingStatus.PENDING: "Pendiente de confirmación",
     BookingStatus.CONFIRMED: "Confirmada",
     BookingStatus.CANCELLED: "Cancelada",
     BookingStatus.COMPLETED: "Completada",
@@ -41,6 +41,7 @@ class Booking:
     taxes: Decimal | None = None
     final_price: Decimal | None = None
     payment_id: UUID | None = None
+    payment_status: str | None = None
     traveler_name: str | None = None
     traveler_email: str | None = None
     traveler_phone: str | None = None

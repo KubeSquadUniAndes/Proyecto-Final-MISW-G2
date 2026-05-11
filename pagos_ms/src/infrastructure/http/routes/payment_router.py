@@ -6,7 +6,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.application.use_cases.create_payment import CreatePaymentUseCase
 from src.application.use_cases.confirm_payment import ConfirmPaymentUseCase
 from src.infrastructure.database.base import get_db
-from src.infrastructure.database.repositories.payment_repository import PaymentRepository
+from src.infrastructure.database.repositories.payment_repository import (
+    PaymentRepository,
+)
 from src.infrastructure.clients.reservas_client import ReservasClient
 from src.infrastructure.clients.notificaciones_client import NotificacionesClient
 from src.infrastructure.http.schemas.payment_schemas import (
@@ -18,7 +20,9 @@ from src.infrastructure.http.schemas.payment_schemas import (
 router = APIRouter(tags=["payments"])
 
 
-@router.post("/payments", response_model=PaymentResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/payments", response_model=PaymentResponse, status_code=status.HTTP_201_CREATED
+)
 async def create_payment(
     request: CreatePaymentRequest,
     db: AsyncSession = Depends(get_db),
@@ -26,7 +30,7 @@ async def create_payment(
     """Create a new payment record"""
     repository = PaymentRepository(db)
     use_case = CreatePaymentUseCase(repository)
-    
+
     try:
         payment = await use_case.execute(
             booking_id=request.booking_id,
@@ -51,7 +55,7 @@ async def confirm_payment(
 ):
     """
     Confirm payment and update booking status.
-    
+
     This endpoint:
     - Updates payment status to CONFIRMED
     - Stores provider transaction ID and timestamp
@@ -63,7 +67,7 @@ async def confirm_payment(
     reservas_client = ReservasClient()
     notificaciones_client = NotificacionesClient()
     use_case = ConfirmPaymentUseCase(repository, reservas_client, notificaciones_client)
-    
+
     try:
         payment = await use_case.execute(
             booking_id=booking_id,
@@ -74,7 +78,9 @@ async def confirm_payment(
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
+        )
 
 
 @router.get("/payments/{booking_id}", response_model=PaymentResponse)
@@ -85,11 +91,11 @@ async def get_payment_by_booking(
     """Get payment by booking ID"""
     repository = PaymentRepository(db)
     payment = await repository.find_by_booking_id(booking_id)
-    
+
     if not payment:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Payment for booking {booking_id} not found"
+            detail=f"Payment for booking {booking_id} not found",
         )
-    
+
     return PaymentResponse.model_validate(payment)
