@@ -40,6 +40,9 @@ from src.infrastructure.http.schemas.booking_schema import (
     RejectBookingRequest,
     UpdateBookingRequest,
 )
+from src.infrastructure.messaging.sns_room_availability_publisher import (
+    SNSRoomAvailabilityPublisher,
+)
 
 router = APIRouter(prefix="/bookings", tags=["Bookings"])
 
@@ -56,6 +59,11 @@ _notificaciones_client = NotificacionesClient(
 _users_client = UsersClient(
     base_url=settings.USERS_MS_URL,
     api_key=settings.USERS_MS_INTERNAL_API_KEY,
+)
+
+_availability_publisher = SNSRoomAvailabilityPublisher(
+    topic_arn=settings.SNS_ROOM_AVAILABILITY_TOPIC_ARN,
+    aws_region=settings.AWS_REGION,
 )
 
 
@@ -175,6 +183,7 @@ async def create_booking(
         repo,
         domain_service,
         anomaly_client=_anomaly_client,
+        availability_publisher=_availability_publisher,
     )
     try:
         dto = CreateBookingDTO(
@@ -254,7 +263,10 @@ async def update_booking(
     repo = _make_repo(db)
     domain_service = BookingDomainService(repo)
     use_case = UpdateBookingUseCase(
-        repo, domain_service, anomaly_client=_anomaly_client
+        repo,
+        domain_service,
+        anomaly_client=_anomaly_client,
+        availability_publisher=_availability_publisher,
     )
     try:
         dto = UpdateBookingDTO(

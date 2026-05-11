@@ -1,7 +1,8 @@
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 
 from src.application.dtos.room_dto import RoomResponseDTO
+from src.domain.entities.room import RoomStatus
 from src.domain.repositories.room_repository_port import RoomRepositoryPort
 from src.infrastructure.clients.reservas_client import ReservasClient
 
@@ -27,6 +28,18 @@ class SearchRoomsUseCase:
         if dto.checkin >= dto.checkout:
             raise ValueError("checkin must be before checkout")
 
+        # Normalize to UTC so reservas_ms gets timezone-aware datetimes
+        checkin = (
+            dto.checkin.replace(tzinfo=timezone.utc)
+            if dto.checkin.tzinfo is None
+            else dto.checkin
+        )
+        checkout = (
+            dto.checkout.replace(tzinfo=timezone.utc)
+            if dto.checkout.tzinfo is None
+            else dto.checkout
+        )
+
         rooms = await self._room_repo.search(
             destination=dto.destination,
             min_capacity=dto.guests,
@@ -34,9 +47,16 @@ class SearchRoomsUseCase:
 
         available = []
         for room in rooms:
-            if await self._reservas_client.is_available(
-                room.id, dto.checkin, dto.checkout
-            ):
+            # Fast path: no bookings at all → always available for any dates
+            if room.status == RoomStatus.DISPONIBLE:
+                is_avail = True
+            else:
+                # PARCIAL/OCUPADA: the room has bookings; ask reservas_ms for actual overlap
+                is_avail = await self._reservas_client.is_available(
+                    room.id, checkin, checkout
+                )
+
+            if is_avail:
                 available.append(
                     RoomResponseDTO(
                         id=room.id,
@@ -51,6 +71,7 @@ class SearchRoomsUseCase:
                         size=room.size,
                         status=room.status,
                         amenities=room.amenities,
+                        booking_ids=room.booking_ids,
                         created_at=room.created_at,
                         updated_at=room.updated_at,
                     )
