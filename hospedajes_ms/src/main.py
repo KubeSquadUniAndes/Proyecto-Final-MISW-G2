@@ -2,11 +2,6 @@ import asyncio
 import logging
 from contextlib import asynccontextmanager
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s %(levelname)s %(name)s %(message)s",
-)
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -19,6 +14,11 @@ from src.infrastructure.http.routes.rate_router import router as rate_router
 from src.infrastructure.http.routes.room_image_router import router as room_image_router
 from src.infrastructure.http.routes.room_router import router as room_router
 from src.infrastructure.messaging.sqs_room_availability_consumer import poll_sqs_loop
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(name)s %(message)s",
+)
 
 
 @asynccontextmanager
