@@ -29,9 +29,24 @@ async def test_confirm_payment_success():
 
     mock_reservas_client = AsyncMock()
     mock_reservas_client.update_booking_status.return_value = True
+    mock_reservas_client.get_booking_details.return_value = {
+        "booking_code": "TH-2026-001",
+        "traveler_name": "Test User",
+        "traveler_email": "test@example.com",
+        "room_type": "Suite",
+        "num_guests": 2,
+        "check_in": "2026-06-01",
+        "check_out": "2026-06-05",
+        "price_per_night": 50.0,
+        "total_nights": 4,
+        "subtotal": 200.0,
+        "taxes": 20.0,
+        "discounts": 0.0,
+        "total_amount": 220.0,
+    }
 
     mock_notificaciones_client = AsyncMock()
-    mock_notificaciones_client.send_payment_confirmation.return_value = True
+    mock_notificaciones_client.send_payment_voucher.return_value = True
 
     use_case = ConfirmPaymentUseCase(
         mock_repository, mock_reservas_client, mock_notificaciones_client
@@ -48,7 +63,7 @@ async def test_confirm_payment_success():
     assert result.status == PaymentStatus.CONFIRMED
     assert result.provider_transaction_id == "ch_1234567890"
     mock_reservas_client.update_booking_status.assert_called_once()
-    mock_notificaciones_client.send_payment_confirmation.assert_called_once()
+    mock_notificaciones_client.send_payment_voucher.assert_called_once()
 
 
 @pytest.mark.asyncio

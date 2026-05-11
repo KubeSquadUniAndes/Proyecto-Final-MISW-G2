@@ -425,7 +425,7 @@ async def approve_booking(
         )
 
     repo = _make_repo(db)
-    use_case = ApproveBookingUseCase(repo)
+    use_case = ApproveBookingUseCase(repo, _notificaciones_client)
     try:
         dto = ApproveBookingDTO(booking_id=booking_id, admin_user_id=user_id)
         result = await use_case.execute(dto)

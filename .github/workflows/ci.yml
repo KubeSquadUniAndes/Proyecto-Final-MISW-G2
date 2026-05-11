@@ -27,6 +27,10 @@ jobs:
             test_path: tests/
             src_path: src
             mypy_path: src/application
+          - service: pagos_ms
+            test_path: tests/
+            src_path: src
+            mypy_path: src/domain src/application
           - service: reservas_ms
             test_path: src/tests/
             src_path: src

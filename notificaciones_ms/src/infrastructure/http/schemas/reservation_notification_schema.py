@@ -1,11 +1,10 @@
 from datetime import date
-from uuid import UUID
 
 from pydantic import BaseModel
 
 
 class ReservationConfirmationRequest(BaseModel):
-    reservation_code: UUID
+    reservation_code: str
     guest_name: str
     guest_email: str
     property_name: str
@@ -19,7 +18,7 @@ class ReservationConfirmationRequest(BaseModel):
     model_config = {
         "json_schema_extra": {
             "example": {
-                "reservation_code": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                "reservation_code": "TH-2026-ABC123",
                 "guest_name": "Juan Pérez",
                 "guest_email": "juan@example.com",
                 "property_name": "Hotel Bogotá Plaza",

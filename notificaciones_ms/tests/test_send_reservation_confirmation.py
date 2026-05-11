@@ -1,7 +1,6 @@
 """Tests for SendReservationConfirmationUseCase using mocks."""
 from datetime import date
 from unittest.mock import AsyncMock, patch
-from uuid import uuid4
 
 import pytest
 
@@ -14,7 +13,7 @@ from src.application.use_cases.send_reservation_confirmation import (
 @pytest.fixture
 def dto():
     return ReservationConfirmationDTO(
-        reservation_code=uuid4(),
+        reservation_code="TH-2026-ABC123",
         guest_name="Juan Pérez",
         guest_email="juan@example.com",
         property_name="Hotel Bogotá Plaza",

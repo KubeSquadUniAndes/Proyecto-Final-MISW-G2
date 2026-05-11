@@ -45,6 +45,7 @@ class SQLAlchemyBookingRepository(BookingRepositoryPort):
             taxes=Decimal(str(model.taxes)) if model.taxes else None,
             final_price=Decimal(str(model.final_price)) if model.final_price else None,
             payment_id=model.payment_id,
+            payment_status=model.payment_status,
             traveler_name=d.get("traveler_name"),
             traveler_email=d.get("traveler_email"),
             traveler_phone=d.get("traveler_phone"),
@@ -129,6 +130,7 @@ class SQLAlchemyBookingRepository(BookingRepositoryPort):
             taxes=booking.taxes,
             final_price=booking.final_price,
             payment_id=booking.payment_id,
+            payment_status=booking.payment_status,
             traveler_name=encrypted.get("traveler_name"),
             traveler_email=encrypted.get("traveler_email"),
             traveler_phone=encrypted.get("traveler_phone"),
@@ -197,6 +199,7 @@ class SQLAlchemyBookingRepository(BookingRepositoryPort):
         model.updated_at = booking.updated_at
         model.special_requests = booking.special_requests
         model.payment_id = booking.payment_id
+        model.payment_status = booking.payment_status
 
         if booking.traveler_name:
             encrypted = await self._encrypt_sensitive(booking)

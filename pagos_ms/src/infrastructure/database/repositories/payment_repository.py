@@ -4,7 +4,7 @@ import uuid
 from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.domain.entities.payment import Payment, PaymentStatus, PaymentProvider, PaymentMethod
+from src.domain.entities.payment import Payment
 from src.domain.repositories.payment_repository_port import PaymentRepositoryPort
 from src.infrastructure.database.models.payment_model import PaymentModel
 from src.infrastructure.config.settings import settings
@@ -20,27 +20,37 @@ class PaymentRepository(PaymentRepositoryPort):
 
         if model.cardholder_name:
             result = await self.session.execute(
-                text(
-                    "SELECT pgp_sym_decrypt(:data, :key) AS decrypted"
-                ),
-                {"data": bytes(model.cardholder_name), "key": settings.AES_ENCRYPTION_KEY},
+                text("SELECT pgp_sym_decrypt(:data, :key) AS decrypted"),
+                {
+                    "data": bytes(model.cardholder_name),
+                    "key": settings.AES_ENCRYPTION_KEY,
+                },
             )
             row = result.fetchone()
             if row:
                 decrypted = row[0]
-                cardholder_name = decrypted if isinstance(decrypted, str) else decrypted.decode("utf-8")
+                cardholder_name = (
+                    decrypted
+                    if isinstance(decrypted, str)
+                    else decrypted.decode("utf-8")
+                )
 
         if model.cardholder_email:
             result = await self.session.execute(
-                text(
-                    "SELECT pgp_sym_decrypt(:data, :key) AS decrypted"
-                ),
-                {"data": bytes(model.cardholder_email), "key": settings.AES_ENCRYPTION_KEY},
+                text("SELECT pgp_sym_decrypt(:data, :key) AS decrypted"),
+                {
+                    "data": bytes(model.cardholder_email),
+                    "key": settings.AES_ENCRYPTION_KEY,
+                },
             )
             row = result.fetchone()
             if row:
                 decrypted = row[0]
-                cardholder_email = decrypted if isinstance(decrypted, str) else decrypted.decode("utf-8")
+                cardholder_email = (
+                    decrypted
+                    if isinstance(decrypted, str)
+                    else decrypted.decode("utf-8")
+                )
 
         return Payment(
             id=model.id,

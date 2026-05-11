@@ -70,6 +70,8 @@ class BookingResponse(BaseModel):
     taxes: Decimal | None = None
     final_price: Decimal | None = None
     payment_id: UUID | None = None
+    payment_status: str | None = None
+    payment_status_display: str | None = None
     traveler_name: str | None = None
     traveler_email: str | None
     traveler_phone: str | None
