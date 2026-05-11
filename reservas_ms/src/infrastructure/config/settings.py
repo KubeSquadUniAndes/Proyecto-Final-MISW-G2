@@ -37,6 +37,10 @@ class Settings(BaseSettings):
     USERS_MS_URL: str = "http://users_ms:8004"
     USERS_MS_INTERNAL_API_KEY: str = "secure_internal_api"
 
+    # AWS Messaging — SNS/SQS room availability events
+    AWS_REGION: str = "us-east-1"
+    SNS_ROOM_AVAILABILITY_TOPIC_ARN: str = ""
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",

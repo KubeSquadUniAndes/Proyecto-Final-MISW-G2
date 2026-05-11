@@ -15,10 +15,12 @@ class UpdateBookingUseCase:
         booking_repo: BookingRepositoryPort,
         domain_service: BookingDomainService,
         anomaly_client=None,
+        availability_publisher=None,
     ) -> None:
         self._repo = booking_repo
         self._domain_service = domain_service
         self._anomaly_client = anomaly_client
+        self._availability_publisher = availability_publisher
 
     async def execute(self, dto: UpdateBookingDTO) -> BookingResponseDTO:
         booking = await self._repo.get_by_id(dto.booking_id)
@@ -72,4 +74,24 @@ class UpdateBookingUseCase:
                 raise ValueError("Error anomaly_check_failed")
 
         updated = await self._repo.update(booking)
+
+        # Publish room availability event (fire-and-forget)
+        if self._availability_publisher:
+            try:
+                from src.domain.events.room_availability_event import RoomAvailabilityEvent
+                event = RoomAvailabilityEvent(
+                    event_type="booking_updated",
+                    booking_id=updated.id,
+                    room_id=updated.room_id,
+                    hotel_id=updated.hotel_id,
+                    status=updated.status.value,
+                    start_time=updated.start_time,
+                    end_time=updated.end_time,
+                )
+                await self._availability_publisher.publish(event)
+            except Exception as exc:
+                logger.error(
+                    "availability_publish_failed booking_id=%s error=%s", updated.id, exc
+                )
+
         return _build_response(updated)

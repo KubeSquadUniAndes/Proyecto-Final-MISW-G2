@@ -33,6 +33,11 @@ resource "aws_subnet" "public" {
     "kubernetes.io/role/elb"                          = "1"
     "kubernetes.io/cluster/${var.project}-${var.environment}" = "shared"
   }
+
+  lifecycle {
+    prevent_destroy = true
+    ignore_changes  = [tags]
+  }
 }
 
 # ── Private Subnets (for EKS nodes and RDS) ───────────────────────────────────
@@ -46,6 +51,10 @@ resource "aws_subnet" "private" {
     Name                                              = "${var.project}-private-${local.azs[count.index]}"
     "kubernetes.io/role/internal-elb"                 = "1"
     "kubernetes.io/cluster/${var.project}-${var.environment}" = "shared"
+  }
+  lifecycle {
+    prevent_destroy = true
+    ignore_changes  = [tags]   # optional: ignore tag drift
   }
 }
 

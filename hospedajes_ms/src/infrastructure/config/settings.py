@@ -24,6 +24,7 @@ class Settings(BaseSettings):
 
     AWS_REGION: str = "us-east-1"
     S3_BUCKET: str = "travelhub-images-780522923809"
+    SQS_QUEUE_URL: str = ""  # set via env var in k8s; empty disables consumer
 
     model_config = SettingsConfigDict(
         env_file=".env",

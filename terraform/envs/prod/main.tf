@@ -80,7 +80,16 @@ module "s3" {
 
   project        = var.project
   environment    = var.environment
-  bucket_name    = "travelhub-images"
+  bucket_name    = "travelhub-images-780522923809"
+  node_role_name = module.eks.node_role_name
+}
+
+# ── SNS + SQS — Room Availability Messaging ──────────────────────────────────
+module "sns_sqs" {
+  source = "../../modules/sns_sqs"
+
+  project        = var.project
+  environment    = var.environment
   node_role_name = module.eks.node_role_name
 }
 
@@ -95,4 +104,20 @@ module "rds" {
   eks_security_group         = module.eks.node_security_group_id
   eks_cluster_security_group = module.eks.cluster_security_group_id
   db_password                = var.db_password
+}
+
+# ── Outputs — SNS/SQS (use these values in k8s ConfigMaps) ───────────────────
+output "sns_room_availability_topic_arn" {
+  description = "Set as SNS_ROOM_AVAILABILITY_TOPIC_ARN in reservas-ms-config ConfigMap"
+  value       = module.sns_sqs.sns_topic_arn
+}
+
+output "sqs_hospedajes_availability_url" {
+  description = "Set as SQS_QUEUE_URL in hospedajes-ms-config ConfigMap"
+  value       = module.sns_sqs.sqs_queue_url
+}
+
+output "sqs_hospedajes_availability_dlq_url" {
+  description = "Dead-letter queue URL — monitor for failed availability events"
+  value       = module.sns_sqs.sqs_dlq_url
 }

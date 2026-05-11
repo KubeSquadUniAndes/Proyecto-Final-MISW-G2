@@ -1,4 +1,11 @@
+import asyncio
+import logging
 from contextlib import asynccontextmanager
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(name)s %(message)s",
+)
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -11,14 +18,22 @@ from src.infrastructure.http.routes.health_router import router as health_router
 from src.infrastructure.http.routes.rate_router import router as rate_router
 from src.infrastructure.http.routes.room_image_router import router as room_image_router
 from src.infrastructure.http.routes.room_router import router as room_router
+from src.infrastructure.messaging.sqs_room_availability_consumer import poll_sqs_loop
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+    consumer_task = asyncio.create_task(poll_sqs_loop())
     print(f"✅ {settings.APP_NAME} v{settings.APP_VERSION} started")
     yield
+    consumer_task.cancel()
+    try:
+        await consumer_task
+    except asyncio.CancelledError:
+        logging.info("sqs_consumer_stopped")
+        pass
     await engine.dispose()
     print(f"🛑 {settings.APP_NAME} stopped")
 
