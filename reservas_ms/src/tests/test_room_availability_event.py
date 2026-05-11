@@ -6,7 +6,9 @@ from uuid import uuid4
 import pytest
 
 from src.domain.events.room_availability_event import RoomAvailabilityEvent
-from src.domain.ports.room_availability_publisher_port import RoomAvailabilityPublisherPort
+from src.domain.ports.room_availability_publisher_port import (
+    RoomAvailabilityPublisherPort,
+)
 
 
 def _make_event(**kwargs) -> RoomAvailabilityEvent:

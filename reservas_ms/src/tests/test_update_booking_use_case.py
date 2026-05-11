@@ -134,7 +134,10 @@ async def test_update_booking_with_anomaly_client_anomalous():
         end_time=now + timedelta(days=4),
     )
     anomaly_client = AsyncMock()
-    anomaly_client.analyze.return_value = {"is_anomalous": True, "action_taken": "blocked"}
+    anomaly_client.analyze.return_value = {
+        "is_anomalous": True,
+        "action_taken": "blocked",
+    }
     uc, _ = _make_use_case(booking=booking, anomaly_client=anomaly_client)
     dto = UpdateBookingDTO(booking_id=booking.id, user_id=user_id)
     result = await uc.execute(dto)

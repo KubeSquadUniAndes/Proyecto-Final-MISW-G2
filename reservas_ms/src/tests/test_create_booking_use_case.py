@@ -153,17 +153,27 @@ async def test_create_booking_anomaly_client_anomalous(
 ):
     start_time, end_time = valid_times
     booking = Booking(
-        user_id=user_id, hotel_id=hotel_id, room_id=room_id,
-        start_time=start_time, end_time=end_time, booking_code="TH-2026-ANOM1",
+        user_id=user_id,
+        hotel_id=hotel_id,
+        room_id=room_id,
+        start_time=start_time,
+        end_time=end_time,
+        booking_code="TH-2026-ANOM1",
     )
     mock_repo.save.return_value = booking
     anomaly_client = AsyncMock()
-    anomaly_client.analyze.return_value = {"is_anomalous": True, "action_taken": "flagged"}
+    anomaly_client.analyze.return_value = {
+        "is_anomalous": True,
+        "action_taken": "flagged",
+    }
     domain_service = BookingDomainService(mock_repo)
     uc = CreateBookingUseCase(mock_repo, domain_service, anomaly_client=anomaly_client)
     dto = CreateBookingDTO(
-        user_id=user_id, hotel_id=hotel_id, room_id=room_id,
-        start_time=start_time, end_time=end_time,
+        user_id=user_id,
+        hotel_id=hotel_id,
+        room_id=room_id,
+        start_time=start_time,
+        end_time=end_time,
     )
     result = await uc.execute(dto)
     assert result.user_id == user_id
@@ -180,8 +190,11 @@ async def test_create_booking_anomaly_client_exception(
     domain_service = BookingDomainService(mock_repo)
     uc = CreateBookingUseCase(mock_repo, domain_service, anomaly_client=anomaly_client)
     dto = CreateBookingDTO(
-        user_id=user_id, hotel_id=hotel_id, room_id=room_id,
-        start_time=start_time, end_time=end_time,
+        user_id=user_id,
+        hotel_id=hotel_id,
+        room_id=room_id,
+        start_time=start_time,
+        end_time=end_time,
     )
     with pytest.raises(ValueError, match="anomaly_check_failed"):
         await uc.execute(dto)
@@ -193,16 +206,25 @@ async def test_create_booking_with_availability_publisher(
 ):
     start_time, end_time = valid_times
     booking = Booking(
-        user_id=user_id, hotel_id=hotel_id, room_id=room_id,
-        start_time=start_time, end_time=end_time, booking_code="TH-2026-PUB01",
+        user_id=user_id,
+        hotel_id=hotel_id,
+        room_id=room_id,
+        start_time=start_time,
+        end_time=end_time,
+        booking_code="TH-2026-PUB01",
     )
     mock_repo.save.return_value = booking
     publisher = AsyncMock()
     domain_service = BookingDomainService(mock_repo)
-    uc = CreateBookingUseCase(mock_repo, domain_service, availability_publisher=publisher)
+    uc = CreateBookingUseCase(
+        mock_repo, domain_service, availability_publisher=publisher
+    )
     dto = CreateBookingDTO(
-        user_id=user_id, hotel_id=hotel_id, room_id=room_id,
-        start_time=start_time, end_time=end_time,
+        user_id=user_id,
+        hotel_id=hotel_id,
+        room_id=room_id,
+        start_time=start_time,
+        end_time=end_time,
     )
     result = await uc.execute(dto)
     assert result.user_id == user_id
@@ -215,18 +237,26 @@ async def test_create_booking_publisher_exception_is_swallowed(
 ):
     start_time, end_time = valid_times
     booking = Booking(
-        user_id=user_id, hotel_id=hotel_id, room_id=room_id,
-        start_time=start_time, end_time=end_time, booking_code="TH-2026-PUB02",
+        user_id=user_id,
+        hotel_id=hotel_id,
+        room_id=room_id,
+        start_time=start_time,
+        end_time=end_time,
+        booking_code="TH-2026-PUB02",
     )
     mock_repo.save.return_value = booking
     publisher = AsyncMock()
     publisher.publish.side_effect = RuntimeError("sns down")
     domain_service = BookingDomainService(mock_repo)
-    uc = CreateBookingUseCase(mock_repo, domain_service, availability_publisher=publisher)
+    uc = CreateBookingUseCase(
+        mock_repo, domain_service, availability_publisher=publisher
+    )
     dto = CreateBookingDTO(
-        user_id=user_id, hotel_id=hotel_id, room_id=room_id,
-        start_time=start_time, end_time=end_time,
+        user_id=user_id,
+        hotel_id=hotel_id,
+        room_id=room_id,
+        start_time=start_time,
+        end_time=end_time,
     )
     result = await uc.execute(dto)
     assert result.user_id == user_id
-
