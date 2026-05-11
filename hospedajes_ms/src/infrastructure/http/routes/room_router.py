@@ -2,6 +2,7 @@ from datetime import datetime
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.application.dtos.room_dto import CreateRoomDTO, UpdateRoomDTO
@@ -63,6 +64,11 @@ async def create_room(
         return RoomResponse(**result.model_dump())
     except ValueError as exc:
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc))
+    except SQLAlchemyError as exc:
+        raise HTTPException(
+            status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Database error: {exc}",
+        )
 
 
 @router.get(
