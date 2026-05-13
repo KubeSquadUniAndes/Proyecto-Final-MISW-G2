@@ -55,7 +55,9 @@ class CancelBookingUseCase:
                 await self._availability_publisher.publish(event)
             except Exception as exc:
                 logger.error(
-                    "availability_publish_failed booking_id=%s error=%s", updated.id, exc
+                    "availability_publish_failed booking_id=%s error=%s",
+                    updated.id,
+                    exc,
                 )
 
         from src.application.use_cases.create_booking import _build_response

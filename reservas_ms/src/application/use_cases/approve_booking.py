@@ -75,7 +75,9 @@ class ApproveBookingUseCase:
                 await self._availability_publisher.publish(event)
             except Exception as exc:
                 logger.error(
-                    "availability_publish_failed booking_id=%s error=%s", updated.id, exc
+                    "availability_publish_failed booking_id=%s error=%s",
+                    updated.id,
+                    exc,
                 )
 
         # Send reservation confirmation email
