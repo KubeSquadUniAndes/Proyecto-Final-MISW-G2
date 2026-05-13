@@ -137,7 +137,7 @@ class CreateBookingUseCase:
         if has_conflict:
             raise ValueError("A schedule conflict exists for this resource")
 
-        # 5. Notify anomaly detector (fire-and-forget)
+        # 5. Notify anomaly detector (fire-and-forget — never blocks booking flow)
         if self._anomaly_client:
             try:
                 result = await self._anomaly_client.analyze(
@@ -157,7 +157,6 @@ class CreateBookingUseCase:
                 logger.error(
                     "anomaly_check_failed booking_id=%s error=%s", booking.id, exc
                 )
-                raise ValueError("Error anomaly_check_failed")
 
         # 6. Persist booking
         saved = await self._repo.save(booking)

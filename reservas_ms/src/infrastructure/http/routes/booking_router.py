@@ -324,7 +324,7 @@ async def cancel_booking(
     db: AsyncSession = Depends(get_db),
 ) -> BookingResponse:
     repo = _make_repo(db)
-    use_case = CancelBookingUseCase(repo)
+    use_case = CancelBookingUseCase(repo, availability_publisher=_availability_publisher)
     try:
         dto = CancelBookingDTO(booking_id=booking_id, user_id=user_id)
         result = await use_case.execute(dto)
@@ -427,7 +427,7 @@ async def approve_booking(
         )
 
     repo = _make_repo(db)
-    use_case = ApproveBookingUseCase(repo, _notificaciones_client)
+    use_case = ApproveBookingUseCase(repo, _notificaciones_client, availability_publisher=_availability_publisher)
     try:
         dto = ApproveBookingDTO(booking_id=booking_id, admin_user_id=user_id)
         result = await use_case.execute(dto)
@@ -485,7 +485,7 @@ async def reject_booking(
         )
 
     repo = _make_repo(db)
-    use_case = RejectBookingUseCase(repo)
+    use_case = RejectBookingUseCase(repo, availability_publisher=_availability_publisher)
     try:
         dto = RejectBookingDTO(
             booking_id=booking_id,
