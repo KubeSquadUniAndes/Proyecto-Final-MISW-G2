@@ -184,9 +184,19 @@ async def test_create_booking_anomaly_client_anomalous(
 async def test_create_booking_anomaly_client_exception(
     mock_repo, user_id, hotel_id, room_id, valid_times
 ):
+    """Anomaly client failure must be swallowed — booking should still succeed."""
     start_time, end_time = valid_times
     anomaly_client = AsyncMock()
     anomaly_client.analyze.side_effect = RuntimeError("service unavailable")
+    booking = Booking(
+        user_id=user_id,
+        hotel_id=hotel_id,
+        room_id=room_id,
+        start_time=start_time,
+        end_time=end_time,
+        booking_code="TH-2026-ANOMERR",
+    )
+    mock_repo.save.return_value = booking
     domain_service = BookingDomainService(mock_repo)
     uc = CreateBookingUseCase(mock_repo, domain_service, anomaly_client=anomaly_client)
     dto = CreateBookingDTO(
@@ -196,8 +206,9 @@ async def test_create_booking_anomaly_client_exception(
         start_time=start_time,
         end_time=end_time,
     )
-    with pytest.raises(ValueError, match="anomaly_check_failed"):
-        await uc.execute(dto)
+    result = await uc.execute(dto)
+    assert result.room_id == room_id
+    anomaly_client.analyze.assert_called_once()
 
 
 @pytest.mark.asyncio

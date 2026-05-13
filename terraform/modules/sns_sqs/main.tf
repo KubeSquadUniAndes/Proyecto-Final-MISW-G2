@@ -109,3 +109,65 @@ resource "aws_iam_role_policy_attachment" "nodes_sqs_consume" {
   role       = var.node_role_name
   policy_arn = aws_iam_policy.sqs_consume_room_availability.arn
 }
+
+# ── IRSA Role — hospedajes_ms SQS consumer ───────────────────────────────────
+# Allows the hospedajes-sa Kubernetes ServiceAccount to call SQS without
+# relying on EC2 IMDS (which is blocked by Istio ambient ztunnel).
+resource "aws_iam_role" "hospedajes_sqs" {
+  name = "${var.project}-${var.environment}-hospedajes-sqs-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Principal = {
+        Federated = var.oidc_provider_arn
+      }
+      Action = "sts:AssumeRoleWithWebIdentity"
+      Condition = {
+        StringEquals = {
+          "${var.oidc_provider_url}:sub" = "system:serviceaccount:workloads:hospedajes-sa"
+          "${var.oidc_provider_url}:aud" = "sts.amazonaws.com"
+        }
+      }
+    }]
+  })
+
+  tags = local.common_tags
+}
+
+resource "aws_iam_role_policy_attachment" "hospedajes_sqs_irsa" {
+  role       = aws_iam_role.hospedajes_sqs.name
+  policy_arn = aws_iam_policy.sqs_consume_room_availability.arn
+}
+
+# ── IRSA Role — reservas_ms SNS publisher ────────────────────────────────────
+# Allows the reservas-sa Kubernetes ServiceAccount to publish to SNS without
+# relying on EC2 IMDS (which is blocked by Istio ambient ztunnel).
+resource "aws_iam_role" "reservas_sns" {
+  name = "${var.project}-${var.environment}-reservas-sns-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Principal = {
+        Federated = var.oidc_provider_arn
+      }
+      Action = "sts:AssumeRoleWithWebIdentity"
+      Condition = {
+        StringEquals = {
+          "${var.oidc_provider_url}:sub" = "system:serviceaccount:workloads:reservas-sa"
+          "${var.oidc_provider_url}:aud" = "sts.amazonaws.com"
+        }
+      }
+    }]
+  })
+
+  tags = local.common_tags
+}
+
+resource "aws_iam_role_policy_attachment" "reservas_sns_irsa" {
+  role       = aws_iam_role.reservas_sns.name
+  policy_arn = aws_iam_policy.sns_publish_room_availability.arn
+}

@@ -123,6 +123,7 @@ spec:
                   - hospedajes-app
               topologyKey: kubernetes.io/hostname
       terminationGracePeriodSeconds: 30
+      serviceAccountName: hospedajes-sa
       initContainers:
       - name: wait-for-postgres
         image: postgres:alpine3.22
@@ -380,6 +381,7 @@ spec:
                   - reservas-app
               topologyKey: kubernetes.io/hostname
       terminationGracePeriodSeconds: 30
+      serviceAccountName: reservas-sa
       initContainers:
       - name: wait-for-postgres
         image: postgres:alpine3.22

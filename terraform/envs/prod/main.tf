@@ -88,9 +88,11 @@ module "s3" {
 module "sns_sqs" {
   source = "../../modules/sns_sqs"
 
-  project        = var.project
-  environment    = var.environment
-  node_role_name = module.eks.node_role_name
+  project           = var.project
+  environment       = var.environment
+  node_role_name    = module.eks.node_role_name
+  oidc_provider_arn = module.eks.oidc_provider_arn
+  oidc_provider_url = module.eks.oidc_provider_url
 }
 
 # ── RDS PostgreSQL ────────────────────────────────────────────────────────────

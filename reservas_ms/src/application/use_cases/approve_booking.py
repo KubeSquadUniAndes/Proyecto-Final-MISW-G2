@@ -4,6 +4,9 @@ import logging
 
 from src.application.dtos.booking_dto import ApproveBookingDTO, BookingResponseDTO
 from src.domain.entities.booking import BookingStatus
+from src.domain.ports.room_availability_publisher_port import (
+    RoomAvailabilityPublisherPort,
+)
 from src.domain.repositories.booking_repository_port import BookingRepositoryPort
 from src.infrastructure.clients.notificaciones_client import NotificacionesClient
 
@@ -17,9 +20,11 @@ class ApproveBookingUseCase:
         self,
         repository: BookingRepositoryPort,
         notificaciones_client: NotificacionesClient | None = None,
+        availability_publisher: RoomAvailabilityPublisherPort | None = None,
     ) -> None:
         self._repo = repository
         self._notificaciones_client = notificaciones_client
+        self._availability_publisher = availability_publisher
 
     async def execute(self, dto: ApproveBookingDTO) -> BookingResponseDTO:
         """
@@ -50,6 +55,30 @@ class ApproveBookingUseCase:
             dto.booking_id,
             dto.admin_user_id,
         )
+
+        # Publish room availability event (fire-and-forget)
+        if self._availability_publisher:
+            try:
+                from src.domain.events.room_availability_event import (
+                    RoomAvailabilityEvent,
+                )
+
+                event = RoomAvailabilityEvent(
+                    event_type="booking_confirmed",
+                    booking_id=updated.id,
+                    room_id=updated.room_id,
+                    hotel_id=updated.hotel_id,
+                    status=updated.status.value,
+                    start_time=updated.start_time,
+                    end_time=updated.end_time,
+                )
+                await self._availability_publisher.publish(event)
+            except Exception as exc:
+                logger.error(
+                    "availability_publish_failed booking_id=%s error=%s",
+                    updated.id,
+                    exc,
+                )
 
         # Send reservation confirmation email
         if self._notificaciones_client and updated.traveler_email:

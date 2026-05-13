@@ -4,6 +4,9 @@ import logging
 
 from src.application.dtos.booking_dto import BookingResponseDTO, RejectBookingDTO
 from src.domain.entities.booking import BookingStatus
+from src.domain.ports.room_availability_publisher_port import (
+    RoomAvailabilityPublisherPort,
+)
 from src.domain.repositories.booking_repository_port import BookingRepositoryPort
 
 logger = logging.getLogger(__name__)
@@ -12,8 +15,13 @@ logger = logging.getLogger(__name__)
 class RejectBookingUseCase:
     """Reject a pending booking and release inventory."""
 
-    def __init__(self, repository: BookingRepositoryPort) -> None:
+    def __init__(
+        self,
+        repository: BookingRepositoryPort,
+        availability_publisher: RoomAvailabilityPublisherPort | None = None,
+    ) -> None:
         self._repo = repository
+        self._availability_publisher = availability_publisher
 
     async def execute(self, dto: RejectBookingDTO) -> BookingResponseDTO:
         """
@@ -61,11 +69,29 @@ class RejectBookingUseCase:
             dto.rejection_reason,
         )
 
-        # TODO: Release inventory in hospedajes_ms
-        # await hospedajes_client.release_room(room_id, start_time, end_time)
+        # Publish room availability event to release the room (fire-and-forget)
+        if self._availability_publisher:
+            try:
+                from src.domain.events.room_availability_event import (
+                    RoomAvailabilityEvent,
+                )
 
-        # TODO: Send notification to traveler
-        # await notification_client.send(user_id, "booking_rejected", data)
+                event = RoomAvailabilityEvent(
+                    event_type="booking_rejected",
+                    booking_id=updated.id,
+                    room_id=updated.room_id,
+                    hotel_id=updated.hotel_id,
+                    status=updated.status.value,
+                    start_time=updated.start_time,
+                    end_time=updated.end_time,
+                )
+                await self._availability_publisher.publish(event)
+            except Exception as exc:
+                logger.error(
+                    "availability_publish_failed booking_id=%s error=%s",
+                    updated.id,
+                    exc,
+                )
 
         return BookingResponseDTO(
             id=updated.id,
