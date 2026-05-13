@@ -26,6 +26,12 @@ output "external_secrets_role_arn" {
 output "oidc_provider_arn" {
   value = aws_iam_openid_connect_provider.eks.arn
 }
+
+output "oidc_provider_url" {
+  description = "OIDC provider URL with https:// stripped — used as key prefix in IRSA trust policy conditions"
+  value       = replace(aws_iam_openid_connect_provider.eks.url, "https://", "")
+}
+
 output "node_role_name" {
   value = aws_iam_role.eks_nodes.name
 }

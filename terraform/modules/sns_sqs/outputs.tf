@@ -27,3 +27,13 @@ output "sqs_dlq_arn" {
   description = "ARN of the dead-letter queue"
   value       = aws_sqs_queue.hospedajes_availability_dlq.arn
 }
+
+output "hospedajes_sqs_role_arn" {
+  description = "IAM Role ARN for hospedajes-sa IRSA — annotate the hospedajes-sa ServiceAccount with this value"
+  value       = aws_iam_role.hospedajes_sqs.arn
+}
+
+output "reservas_sns_role_arn" {
+  description = "IAM Role ARN for reservas-sa IRSA — annotate the reservas-sa ServiceAccount with this value"
+  value       = aws_iam_role.reservas_sns.arn
+}

@@ -21,6 +21,18 @@ variable "node_role_name" {
   nullable    = false
 }
 
+variable "oidc_provider_arn" {
+  description = "ARN of the EKS OIDC provider — required for IRSA trust policies"
+  type        = string
+  nullable    = false
+}
+
+variable "oidc_provider_url" {
+  description = "EKS OIDC provider URL without https:// (e.g. oidc.eks.us-east-1.amazonaws.com/id/XXXX)"
+  type        = string
+  nullable    = false
+}
+
 variable "visibility_timeout_seconds" {
   description = "Seconds a received message is hidden from other consumers; must be >= consumer max processing time"
   type        = number

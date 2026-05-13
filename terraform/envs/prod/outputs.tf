@@ -51,3 +51,13 @@ output "configure_kubectl" {
   description = "Run this command to configure kubectl"
   value       = "aws eks update-kubeconfig --region ${var.aws_region} --name ${module.eks.cluster_name}"
 }
+
+output "hospedajes_sqs_role_arn" {
+  description = "Annotate hospedajes-sa ServiceAccount with this ARN (eks.amazonaws.com/role-arn)"
+  value       = module.sns_sqs.hospedajes_sqs_role_arn
+}
+
+output "reservas_sns_role_arn" {
+  description = "Annotate reservas-sa ServiceAccount with this ARN (eks.amazonaws.com/role-arn)"
+  value       = module.sns_sqs.reservas_sns_role_arn
+}

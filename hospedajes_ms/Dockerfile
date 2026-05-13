@@ -13,4 +13,4 @@ ENV PYTHONUNBUFFERED=1
 
 EXPOSE 8003
 
-CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8003"]
+CMD ["sh", "-c", "python run_migrations.py && uvicorn src.main:app --host 0.0.0.0 --port 8003"]
