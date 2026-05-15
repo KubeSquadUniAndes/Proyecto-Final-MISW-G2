@@ -46,6 +46,9 @@ class Booking:
     traveler_email: str | None = None
     traveler_phone: str | None = None
     traveler_document: str | None = None
+    qr_code: str | None = None
+    qr_generated_at: datetime | None = None
+    qr_is_valid: bool = True
     created_at: datetime = field(default_factory=datetime.utcnow)
     updated_at: datetime = field(default_factory=datetime.utcnow)
 
@@ -79,6 +82,11 @@ class Booking:
         if self.status != BookingStatus.CONFIRMED:
             raise ValueError(f"Cannot complete a booking with status '{self.status}'")
         self.status = BookingStatus.COMPLETED
+        self.updated_at = datetime.utcnow()
+
+    def invalidate_qr(self) -> None:
+        """Invalidate the QR code (e.g. on cancellation)."""
+        self.qr_is_valid = False
         self.updated_at = datetime.utcnow()
 
     def is_valid(self) -> bool:
