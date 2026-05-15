@@ -6,8 +6,8 @@ import json
 import logging
 from uuid import UUID
 
-import qrcode
-import qrcode.constants
+import qrcode  # type: ignore[import-untyped]
+import qrcode.constants  # type: ignore[import-untyped]
 
 logger = logging.getLogger(__name__)
 

@@ -41,7 +41,8 @@ def test_booking_confirm():
     now = datetime.utcnow()
     b = Booking(
         user_id=uuid4(),
-        resource_id=uuid4(),
+        hotel_id=uuid4(),
+        room_id=uuid4(),
         start_time=now,
         end_time=now + timedelta(hours=1),
     )
@@ -53,7 +54,8 @@ def test_booking_confirm_not_pending():
     now = datetime.utcnow()
     b = Booking(
         user_id=uuid4(),
-        resource_id=uuid4(),
+        hotel_id=uuid4(),
+        room_id=uuid4(),
         start_time=now,
         end_time=now + timedelta(hours=1),
         status=BookingStatus.CONFIRMED,
@@ -66,7 +68,8 @@ def test_booking_cancel():
     now = datetime.utcnow()
     b = Booking(
         user_id=uuid4(),
-        resource_id=uuid4(),
+        hotel_id=uuid4(),
+        room_id=uuid4(),
         start_time=now,
         end_time=now + timedelta(hours=1),
     )
@@ -78,7 +81,8 @@ def test_booking_cancel_already_cancelled():
     now = datetime.utcnow()
     b = Booking(
         user_id=uuid4(),
-        resource_id=uuid4(),
+        hotel_id=uuid4(),
+        room_id=uuid4(),
         start_time=now,
         end_time=now + timedelta(hours=1),
         status=BookingStatus.CANCELLED,
@@ -91,7 +95,8 @@ def test_booking_complete():
     now = datetime.utcnow()
     b = Booking(
         user_id=uuid4(),
-        resource_id=uuid4(),
+        hotel_id=uuid4(),
+        room_id=uuid4(),
         start_time=now,
         end_time=now + timedelta(hours=1),
         status=BookingStatus.CONFIRMED,
@@ -104,7 +109,8 @@ def test_booking_complete_not_confirmed():
     now = datetime.utcnow()
     b = Booking(
         user_id=uuid4(),
-        resource_id=uuid4(),
+        hotel_id=uuid4(),
+        room_id=uuid4(),
         start_time=now,
         end_time=now + timedelta(hours=1),
     )
@@ -116,7 +122,8 @@ def test_booking_is_valid():
     now = datetime.utcnow()
     b = Booking(
         user_id=uuid4(),
-        resource_id=uuid4(),
+        hotel_id=uuid4(),
+        room_id=uuid4(),
         start_time=now,
         end_time=now + timedelta(hours=1),
     )
@@ -127,7 +134,8 @@ def test_booking_is_invalid():
     now = datetime.utcnow()
     b = Booking(
         user_id=uuid4(),
-        resource_id=uuid4(),
+        hotel_id=uuid4(),
+        room_id=uuid4(),
         start_time=now + timedelta(hours=1),
         end_time=now,
     )
@@ -144,7 +152,7 @@ async def test_no_conflict_different_resource():
     rid1 = uuid4()
     rid2 = uuid4()
     existing = Booking(
-        user_id=uid, resource_id=rid1, start_time=now, end_time=now + timedelta(hours=2)
+        user_id=uid, hotel_id=uuid4(), room_id=rid1, start_time=now, end_time=now + timedelta(hours=2)
     )
     mock_repo = AsyncMock()
     mock_repo.list_by_user.return_value = [existing]
@@ -159,7 +167,7 @@ async def test_conflict_same_resource():
     uid = uuid4()
     rid = uuid4()
     existing = Booking(
-        user_id=uid, resource_id=rid, start_time=now, end_time=now + timedelta(hours=2)
+        user_id=uid, hotel_id=uuid4(), room_id=rid, start_time=now, end_time=now + timedelta(hours=2)
     )
     mock_repo = AsyncMock()
     mock_repo.list_by_user.return_value = [existing]
@@ -177,7 +185,8 @@ async def test_no_conflict_cancelled_booking():
     rid = uuid4()
     existing = Booking(
         user_id=uid,
-        resource_id=rid,
+        hotel_id=uuid4(),
+        room_id=rid,
         start_time=now,
         end_time=now + timedelta(hours=2),
         status=BookingStatus.CANCELLED,
@@ -251,7 +260,8 @@ async def test_booking_repo_update_not_found():
     now = datetime.utcnow()
     booking = Booking(
         user_id=uuid4(),
-        resource_id=uuid4(),
+        hotel_id=uuid4(),
+        room_id=uuid4(),
         start_time=now,
         end_time=now + timedelta(hours=1),
     )
@@ -265,7 +275,8 @@ async def test_booking_repo_update_not_found():
 def test_create_booking_request_valid():
     now = datetime.utcnow()
     r = CreateBookingRequest(
-        resource_id=uuid4(),
+        hotel_id=uuid4(),
+        room_id=uuid4(),
         start_time=now,
         end_time=now + timedelta(days=2),
     )
@@ -342,7 +353,8 @@ async def test_create_booking_success(app):
     mock_result = BookingResponseDTO(
         id=uuid4(),
         user_id=uid,
-        resource_id=uuid4(),
+        hotel_id=uuid4(),
+        room_id=uuid4(),
         start_time=now,
         end_time=now + timedelta(days=2),
         status=BookingStatus.PENDING,
@@ -393,7 +405,8 @@ async def test_create_booking_success(app):
             resp = await client.post(
                 "/api/v1/bookings/",
                 json={
-                    "resource_id": str(uuid4()),
+                    "hotel_id": str(uuid4()),
+                    "room_id": str(uuid4()),
                     "start_time": now.isoformat(),
                     "end_time": (now + timedelta(hours=1)).isoformat(),
                 },
@@ -433,7 +446,8 @@ async def test_create_booking_conflict(app):
             resp = await client.post(
                 "/api/v1/bookings/",
                 json={
-                    "resource_id": str(uuid4()),
+                    "hotel_id": str(uuid4()),
+                    "room_id": str(uuid4()),
                     "start_time": now.isoformat(),
                     "end_time": (now + timedelta(hours=1)).isoformat(),
                 },
