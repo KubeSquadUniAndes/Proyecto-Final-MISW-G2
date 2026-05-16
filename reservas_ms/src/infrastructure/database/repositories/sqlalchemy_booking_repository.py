@@ -53,6 +53,10 @@ class SQLAlchemyBookingRepository(BookingRepositoryPort):
             qr_code=model.qr_code,
             qr_generated_at=model.qr_generated_at,
             qr_is_valid=model.qr_is_valid if model.qr_is_valid is not None else True,
+            checked_in_at=model.checked_in_at,
+            checkin_staff_id=model.checkin_staff_id,
+            checkin_device=model.checkin_device,
+            checkin_ip=model.checkin_ip,
             created_at=model.created_at,
             updated_at=model.updated_at,
         )
@@ -209,6 +213,10 @@ class SQLAlchemyBookingRepository(BookingRepositoryPort):
         model.qr_code = booking.qr_code
         model.qr_generated_at = booking.qr_generated_at
         model.qr_is_valid = booking.qr_is_valid
+        model.checked_in_at = booking.checked_in_at
+        model.checkin_staff_id = booking.checkin_staff_id
+        model.checkin_device = booking.checkin_device
+        model.checkin_ip = booking.checkin_ip
 
         if booking.traveler_name:
             encrypted = await self._encrypt_sensitive(booking)

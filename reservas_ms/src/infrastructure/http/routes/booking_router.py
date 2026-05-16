@@ -1,12 +1,13 @@
 from datetime import datetime
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.application.dtos.booking_dto import (
     ApproveBookingDTO,
     CancelBookingDTO,
+    CheckInBookingDTO,
     CreateBookingDTO,
     RejectBookingDTO,
     UpdateBookingDTO,
@@ -14,6 +15,7 @@ from src.application.dtos.booking_dto import (
 from src.application.dtos.availability_dto import AvailabilityQueryDTO
 from src.application.use_cases.approve_booking import ApproveBookingUseCase
 from src.application.use_cases.cancel_booking import CancelBookingUseCase
+from src.application.use_cases.checkin_booking import CheckInBookingUseCase
 from src.application.use_cases.check_availability import CheckAvailabilityUseCase
 from src.application.use_cases.create_booking import CreateBookingUseCase
 from src.application.use_cases.list_bookings import ListBookingsUseCase
@@ -35,6 +37,7 @@ from src.infrastructure.http.middleware.auth_dependency import (
 from src.infrastructure.http.schemas.booking_schema import (
     AvailabilityResponse,
     BookingResponse,
+    CheckInRequest,
     CreateBookingRequest,
     ErrorResponse,
     RejectBookingRequest,
@@ -457,6 +460,77 @@ async def approve_booking(
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(exc))
     except ValueError as exc:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc))
+
+
+# ── POST /bookings/checkin ─────────────────────────────────────────────────────
+
+
+@router.post(
+    "/checkin",
+    response_model=BookingResponse,
+    summary="Process hotel check-in by scanning the booking QR code (hotel admin)",
+    responses={
+        400: {"model": ErrorResponse, "description": "Date mismatch or invalid QR"},
+        401: {"model": ErrorResponse},
+        403: {"model": ErrorResponse},
+        404: {"model": ErrorResponse},
+        409: {
+            "model": ErrorResponse,
+            "description": "Already checked-in or state conflict",
+        },
+    },
+)
+async def checkin_booking(
+    body: CheckInRequest,
+    request: Request,
+    user_role: tuple[UUID, str] = Depends(get_current_user_role),
+    db: AsyncSession = Depends(get_db),
+) -> BookingResponse:
+    """Scan the traveler's QR code to register check-in.
+
+    The hotel app decodes the QR (base64 PNG → QR reader → JSON payload) and
+    sends the extracted booking_code and booking_id to this endpoint.
+    """
+    user_id, role = user_role
+
+    if role != "hotel":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Solo el personal del hotel puede registrar el check-in",
+        )
+
+    client_ip = request.headers.get("X-Forwarded-For") or (
+        request.client.host if request.client else None
+    )
+
+    repo = _make_repo(db)
+    use_case = CheckInBookingUseCase(
+        repo,
+        notificaciones_client=_notificaciones_client,
+        users_client=_users_client,
+    )
+    try:
+        dto = CheckInBookingDTO(
+            booking_code=body.booking_code,
+            booking_id=body.booking_id,
+            staff_id=str(user_id),
+            device=body.device,
+            ip=client_ip,
+        )
+        result = await use_case.execute(dto)
+        return BookingResponse(**result.model_dump())
+    except LookupError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc))
+    except ValueError as exc:
+        detail = str(exc)
+        # Date-related errors → 400 (not a state conflict, just wrong timing)
+        if (
+            "fecha" in detail.lower()
+            or "expirado" in detail.lower()
+            or "disponible" in detail.lower()
+        ):
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=detail)
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=detail)
 
 
 # ── PATCH /bookings/{booking_id}/reject ───────────────────────────────────────

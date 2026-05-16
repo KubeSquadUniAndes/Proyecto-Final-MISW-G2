@@ -79,6 +79,8 @@ class BookingResponse(BaseModel):
     qr_code: str | None = None
     qr_generated_at: datetime | None = None
     qr_is_valid: bool = True
+    checked_in_at: datetime | None = None
+    checkin_staff_id: str | None = None
     cancellable: bool
     created_at: datetime
     updated_at: datetime
@@ -93,6 +95,12 @@ class ErrorResponse(BaseModel):
 
 class RejectBookingRequest(BaseModel):
     rejection_reason: str
+
+
+class CheckInRequest(BaseModel):
+    booking_code: str
+    booking_id: UUID
+    device: str | None = None
 
 
 class AvailabilityResponse(BaseModel):
