@@ -1,0 +1,1343 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TravelHub — Documentación Técnica</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0A0E1A;
+    --surface: #111828;
+    --surface2: #1A2236;
+    --border: #1F2D45;
+    --accent: #00D4FF;
+    --accent2: #7B61FF;
+    --accent3: #00FF9D;
+    --warn: #FF6B35;
+    --text: #E2E8F0;
+    --text-dim: #8899AA;
+    --text-faint: #445566;
+    --mono: 'IBM Plex Mono', monospace;
+    --display: 'Syne', sans-serif;
+    --body: 'Inter', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    position: fixed;
+    top: 0; left: 0;
+    width: 240px;
+    height: 100vh;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sidebar-logo {
+    padding: 28px 24px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .sidebar-logo .wordmark {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: 20px;
+    color: var(--accent);
+    letter-spacing: -0.5px;
+  }
+
+  .sidebar-logo .sub {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    margin-top: 2px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .nav-section {
+    padding: 20px 16px 8px;
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+  }
+
+  .nav-item {
+    display: block;
+    padding: 8px 20px;
+    font-size: 13px;
+    color: var(--text-dim);
+    text-decoration: none;
+    border-left: 2px solid transparent;
+    transition: all 0.15s;
+    font-family: var(--body);
+  }
+
+  .nav-item:hover, .nav-item.active {
+    color: var(--accent);
+    border-left-color: var(--accent);
+    background: rgba(0,212,255,0.05);
+  }
+
+  .nav-item .icon { margin-right: 8px; font-size: 12px; }
+
+  /* ── MAIN ── */
+  .main {
+    margin-left: 240px;
+    min-height: 100vh;
+  }
+
+  /* HERO */
+  .hero {
+    background: linear-gradient(135deg, #0A0E1A 0%, #0D1529 50%, #0A1220 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 80px 60px 60px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -120px; right: -80px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(0,212,255,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -60px; left: 200px;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(123,97,255,0.05) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .hero-tag::before {
+    content: '';
+    display: inline-block;
+    width: 24px; height: 1px;
+    background: var(--accent);
+  }
+
+  .hero-title {
+    font-family: var(--display);
+    font-size: 56px;
+    font-weight: 800;
+    line-height: 1.0;
+    letter-spacing: -2px;
+    margin-bottom: 8px;
+  }
+
+  .hero-title .highlight { color: var(--accent); }
+
+  .hero-subtitle {
+    font-size: 16px;
+    color: var(--text-dim);
+    max-width: 560px;
+    margin: 20px 0 36px;
+    line-height: 1.6;
+  }
+
+  .tech-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .pill {
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 5px 12px;
+    border-radius: 3px;
+    border: 1px solid;
+    letter-spacing: 0.03em;
+  }
+
+  .pill-blue { border-color: rgba(0,212,255,0.4); color: var(--accent); background: rgba(0,212,255,0.06); }
+  .pill-purple { border-color: rgba(123,97,255,0.4); color: var(--accent2); background: rgba(123,97,255,0.06); }
+  .pill-green { border-color: rgba(0,255,157,0.4); color: var(--accent3); background: rgba(0,255,157,0.06); }
+  .pill-orange { border-color: rgba(255,107,53,0.4); color: var(--warn); background: rgba(255,107,53,0.06); }
+
+  /* ── CONTENT ── */
+  .content {
+    padding: 0 60px 80px;
+  }
+
+  section {
+    padding-top: 72px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 32px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-number {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-faint);
+    min-width: 32px;
+  }
+
+  .section-title {
+    font-family: var(--display);
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.5px;
+  }
+
+  .section-title .accent { color: var(--accent); }
+
+  /* CARDS */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+
+  .card-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .card p { color: var(--text-dim); font-size: 14px; line-height: 1.7; }
+  .card p + p { margin-top: 10px; }
+
+  /* GRID */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+
+  /* ARCH LAYERS */
+  .arch-layer {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+
+  .arch-layer-header {
+    background: var(--surface2);
+    padding: 12px 20px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .arch-layer-body {
+    padding: 16px 20px;
+    background: var(--surface);
+  }
+
+  .arch-layer-body ul {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .arch-layer-body li {
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 4px 10px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--text-dim);
+  }
+
+  /* DOMAIN MODEL TABLE */
+  .domain-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .domain-table th {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    padding: 10px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+  }
+
+  .domain-table td {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-dim);
+    vertical-align: top;
+  }
+
+  .domain-table tr:last-child td { border-bottom: none; }
+  .domain-table tr:hover td { background: rgba(0,212,255,0.02); }
+
+  .entity-name {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .attr-list {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-faint);
+    line-height: 1.9;
+  }
+
+  /* PIPELINE */
+  .pipeline {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    margin: 20px 0;
+    overflow-x: auto;
+  }
+
+  .pipeline-step {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-right: none;
+    padding: 16px 14px;
+    position: relative;
+    min-width: 120px;
+  }
+
+  .pipeline-step:last-child { border-right: 1px solid var(--border); border-radius: 0 6px 6px 0; }
+  .pipeline-step:first-child { border-radius: 6px 0 0 6px; }
+
+  .pipeline-step::after {
+    content: '→';
+    position: absolute;
+    right: -14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-faint);
+    font-size: 16px;
+    z-index: 1;
+    background: var(--bg);
+    padding: 0 2px;
+  }
+
+  .pipeline-step:last-child::after { display: none; }
+
+  .ps-tag {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .ps-title {
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+
+  .ps-items {
+    list-style: none;
+    font-size: 11px;
+    color: var(--text-faint);
+    line-height: 1.8;
+  }
+
+  /* SERVICE CARDS */
+  .service-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 4px;
+  }
+
+  .service-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px 18px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .service-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 100%;
+  }
+
+  .sc-blue::before { background: var(--accent); }
+  .sc-purple::before { background: var(--accent2); }
+  .sc-green::before { background: var(--accent3); }
+  .sc-orange::before { background: var(--warn); }
+
+  .sc-name {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 15px;
+    margin-bottom: 4px;
+  }
+
+  .sc-tech {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-faint);
+    margin-bottom: 10px;
+    letter-spacing: 0.05em;
+  }
+
+  .sc-desc {
+    font-size: 12px;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+
+  /* INFRA TABLE */
+  .infra-row {
+    display: grid;
+    grid-template-columns: 180px 1fr 160px;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    gap: 16px;
+  }
+
+  .infra-row:last-child { border-bottom: none; }
+  .infra-row:hover { background: rgba(0,212,255,0.02); }
+
+  .infra-component {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--accent);
+  }
+
+  .infra-desc { font-size: 13px; color: var(--text-dim); }
+
+  .infra-tech {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-faint);
+    text-align: right;
+  }
+
+  /* BRANCH DIAGRAM */
+  .branch-flow {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 28px 32px;
+    font-family: var(--mono);
+    font-size: 12px;
+    overflow-x: auto;
+  }
+
+  .branch-line {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-bottom: 6px;
+    color: var(--text-dim);
+  }
+
+  .branch-name {
+    min-width: 120px;
+    font-weight: 600;
+  }
+
+  .branch-main { color: #FF6B35; }
+  .branch-develop { color: #7B61FF; }
+  .branch-feature { color: #00D4FF; }
+
+  .branch-track {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+  }
+
+  .bnode {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .bline { height: 2px; flex: 1; }
+
+  /* CALLOUT */
+  .callout {
+    border-left: 3px solid var(--accent);
+    background: rgba(0,212,255,0.04);
+    border-radius: 0 4px 4px 0;
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+
+  .callout strong { color: var(--accent); font-weight: 600; }
+
+  .callout-warn {
+    border-left-color: var(--warn);
+    background: rgba(255,107,53,0.04);
+  }
+
+  .callout-warn strong { color: var(--warn); }
+
+  .callout-green {
+    border-left-color: var(--accent3);
+    background: rgba(0,255,157,0.04);
+  }
+
+  .callout-green strong { color: var(--accent3); }
+
+  /* STATUS BADGE */
+  .badge {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    padding: 2px 8px;
+    border-radius: 2px;
+    vertical-align: middle;
+  }
+
+  .badge-green { background: rgba(0,255,157,0.12); color: var(--accent3); border: 1px solid rgba(0,255,157,0.25); }
+  .badge-blue { background: rgba(0,212,255,0.12); color: var(--accent); border: 1px solid rgba(0,212,255,0.25); }
+
+  /* TESTING TABLE */
+  .test-row {
+    display: grid;
+    grid-template-columns: 140px 120px 1fr;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    gap: 16px;
+    align-items: center;
+  }
+
+  .test-row:last-child { border-bottom: none; }
+
+  .test-layer { font-weight: 500; font-size: 14px; }
+  .test-tool { font-family: var(--mono); font-size: 12px; color: var(--accent2); }
+  .test-desc { font-size: 13px; color: var(--text-dim); }
+
+  /* DATA SCHEMA */
+  .schema-block {
+    background: #0D1220;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 20px 24px;
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1.9;
+    color: var(--text-dim);
+  }
+
+  .schema-entity { color: var(--accent); font-weight: 600; }
+  .schema-field { color: #A8C4D8; }
+  .schema-type { color: var(--text-faint); }
+  .schema-pk { color: var(--accent3); }
+  .schema-fk { color: var(--warn); }
+
+  /* FOOTER */
+  .footer {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 24px 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-faint);
+  }
+
+  h3 {
+    font-family: var(--display);
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text);
+    margin: 24px 0 12px;
+  }
+
+  h3:first-child { margin-top: 0; }
+
+  p { color: var(--text-dim); font-size: 14px; line-height: 1.7; margin-bottom: 10px; }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="wordmark">TravelHub</div>
+    <div class="sub">Documentación Técnica</div>
+  </div>
+
+  <div class="nav-section">Arquitectura</div>
+  <a class="nav-item" href="#overview"><span class="icon">◈</span>Visión General</a>
+  <a class="nav-item" href="#dominio"><span class="icon">◈</span>Modelo de Dominio</a>
+  <a class="nav-item" href="#componentes"><span class="icon">◈</span>Componentes</a>
+  <a class="nav-item" href="#despliegue"><span class="icon">◈</span>Despliegue</a>
+  <a class="nav-item" href="#concurrencia"><span class="icon">◈</span>Concurrencia</a>
+  <a class="nav-item" href="#informacion"><span class="icon">◈</span>Información</a>
+
+  <div class="nav-section">Ingeniería</div>
+  <a class="nav-item" href="#cicd"><span class="icon">◈</span>CI / CD</a>
+  <a class="nav-item" href="#gitflow"><span class="icon">◈</span>GitFlow</a>
+  <a class="nav-item" href="#testing"><span class="icon">◈</span>Pruebas</a>
+  <a class="nav-item" href="#infraestructura"><span class="icon">◈</span>Infraestructura</a>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-tag">Sprint 3 · Documentación Técnica</div>
+    <h1 class="hero-title">Travel<span class="highlight">Hub</span></h1>
+    <p class="hero-subtitle">Plataforma de reservas y hospedajes con arquitectura de microservicios desplegada en AWS EKS, aplicaciones móvil Android y web Angular.</p>
+    <div class="tech-pills">
+      <span class="pill pill-blue">Python · FastAPI</span>
+      <span class="pill pill-blue">AWS EKS · K8s</span>
+      <span class="pill pill-purple">Android · Kotlin</span>
+      <span class="pill pill-purple">Angular · CloudFront</span>
+      <span class="pill pill-green">PostgreSQL · Redis</span>
+      <span class="pill pill-green">RabbitMQ / SQS</span>
+      <span class="pill pill-orange">GitHub Actions CI/CD</span>
+      <span class="pill pill-orange">Docker · Alembic</span>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ══ 1. VISIÓN GENERAL ══ -->
+    <section id="overview">
+      <div class="section-header">
+        <span class="section-number">01</span>
+        <h2 class="section-title">Visión <span class="accent">General</span></h2>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Contexto del sistema</div>
+          <p>TravelHub es una plataforma que conecta viajeros y hoteles para la gestión de reservas y hospedajes. Está compuesta por una aplicación móvil Android, un frontend web y un backend de microservicios.</p>
+          <p>Los actores principales son el <strong style="color:var(--text)">Usuario Viajero</strong> (accede vía app móvil o web) y el <strong style="color:var(--text)">Usuario Hotel / Administrador</strong> (gestiona tarifas, habitaciones y políticas).</p>
+        </div>
+        <div class="card">
+          <div class="card-title">Decisiones arquitectónicas clave</div>
+          <p>• Microservicios desplegados en <strong style="color:var(--accent)">AWS EKS</strong> con escalado por pods (k8sPod).</p>
+          <p>• Separación de lectura y escritura: escritura transaccional en PostgreSQL, lectura rápida a través de <strong style="color:var(--accent)">Redis Cache</strong>.</p>
+          <p>• Comunicación asíncrona vía <strong style="color:var(--accent)">Message Broker</strong> (RabbitMQ / AWS SQS) para eventos entre servicios.</p>
+          <p>• Cifrado de datos sensibles con extensión <strong style="color:var(--accent)">pgcrypto AES-256</strong> en PostgreSQL.</p>
+        </div>
+      </div>
+
+      <div class="callout">
+        <strong>Meta de disponibilidad:</strong> RPO ≤ 5 min · RTO ≤ 15 min — garantizados mediante réplica PostgreSQL Multi-AZ y colas de eventos durables.
+      </div>
+
+      <div style="margin-top:20px;">
+        <div class="arch-layer">
+          <div class="arch-layer-header" style="color:var(--accent2)">🖥️ &nbsp;Presentación</div>
+          <div class="arch-layer-body">
+            <ul>
+              <li>APP Móvil · Kotlin/Android</li>
+              <li>Web FE · Angular · CloudFront</li>
+            </ul>
+          </div>
+        </div>
+        <div class="arch-layer">
+          <div class="arch-layer-header" style="color:var(--accent)">⚡ &nbsp;API Gateway / Intermediación</div>
+          <div class="arch-layer-body">
+            <ul>
+              <li>ApiGateway (k8sPod)</li>
+              <li>LoginHandler · Token Validator</li>
+              <li>ProveedoresPagos · GateWay</li>
+            </ul>
+          </div>
+        </div>
+        <div class="arch-layer">
+          <div class="arch-layer-header" style="color:var(--accent3)">🔧 &nbsp;Microservicios de negocio</div>
+          <div class="arch-layer-body">
+            <ul>
+              <li>Reservas (1..3)</li>
+              <li>Hospedajes (1..3)</li>
+              <li>Pagos (1..2)</li>
+              <li>Usuarios (1)</li>
+              <li>Busqueda (Lambda)</li>
+              <li>Notificaciones (Lambda)</li>
+              <li>Monitor</li>
+              <li>DetectorAnomalias</li>
+              <li>TimeoutDetector</li>
+            </ul>
+          </div>
+        </div>
+        <div class="arch-layer">
+          <div class="arch-layer-header" style="color:var(--warn)">🗄️ &nbsp;Persistencia</div>
+          <div class="arch-layer-body">
+            <ul>
+              <li>PostgreSQL · TravelHubDB (Primary + Replica)</li>
+              <li>Redis · SessionCache / DisponibilidadPrecios</li>
+              <li>AWS SQS · TravelHubTopics</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ 2. DOMINIO ══ -->
+    <section id="dominio">
+      <div class="section-header">
+        <span class="section-number">02</span>
+        <h2 class="section-title">Modelo de <span class="accent">Dominio</span></h2>
+      </div>
+
+      <p>Entidades principales identificadas en el modelo de dominio del sistema TravelHub:</p>
+
+      <div class="card" style="padding:0; overflow:hidden; margin-top:16px;">
+        <table class="domain-table">
+          <thead>
+            <tr>
+              <th>Entidad</th>
+              <th>Atributos</th>
+              <th>Relaciones / Enums</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="entity-name">UsuarioViajero</span></td>
+              <td class="attr-list">id: Integer<br>nit: Integer<br>nombre: String</td>
+              <td class="attr-list">→ Reserva (1..N)</td>
+            </tr>
+            <tr>
+              <td><span class="entity-name">Reserva</span></td>
+              <td class="attr-list">id: Integer<br>fechaInicio: Datetime<br>fechaFin: Datetime<br>valor: Float<br>estado: ESTADORESERVA</td>
+              <td class="attr-list">ESTADORESERVA:<br>CONFIRMADA · PRE-APROBADA<br>CANCELADA · CADUCADA<br>PENDIENTE-PAGO · FINALIZADA</td>
+            </tr>
+            <tr>
+              <td><span class="entity-name">Habitación</span></td>
+              <td class="attr-list">id: Integer<br>numero: Integer<br>tipo: TIPOHABITACION</td>
+              <td class="attr-list">TIPOHABITACION:<br>INDIVIDUAL · DOBLE · SUIT</td>
+            </tr>
+            <tr>
+              <td><span class="entity-name">Hotel</span></td>
+              <td class="attr-list">id: Integer<br>codigo: String<br>nombre: String</td>
+              <td class="attr-list">→ Habitación (1..N)<br>→ Política (N..N)</td>
+            </tr>
+            <tr>
+              <td><span class="entity-name">Tarifa</span></td>
+              <td class="attr-list">id: Integer<br>fecha: Datetime<br>tipo: TIPOTARIFA</td>
+              <td class="attr-list">TIPOTARIFA:<br>ESTANDAR · PROMOCION</td>
+            </tr>
+            <tr>
+              <td><span class="entity-name">Pagos</span></td>
+              <td class="attr-list">id: Integer<br>fecha: Datetime<br>valor: Float<br>metodo: METODOPAGO</td>
+              <td class="attr-list">METODOPAGO:<br>TARJETA · TRANSFERENCIA<br>EFECTIVO</td>
+            </tr>
+            <tr>
+              <td><span class="entity-name">Agencia</span></td>
+              <td class="attr-list">id: Integer<br>codigo: String<br>nombre: String</td>
+              <td class="attr-list">—</td>
+            </tr>
+            <tr>
+              <td><span class="entity-name">Política</span></td>
+              <td class="attr-list">id: Integer<br>nombre: String<br>descripción: String</td>
+              <td class="attr-list">→ Hotel</td>
+            </tr>
+            <tr>
+              <td><span class="entity-name">Administrador</span></td>
+              <td class="attr-list">id: Integer<br>usuario: String<br>nombre: String</td>
+              <td class="attr-list">Gestiona tarifas y habitaciones</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ══ 3. COMPONENTES ══ -->
+    <section id="componentes">
+      <div class="section-header">
+        <span class="section-number">03</span>
+        <h2 class="section-title">Diagrama de <span class="accent">Componentes</span></h2>
+      </div>
+
+      <h3>Frontend</h3>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Presentación Móvil</div>
+          <p>Arquitectura MVC en Android. La <strong style="color:var(--text)">Vista</strong> delega acciones al <strong style="color:var(--text)">Controlador</strong> que consume los servicios REST del ApiGateway. Desarrollada en <span class="badge badge-blue">Kotlin</span>.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">Presentación Web</div>
+          <p>SPA en <span class="badge badge-blue">Angular</span> con arquitectura de componentes. El FrontHub se despliega en <strong style="color:var(--accent)">AWS CloudFront</strong> como CDN. Vista → Controlador → HTTP al ApiGateway.</p>
+        </div>
+      </div>
+
+      <h3>Servicios de negocio</h3>
+      <div class="service-grid">
+        <div class="service-card sc-blue">
+          <div class="sc-name">Reservas</div>
+          <div class="sc-tech">k8sPod · count 1..3 · FastAPI</div>
+          <div class="sc-desc">Gestión del ciclo de vida completo de reservas: creación, validación de disponibilidad, cambio de estado y finalización.</div>
+        </div>
+        <div class="service-card sc-blue">
+          <div class="sc-name">Hospedajes</div>
+          <div class="sc-tech">k8sPod · count 1..3 · FastAPI</div>
+          <div class="sc-desc">Administración de hoteles, habitaciones, tarifas y políticas. Expone endpoints para gestión por parte del rol administrador/hotel.</div>
+        </div>
+        <div class="service-card sc-orange">
+          <div class="sc-name">Pagos</div>
+          <div class="sc-tech">k8sPod · count 1..2 · FastAPI</div>
+          <div class="sc-desc">Integración con proveedores de pago externos a través del GateWay intermediario. Maneja estados de transacción y registro de pagos.</div>
+        </div>
+        <div class="service-card sc-purple">
+          <div class="sc-name">Usuarios</div>
+          <div class="sc-tech">k8sPod · count 1 · FastAPI</div>
+          <div class="sc-desc">Registro, autenticación y perfil de usuarios. Trabaja en conjunto con LoginHandler para validación de tokens.</div>
+        </div>
+        <div class="service-card sc-green">
+          <div class="sc-name">Búsqueda</div>
+          <div class="sc-tech">AWS Lambda · count 0..3</div>
+          <div class="sc-desc">Motor de búsqueda de disponibilidad. Lee de Redis Cache para respuestas en &lt;200ms. Se actualiza vía eventos asíncronos RoomAvailabilityChanged.</div>
+        </div>
+        <div class="service-card sc-green">
+          <div class="sc-name">Notificaciones</div>
+          <div class="sc-tech">AWS Lambda · count 0..3</div>
+          <div class="sc-desc">Envío de notificaciones push a dispositivos móviles. Suscrito a eventos del Message Broker para notificar cambios de estado de reservas.</div>
+        </div>
+      </div>
+
+      <h3 style="margin-top:28px;">Componentes transversales</h3>
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-title">LoginHandler</div>
+          <p>Validación de tokens JWT. Intermediario entre el ApiGateway y los servicios internos. Conecta con Redis SessionCache vía TCP/IP.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">Monitor</div>
+          <p>Supervisión del estado de los pods del cluster K8s. Coordina con TimeoutDetector y DetectorAnomalias para alertas proactivas.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">DetectorAnomalias</div>
+          <p>Análisis de patrones anómalos en el cluster. Componente k8sPod que interactúa con el Monitor y publica eventos al Message Broker.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ 4. DESPLIEGUE ══ -->
+    <section id="despliegue">
+      <div class="section-header">
+        <span class="section-number">04</span>
+        <h2 class="section-title">Diagrama de <span class="accent">Despliegue</span></h2>
+      </div>
+
+      <div class="callout">
+        <strong>Proveedor cloud:</strong> AWS · Región única con opción Multi-AZ. Infraestructura definida como código con <strong>Terraform</strong>.
+      </div>
+
+      <h3>Topología de red</h3>
+      <div class="card" style="padding:0; overflow:hidden;">
+        <div class="infra-row" style="background:var(--surface2); font-family:var(--mono); font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:var(--text-faint);">
+          <div>Componente</div><div>Descripción</div><div style="text-align:right;">Tecnología</div>
+        </div>
+        <div class="infra-row">
+          <div class="infra-component">Load Balancer</div>
+          <div class="infra-desc">Balanceador externo dentro del Security Group. Distribuye tráfico entrante hacia el K8S Ingress.</div>
+          <div class="infra-tech">AWS ALB</div>
+        </div>
+        <div class="infra-row">
+          <div class="infra-component">Cluster K8S</div>
+          <div class="infra-desc">Cluster principal gestionado por Terraform. Contiene subredes pública y privada.</div>
+          <div class="infra-tech">AWS EKS</div>
+        </div>
+        <div class="infra-row">
+          <div class="infra-component">Public Subnet</div>
+          <div class="infra-desc">Expone los servicios Lambda de Búsqueda y Notificaciones. Acceso controlado por Security Group.</div>
+          <div class="infra-tech">AWS Lambda</div>
+        </div>
+        <div class="infra-row">
+          <div class="infra-component">EC2 Instance</div>
+          <div class="infra-desc">Contiene el Web FE, ApiGateway y el servicio de Hospedajes. Punto de entrada para tráfico HTTP interno.</div>
+          <div class="infra-tech">EC2 · K8sPods</div>
+        </div>
+        <div class="infra-row">
+          <div class="infra-component">Private Subnet</div>
+          <div class="infra-desc">Servicios internos: Reservas, Pagos, LoginHandler, Usuarios, Monitor. Acceden a la BD por TCP/IP.</div>
+          <div class="infra-tech">K8sPods</div>
+        </div>
+        <div class="infra-row">
+          <div class="infra-component">TravelHubDB</div>
+          <div class="infra-desc">Base de datos principal PostgreSQL con extensión pgcrypto AES-256. Réplica para alta disponibilidad.</div>
+          <div class="infra-tech">AWS RDS · pgcrypto</div>
+        </div>
+        <div class="infra-row">
+          <div class="infra-component">TravelHubTopics</div>
+          <div class="infra-desc">Cola de mensajes para comunicación asíncrona entre servicios. Eventos durables con retención configurable.</div>
+          <div class="infra-tech">AWS SQS</div>
+        </div>
+        <div class="infra-row">
+          <div class="infra-component">SessionCache / Redis</div>
+          <div class="infra-desc">Caché de sesiones y disponibilidad/precios en tiempo real. Accedido por LoginHandler y Búsqueda.</div>
+          <div class="infra-tech">AWS ElastiCache</div>
+        </div>
+        <div class="infra-row">
+          <div class="infra-component">APP Móvil</div>
+          <div class="infra-desc">Aplicación Android publicada en Google Play Store. Se comunica con el ApiGateway vía HTTP.</div>
+          <div class="infra-tech">Android Store · Kotlin</div>
+        </div>
+        <div class="infra-row">
+          <div class="infra-component">AWS ECR</div>
+          <div class="infra-desc">Registro de imágenes Docker. El pipeline CD construye y publica las imágenes para el rollout en EKS.</div>
+          <div class="infra-tech">AWS ECR</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ 5. CONCURRENCIA ══ -->
+    <section id="concurrencia">
+      <div class="section-header">
+        <span class="section-number">05</span>
+        <h2 class="section-title">Diagrama de <span class="accent">Concurrencia</span></h2>
+      </div>
+
+      <p>El sistema gestiona la concurrencia a través de tres mecanismos principales: escalado horizontal de pods, separación lectura/escritura, y mensajería asíncrona.</p>
+
+      <div class="grid-2" style="margin-top:16px;">
+        <div class="card">
+          <div class="card-title">Flujo de escritura (transaccional)</div>
+          <p>Las operaciones de escritura pasan por el <strong style="color:var(--accent)">ApiGateway → Reservas/Hospedajes/Pagos → PostgreSQL</strong>. Cada transacción es atómica y escribe con <code style="font-family:var(--mono); font-size:12px; color:var(--accent3)">write(transaction)</code>.</p>
+          <p>Al completarse, se publica el evento <code style="font-family:var(--mono); font-size:12px; color:var(--accent3)">RoomAvailabilityChanged</code> al Message Broker de forma asíncrona.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">Flujo de lectura (rápida)</div>
+          <p>Las búsquedas de disponibilidad consultan directamente <strong style="color:var(--accent)">Redis Cache</strong> con la clave <code style="font-family:var(--mono); font-size:11px; color:var(--accent3)">availability:{hotelId}:{date}</code>.</p>
+          <p>El servicio Búsqueda (Lambda) realiza <code style="font-family:var(--mono); font-size:12px; color:var(--accent3)">upd/read (hot path)</code> para respuestas &lt;200ms, actualizando el caché al recibir eventos del broker.</p>
+        </div>
+      </div>
+
+      <h3>Escalado de pods</h3>
+      <div class="card">
+        <div class="card-title">Configuración de réplicas por servicio</div>
+        <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-top:8px;">
+          <div style="text-align:center; padding:12px; background:var(--surface2); border-radius:4px;">
+            <div style="font-family:var(--mono); font-size:11px; color:var(--text-faint)">Reservas</div>
+            <div style="font-size:22px; font-weight:700; color:var(--accent); font-family:var(--display)">1..3</div>
+          </div>
+          <div style="text-align:center; padding:12px; background:var(--surface2); border-radius:4px;">
+            <div style="font-family:var(--mono); font-size:11px; color:var(--text-faint)">Hospedajes</div>
+            <div style="font-size:22px; font-weight:700; color:var(--accent); font-family:var(--display)">1..3</div>
+          </div>
+          <div style="text-align:center; padding:12px; background:var(--surface2); border-radius:4px;">
+            <div style="font-family:var(--mono); font-size:11px; color:var(--text-faint)">LoginHandler</div>
+            <div style="font-size:22px; font-weight:700; color:var(--accent2); font-family:var(--display)">1..2</div>
+          </div>
+          <div style="text-align:center; padding:12px; background:var(--surface2); border-radius:4px;">
+            <div style="font-family:var(--mono); font-size:11px; color:var(--text-faint)">Pagos</div>
+            <div style="font-size:22px; font-weight:700; color:var(--warn); font-family:var(--display)">1..2</div>
+          </div>
+        </div>
+        <div style="margin-top:12px; display:grid; grid-template-columns:repeat(3,1fr); gap:12px;">
+          <div style="text-align:center; padding:12px; background:var(--surface2); border-radius:4px;">
+            <div style="font-family:var(--mono); font-size:11px; color:var(--text-faint)">Búsqueda (Lambda)</div>
+            <div style="font-size:22px; font-weight:700; color:var(--accent3); font-family:var(--display)">0..3</div>
+          </div>
+          <div style="text-align:center; padding:12px; background:var(--surface2); border-radius:4px;">
+            <div style="font-family:var(--mono); font-size:11px; color:var(--text-faint)">Notificaciones (Lambda)</div>
+            <div style="font-size:22px; font-weight:700; color:var(--accent3); font-family:var(--display)">0..3</div>
+          </div>
+          <div style="text-align:center; padding:12px; background:var(--surface2); border-radius:4px;">
+            <div style="font-family:var(--mono); font-size:11px; color:var(--text-faint)">Usuarios</div>
+            <div style="font-size:22px; font-weight:700; color:var(--text-dim); font-family:var(--display)">1</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout callout-green" style="margin-top:16px;">
+        <strong>Pub/Sub:</strong> El eventHandler suscrito al Queue TravelHubTopics distribuye eventos <code style="font-family:var(--mono); font-size:11px;">RoomAvailabilityChanged</code> hacia Búsqueda y Notificaciones en paralelo. Las Lambdas escalan a 0 cuando no hay demanda.
+      </div>
+    </section>
+
+    <!-- ══ 6. INFORMACIÓN ══ -->
+    <section id="informacion">
+      <div class="section-header">
+        <span class="section-number">06</span>
+        <h2 class="section-title">Diagrama de <span class="accent">Información</span></h2>
+      </div>
+
+      <p>Esquema de datos principal y estructuras de eventos para el sistema TravelHub.</p>
+
+      <div class="grid-2" style="margin-top:16px;">
+        <div class="schema-block">
+          <div><span class="schema-entity">Usuario</span></div>
+          <div><span class="schema-pk">userId</span><span class="schema-type">: UUID (PK)</span></div>
+          <div><span class="schema-field">name</span><span class="schema-type">: String</span></div>
+          <div><span class="schema-field">email</span><span class="schema-type">: String</span></div>
+          <div><span class="schema-field">status</span><span class="schema-type">: Enum</span></div>
+          <div><span class="schema-field">createdAt</span><span class="schema-type">: Timestamp</span></div>
+          <br>
+          <div><span class="schema-entity">Hotel</span></div>
+          <div><span class="schema-pk">hotelId</span><span class="schema-type">: UUID (PK)</span></div>
+          <div><span class="schema-field">name, city, address</span><span class="schema-type">: String</span></div>
+          <div><span class="schema-field">status</span><span class="schema-type">: Enum</span></div>
+          <div><span class="schema-field">updatedAt</span><span class="schema-type">: Timestamp</span></div>
+          <br>
+          <div><span class="schema-entity">Hospedaje</span></div>
+          <div><span class="schema-pk">stayId</span><span class="schema-type">: UUID (PK)</span></div>
+          <div><span class="schema-fk">hotelId</span><span class="schema-type">: UUID (FK)</span></div>
+          <div><span class="schema-field">type, capacity</span><span class="schema-type">: String/Int</span></div>
+          <div><span class="schema-field">active</span><span class="schema-type">: Bool</span></div>
+        </div>
+        <div class="schema-block">
+          <div><span class="schema-entity">Reserva</span></div>
+          <div><span class="schema-pk">bookingId</span><span class="schema-type">: UUID (PK)</span></div>
+          <div><span class="schema-fk">userId, stayId</span><span class="schema-type">: UUID (FK)</span></div>
+          <div><span class="schema-field">checkIn, checkOut</span><span class="schema-type">: Date</span></div>
+          <div><span class="schema-field">status</span><span class="schema-type">: Enum</span></div>
+          <div><span class="schema-field">totalAmount</span><span class="schema-type">: Money</span></div>
+          <br>
+          <div><span class="schema-entity">Pago</span></div>
+          <div><span class="schema-pk">paymentId</span><span class="schema-type">: UUID (PK)</span></div>
+          <div><span class="schema-fk">bookingId, userId</span><span class="schema-type">: UUID (FK)</span></div>
+          <div><span class="schema-field">amount</span><span class="schema-type">: Money</span></div>
+          <div><span class="schema-field">provider, status</span><span class="schema-type">: String/Enum</span></div>
+          <br>
+          <div><span class="schema-entity">Disponibilidad</span></div>
+          <div><span class="schema-pk">stayId</span><span class="schema-type">: UUID (PK)</span></div>
+          <div><span class="schema-field">date</span><span class="schema-type">: Date</span></div>
+          <div><span class="schema-field">availableUnits, minPrice</span><span class="schema-type">: Int/Money</span></div>
+        </div>
+      </div>
+
+      <h3>Estructuras Pub/Sub + Redis</h3>
+      <div class="schema-block" style="margin-top:4px;">
+        <div style="color:var(--text-dim); margin-bottom:8px;">// Evento publicado al Message Broker</div>
+        <div><span class="schema-entity">RoomAvailabilityChanged</span> <span class="schema-type">{</span></div>
+        <div style="padding-left:20px;"><span class="schema-field">stayId, hotelId</span><span class="schema-type">: UUID</span></div>
+        <div style="padding-left:20px;"><span class="schema-field">dateRange</span><span class="schema-type">: DateRange</span></div>
+        <div style="padding-left:20px;"><span class="schema-field">availability, minPrice</span><span class="schema-type">: Int / Money</span></div>
+        <div style="padding-left:20px;"><span class="schema-field">updatedAt</span><span class="schema-type">: Timestamp</span></div>
+        <div style="padding-left:20px;"><span class="schema-field">version</span><span class="schema-type">: Int</span></div>
+        <div><span class="schema-type">}</span></div>
+        <br>
+        <div style="color:var(--text-dim); margin-bottom:8px;">// Clave Redis para caché de disponibilidad</div>
+        <div><span class="schema-field">availability:</span><span class="schema-pk">{hotelId}</span><span class="schema-field">:</span><span class="schema-pk">{date}</span> <span class="schema-type">→ { availableUnits, minPrice, lastUpdated }</span></div>
+      </div>
+    </section>
+
+    <!-- ══ 7. CI / CD ══ -->
+    <section id="cicd">
+      <div class="section-header">
+        <span class="section-number">07</span>
+        <h2 class="section-title">Pipeline <span class="accent">CI / CD</span></h2>
+      </div>
+
+      <p>Pipelines gestionados en <strong style="color:var(--text)">GitHub Actions</strong>. El CI se ejecuta en ramas feature y develop; el CD únicamente con push a <code style="font-family:var(--mono); font-size:12px; color:var(--warn)">main</code>.</p>
+
+      <h3>Integración Continua (CI)</h3>
+      <div class="pipeline">
+        <div class="pipeline-step">
+          <div class="ps-tag" style="color:var(--accent)">trigger</div>
+          <div class="ps-title">Push / PR</div>
+          <ul class="ps-items">
+            <li>feature/*</li>
+            <li>develop</li>
+          </ul>
+        </div>
+        <div class="pipeline-step">
+          <div class="ps-tag" style="color:var(--accent2)">quality</div>
+          <div class="ps-title">Calidad</div>
+          <ul class="ps-items">
+            <li>Lint</li>
+            <li>Code quality</li>
+            <li>Coverage</li>
+          </ul>
+        </div>
+        <div class="pipeline-step">
+          <div class="ps-tag" style="color:var(--accent2)">tests</div>
+          <div class="ps-title">Pruebas</div>
+          <ul class="ps-items">
+            <li>Unit tests</li>
+            <li>Newman (API)</li>
+          </ul>
+        </div>
+        <div class="pipeline-step">
+          <div class="ps-tag" style="color:var(--accent3)">result</div>
+          <div class="ps-title">Resultado</div>
+          <ul class="ps-items">
+            <li>✓ Pass → PR ready</li>
+            <li>✗ Fail → block</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>Despliegue Continuo (CD)</h3>
+      <div class="pipeline">
+        <div class="pipeline-step">
+          <div class="ps-tag" style="color:var(--warn)">trigger</div>
+          <div class="ps-title">Push main</div>
+          <ul class="ps-items">
+            <li>Solo main</li>
+          </ul>
+        </div>
+        <div class="pipeline-step">
+          <div class="ps-tag" style="color:var(--accent)">build</div>
+          <div class="ps-title">Docker Build</div>
+          <ul class="ps-items">
+            <li>Build image</li>
+            <li>Push → ECR</li>
+          </ul>
+        </div>
+        <div class="pipeline-step">
+          <div class="ps-tag" style="color:var(--accent)">migrate</div>
+          <div class="ps-title">Alembic</div>
+          <ul class="ps-items">
+            <li>DB migrations</li>
+            <li>Versionamiento</li>
+          </ul>
+        </div>
+        <div class="pipeline-step">
+          <div class="ps-tag" style="color:var(--accent2)">deploy</div>
+          <div class="ps-title">EKS Rollout</div>
+          <ul class="ps-items">
+            <li>kubectl rollout</li>
+            <li>Zero downtime</li>
+          </ul>
+        </div>
+        <div class="pipeline-step">
+          <div class="ps-tag" style="color:var(--accent3)">web</div>
+          <div class="ps-title">CloudFront</div>
+          <ul class="ps-items">
+            <li>Deploy Angular</li>
+            <li>Cache invalidate</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="callout callout-warn" style="margin-top:8px;">
+        <strong>Migraciones:</strong> Alembic gestiona el versionamiento del esquema PostgreSQL. Las migraciones se ejecutan como paso previo al rollout de pods, garantizando compatibilidad entre versión de código y esquema de BD.
+      </div>
+    </section>
+
+    <!-- ══ 8. GITFLOW ══ -->
+    <section id="gitflow">
+      <div class="section-header">
+        <span class="section-number">08</span>
+        <h2 class="section-title">Estrategia <span class="accent">GitFlow</span></h2>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <div class="branch-flow">
+            <div class="branch-line">
+              <span class="branch-name branch-main">main</span>
+              <div class="branch-track">
+                <div class="bnode" style="background:var(--warn)"></div>
+                <div class="bline" style="background:var(--warn)"></div>
+                <div class="bnode" style="background:var(--warn)"></div>
+                <div class="bline" style="background:var(--warn)"></div>
+                <div class="bnode" style="background:var(--warn)"></div>
+              </div>
+            </div>
+            <div style="color:var(--text-faint); font-size:11px; margin: 2px 0 8px 120px;">↑ PR + CI ↑ PR + CI</div>
+            <div class="branch-line">
+              <span class="branch-name branch-develop">develop</span>
+              <div class="branch-track">
+                <div class="bnode" style="background:var(--accent2)"></div>
+                <div class="bline" style="background:var(--accent2)"></div>
+                <div class="bnode" style="background:var(--accent2)"></div>
+                <div class="bline" style="background:var(--accent2)"></div>
+                <div class="bnode" style="background:var(--accent2)"></div>
+                <div class="bline" style="background:var(--accent2)"></div>
+                <div class="bnode" style="background:var(--accent2)"></div>
+              </div>
+            </div>
+            <div style="color:var(--text-faint); font-size:11px; margin: 2px 0 8px 120px;">↑ PR + CI &nbsp;&nbsp;&nbsp; ↑ PR + CI</div>
+            <div class="branch-line">
+              <span class="branch-name branch-feature">feature/A</span>
+              <div class="branch-track">
+                <div class="bnode" style="background:var(--accent)"></div>
+                <div class="bline" style="background:var(--accent)"></div>
+                <div class="bnode" style="background:var(--accent)"></div>
+                <div class="bline" style="background:var(--accent)"></div>
+                <div class="bnode" style="background:var(--accent)"></div>
+              </div>
+            </div>
+            <div style="margin-top:6px;" class="branch-line">
+              <span class="branch-name branch-feature" style="color:#00AACC">feature/B</span>
+              <div class="branch-track">
+                <div class="bnode" style="background:#00AACC"></div>
+                <div class="bline" style="background:#00AACC"></div>
+                <div class="bnode" style="background:#00AACC"></div>
+                <div class="bline" style="background:#00AACC"></div>
+                <div class="bnode" style="background:#00AACC"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="card">
+            <div class="card-title">Reglas de flujo</div>
+            <p>• Cada funcionalidad parte de una rama <code style="font-family:var(--mono); font-size:11px; color:var(--accent)">feature/nombre</code> desde develop.</p>
+            <p>• Al terminar, se abre un <strong style="color:var(--text)">Pull Request → develop</strong>. El CI debe pasar para hacer merge.</p>
+            <p>• Para release, se abre un <strong style="color:var(--text)">Pull Request develop → main</strong>. El CI valida nuevamente.</p>
+            <p>• El merge a main dispara automáticamente el pipeline <strong style="color:var(--warn)">CD</strong>.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ 9. TESTING ══ -->
+    <section id="testing">
+      <div class="section-header">
+        <span class="section-number">09</span>
+        <h2 class="section-title">Estrategia de <span class="accent">Pruebas</span></h2>
+      </div>
+
+      <div class="card" style="padding:0; overflow:hidden;">
+        <div class="test-row" style="background:var(--surface2); font-family:var(--mono); font-size:10px; color:var(--text-faint); letter-spacing:0.1em; text-transform:uppercase;">
+          <div>Capa</div><div>Herramienta</div><div>Alcance</div>
+        </div>
+        <div class="test-row">
+          <div class="test-layer">Unitarias <span class="badge badge-green">CI</span></div>
+          <div class="test-tool">pytest · unittest</div>
+          <div class="test-desc">Validación de lógica de negocio en microservicios FastAPI. Ejecutadas en cada push a feature y develop. Coverage reportado como gate de calidad.</div>
+        </div>
+        <div class="test-row">
+          <div class="test-layer">API / Integración <span class="badge badge-green">CI</span></div>
+          <div class="test-tool">Newman (Postman)</div>
+          <div class="test-desc">Colecciones Postman ejecutadas por Newman en el pipeline CI. Validan contratos de endpoints REST entre servicios antes de hacer merge.</div>
+        </div>
+        <div class="test-row">
+          <div class="test-layer">Frontend E2E <span class="badge badge-blue">QA</span></div>
+          <div class="test-tool">Cypress</div>
+          <div class="test-desc">Pruebas automatizadas de extremo a extremo sobre la aplicación Angular. Simulan flujos de usuario completos: búsqueda, reserva y pago.</div>
+        </div>
+        <div class="test-row">
+          <div class="test-layer">Mobile E2E <span class="badge badge-blue">QA</span></div>
+          <div class="test-tool">Espresso</div>
+          <div class="test-desc">Pruebas de UI automatizadas en Android. Validan flujos críticos de la APP Móvil: autenticación, búsqueda de hospedajes y proceso de reserva.</div>
+        </div>
+      </div>
+
+      <div class="callout callout-green" style="margin-top:16px;">
+        <strong>Coverage:</strong> El coverage de pruebas unitarias es una condición obligatoria en el CI. Un PR no puede mergearse a develop o main si el coverage cae por debajo del umbral definido.
+      </div>
+    </section>
+
+    <!-- ══ 10. INFRAESTRUCTURA ══ -->
+    <section id="infraestructura">
+      <div class="section-header">
+        <span class="section-number">10</span>
+        <h2 class="section-title">Resumen de <span class="accent">Infraestructura</span></h2>
+      </div>
+
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-title">Contenedores</div>
+          <p>Todos los microservicios se empaquetan como <strong style="color:var(--accent)">imágenes Docker</strong> construidas en el pipeline CD y almacenadas en AWS ECR. El despliegue se realiza con <code style="font-family:var(--mono);font-size:11px;color:var(--accent3)">kubectl rollout</code> sin downtime.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">Base de datos</div>
+          <p><strong style="color:var(--accent)">PostgreSQL</strong> en AWS RDS con réplica Multi-AZ. Migraciones gestionadas con <strong style="color:var(--accent)">Alembic</strong>. Datos sensibles cifrados con extensión <code style="font-family:var(--mono);font-size:11px;color:var(--accent3)">pgcrypto AES-256</code>.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">IaC</div>
+          <p>Toda la infraestructura AWS está definida como código con <strong style="color:var(--accent)">Terraform</strong>: VPC, subredes, Security Groups, EKS cluster, RDS, ElastiCache y SQS.</p>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /content -->
+
+  <footer class="footer">
+    <span>TravelHub · Documentación Técnica · Sprint 3</span>
+    <span>Juan Sebastian &nbsp;·&nbsp; David Escobar &nbsp;·&nbsp; Daniel Zapata &nbsp;·&nbsp; Eduar Bernal</span>
+  </footer>
+
+</div><!-- /main -->
+
+<script>
+  // Active nav highlight on scroll
+  const sections = document.querySelectorAll('section[id]');
+  const navItems = document.querySelectorAll('.nav-item');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navItems.forEach(n => n.classList.remove('active'));
+        const active = document.querySelector(`.nav-item[href="#${entry.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { threshold: 0.3 });
+
+  sections.forEach(s => observer.observe(s));
+</script>
+
+</body>
+</html>
