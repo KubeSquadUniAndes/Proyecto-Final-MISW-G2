@@ -333,19 +333,42 @@ jobs:
       - name: Install Newman
         run: npm install -g newman newman-reporter-htmlextra
 
-      - name: Run Newman tests
+      - name: Run Newman tests (travelhub)
         run: |
           newman run postman/travelhub-collection.json \
             -e postman/travelhub-environment.json \
             --env-var base_url=${{ secrets.EKS_BASE_URL }} \
             -r cli,htmlextra \
-            --reporter-htmlextra-export postman/report.html \
+            --reporter-htmlextra-export postman/report-travelhub.html \
             --insecure \
             --bail
 
-      - name: Upload Newman report
+      - name: Run Newman tests (reservas-ms)
+        run: |
+          newman run postman/reservas-ms-collection.json \
+            -e postman/travelhub-environment.json \
+            --env-var base_url=${{ secrets.EKS_BASE_URL }} \
+            --env-var user_email=${{ secrets.RESERVAS_USER_EMAIL }} \
+            --env-var user_password=${{ secrets.RESERVAS_USER_PASSWORD }} \
+            --env-var hotel_email=${{ secrets.RESERVAS_HOTEL_EMAIL }} \
+            --env-var hotel_password=${{ secrets.RESERVAS_HOTEL_PASSWORD }} \
+            --env-var hotel_id=${{ secrets.RESERVAS_HOTEL_ID }} \
+            --env-var room_id=${{ secrets.RESERVAS_ROOM_ID }} \
+            -r cli,htmlextra \
+            --reporter-htmlextra-export postman/report-reservas.html \
+            --insecure \
+            --bail
+
+      - name: Upload Newman report (travelhub)
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: newman-report-cd
-          path: postman/report.html
+          name: newman-report-travelhub
+          path: postman/report-travelhub.html
+
+      - name: Upload Newman report (reservas-ms)
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: newman-report-reservas
+          path: postman/report-reservas.html

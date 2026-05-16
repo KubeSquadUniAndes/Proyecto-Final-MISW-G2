@@ -1,458 +1,818 @@
 {
-	"info": {
-		"_postman_id": "reservas-ms-collection",
-		"name": "Reservas MS - TravelHub",
-		"description": "Collection for testing Reservas microservice endpoints with hotel_id and room_id",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
-	},
-	"item": [
-		{
-			"name": "1. Create Booking",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 201\", function () {",
-							"    pm.response.to.have.status(201);",
-							"});",
-							"",
-							"pm.test(\"Response has booking_id\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData).to.have.property('id');",
-							"    pm.environment.set(\"booking_id\", jsonData.id);",
-							"});",
-							"",
-							"pm.test(\"Booking has hotel_id and room_id\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData).to.have.property('hotel_id');",
-							"    pm.expect(jsonData).to.have.property('room_id');",
-							"});",
-							"",
-							"pm.test(\"Status is pending\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.status).to.eql('pending');",
-							"});",
-							"",
-							"pm.test(\"Has booking_code\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.booking_code).to.match(/^TH-2026-/);",
-							"});",
-							"",
-							"pm.test(\"Pricing calculated correctly\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.total_nights).to.eql(4);",
-							"    pm.expect(jsonData.total_price).to.eql('600.00');",
-							"    pm.expect(jsonData.taxes).to.eql('114.00');",
-							"    pm.expect(jsonData.final_price).to.eql('714.00');",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					},
-					{
-						"key": "Authorization",
-						"value": "Bearer {{access_token}}"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n  \"hotel_id\": \"{{hotel_id}}\",\n  \"room_id\": \"{{room_id}}\",\n  \"start_time\": \"2026-05-01T15:00:00Z\",\n  \"end_time\": \"2026-05-05T11:00:00Z\",\n  \"room_type\": \"Deluxe\",\n  \"num_guests\": 2,\n  \"price_per_night\": 150.00,\n  \"traveler_name\": \"Test User\",\n  \"traveler_email\": \"test@example.com\",\n  \"traveler_phone\": \"+573001234567\",\n  \"traveler_document\": \"1234567890\",\n  \"notes\": \"Test booking\",\n  \"special_requests\": \"Late check-in\"\n}"
-				},
-				"url": {
-					"raw": "{{base_url}}/reservas/api/v1/bookings/",
-					"host": ["{{base_url}}"],
-					"path": ["reservas", "api", "v1", "bookings", ""]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "2. List User Bookings",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});",
-							"",
-							"pm.test(\"Response is an array\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData).to.be.an('array');",
-							"});",
-							"",
-							"pm.test(\"Bookings have hotel_id and room_id\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    if (jsonData.length > 0) {",
-							"        pm.expect(jsonData[0]).to.have.property('hotel_id');",
-							"        pm.expect(jsonData[0]).to.have.property('room_id');",
-							"    }",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer {{access_token}}"
-					}
-				],
-				"url": {
-					"raw": "{{base_url}}/reservas/api/v1/bookings/",
-					"host": ["{{base_url}}"],
-					"path": ["reservas", "api", "v1", "bookings", ""]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "3. Get Booking by ID",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});",
-							"",
-							"pm.test(\"Booking has correct ID\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.id).to.eql(pm.environment.get('booking_id'));",
-							"});",
-							"",
-							"pm.test(\"Has hotel_id and room_id\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData).to.have.property('hotel_id');",
-							"    pm.expect(jsonData).to.have.property('room_id');",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer {{access_token}}"
-					}
-				],
-				"url": {
-					"raw": "{{base_url}}/reservas/api/v1/bookings/{{booking_id}}",
-					"host": ["{{base_url}}"],
-					"path": ["reservas", "api", "v1", "bookings", "{{booking_id}}"]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "4. Check Room Availability",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});",
-							"",
-							"pm.test(\"Response has room_id\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData).to.have.property('room_id');",
-							"});",
-							"",
-							"pm.test(\"Has bookings array\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.bookings).to.be.an('array');",
-							"});",
-							"",
-							"pm.test(\"Has summary with status counts\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.summary).to.have.property('confirmed');",
-							"    pm.expect(jsonData.summary).to.have.property('pending');",
-							"    pm.expect(jsonData.summary).to.have.property('cancelled');",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{base_url}}/reservas/api/v1/bookings/availability?room_id={{room_id}}&start_time=2026-05-01T00:00:00Z&end_time=2026-05-10T00:00:00Z",
-					"host": ["{{base_url}}"],
-					"path": ["reservas", "api", "v1", "bookings", "availability"],
-					"query": [
-						{
-							"key": "room_id",
-							"value": "{{room_id}}"
-						},
-						{
-							"key": "start_time",
-							"value": "2026-05-01T00:00:00Z"
-						},
-						{
-							"key": "end_time",
-							"value": "2026-05-10T00:00:00Z"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "5. Update Booking",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});",
-							"",
-							"pm.test(\"Notes updated\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.notes).to.eql('Updated notes');",
-							"});",
-							"",
-							"pm.test(\"Updated timestamp changed\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.updated_at).to.not.eql(jsonData.created_at);",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "PATCH",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					},
-					{
-						"key": "Authorization",
-						"value": "Bearer {{access_token}}"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n  \"notes\": \"Updated notes\"\n}"
-				},
-				"url": {
-					"raw": "{{base_url}}/reservas/api/v1/bookings/{{booking_id}}",
-					"host": ["{{base_url}}"],
-					"path": ["reservas", "api", "v1", "bookings", "{{booking_id}}"]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "6. Approve Booking (Hotel Admin)",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});",
-							"",
-							"pm.test(\"Status changed to confirmed\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.status).to.eql('confirmed');",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "PATCH",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer {{access_token}}"
-					}
-				],
-				"url": {
-					"raw": "{{base_url}}/reservas/api/v1/bookings/{{booking_id}}/approve",
-					"host": ["{{base_url}}"],
-					"path": ["reservas", "api", "v1", "bookings", "{{booking_id}}", "approve"]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "7. List Hotel Bookings (Hotel Role)",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});",
-							"",
-							"pm.test(\"Response is an array\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData).to.be.an('array');",
-							"});",
-							"",
-							"pm.test(\"All bookings belong to same hotel\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    var hotelId = pm.environment.get('hotel_id');",
-							"    jsonData.forEach(function(booking) {",
-							"        pm.expect(booking.hotel_id).to.eql(hotelId);",
-							"    });",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer {{hotel_access_token}}"
-					}
-				],
-				"url": {
-					"raw": "{{base_url}}/reservas/api/v1/bookings/hotel/{{hotel_id}}",
-					"host": ["{{base_url}}"],
-					"path": ["reservas", "api", "v1", "bookings", "hotel", "{{hotel_id}}"]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "8. Reject Booking (Hotel Admin)",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});",
-							"",
-							"pm.test(\"Status changed to cancelled\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.status).to.eql('cancelled');",
-							"});",
-							"",
-							"pm.test(\"Rejection reason in notes\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.notes).to.include('[REJECTED by admin]');",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "PATCH",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					},
-					{
-						"key": "Authorization",
-						"value": "Bearer {{access_token}}"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n  \"rejection_reason\": \"Room not available\"\n}"
-				},
-				"url": {
-					"raw": "{{base_url}}/reservas/api/v1/bookings/{{booking_id}}/reject",
-					"host": ["{{base_url}}"],
-					"path": ["reservas", "api", "v1", "bookings", "{{booking_id}}", "reject"]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "9. Cancel Booking",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});",
-							"",
-							"pm.test(\"Status changed to cancelled\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.status).to.eql('cancelled');",
-							"});",
-							"",
-							"pm.test(\"Not cancellable anymore\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.cancellable).to.eql(false);",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "DELETE",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer {{access_token}}"
-					}
-				],
-				"url": {
-					"raw": "{{base_url}}/reservas/api/v1/bookings/{{booking_id}}",
-					"host": ["{{base_url}}"],
-					"path": ["reservas", "api", "v1", "bookings", "{{booking_id}}"]
-				}
-			},
-			"response": []
-		}
-	],
-	"variable": [
-		{
-			"key": "base_url",
-			"value": "https://k8s-workload-travelhu-6ebf4c6317-8eaeeae129c46548.elb.us-east-1.amazonaws.com",
-			"type": "string"
-		},
-		{
-			"key": "hotel_id",
-			"value": "550e8400-e29b-41d4-a716-446655440001",
-			"type": "string"
-		},
-		{
-			"key": "room_id",
-			"value": "550e8400-e29b-41d4-a716-446655440002",
-			"type": "string"
-		}
-	]
+  "info": {
+    "_postman_id": "reservas-ms-collection",
+    "name": "Reservas MS - TravelHub",
+    "description": "E2E collection for Reservas microservice. Flow: create → list → get (no QR) → availability → update → [reject separate booking] → approve (QR generated) → get (QR verified) → list hotel → cancel (QR invalidated).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "0a. Login Usuario (obtiene access_token)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Login usuario exitoso\", function () {",
+              "    pm.response.to.have.status(200);",
+              "    var body = pm.response.json();",
+              "    pm.expect(body).to.have.property('access_token');",
+              "    pm.environment.set('access_token', body.access_token);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{user_email}}\",\n  \"password\": \"{{user_password}}\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/login-handler/api/v1/auth/login",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "login-handler",
+            "api",
+            "v1",
+            "auth",
+            "login"
+          ]
+        }
+      }
+    },
+    {
+      "name": "0b. Login Hotel Admin (obtiene hotel_access_token)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Login hotel exitoso\", function () {",
+              "    pm.response.to.have.status(200);",
+              "    var body = pm.response.json();",
+              "    pm.expect(body).to.have.property('access_token');",
+              "    pm.environment.set('hotel_access_token', body.access_token);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{hotel_email}}\",\n  \"password\": \"{{hotel_password}}\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/login-handler/api/v1/auth/login",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "login-handler",
+            "api",
+            "v1",
+            "auth",
+            "login"
+          ]
+        }
+      }
+    },
+    {
+      "name": "1. Create Booking",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 201\", function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "",
+              "pm.test(\"Response has booking_id\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('id');",
+              "    pm.environment.set(\"booking_id\", jsonData.id);",
+              "});",
+              "",
+              "pm.test(\"Booking has hotel_id and room_id\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('hotel_id');",
+              "    pm.expect(jsonData).to.have.property('room_id');",
+              "});",
+              "",
+              "pm.test(\"Status is pending\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.status).to.eql('pending');",
+              "});",
+              "",
+              "pm.test(\"Has booking_code\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.booking_code).to.match(/^TH-2026-/);",
+              "});",
+              "",
+              "pm.test(\"Pricing calculated correctly\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.total_nights).to.eql(4);",
+              "    pm.expect(jsonData.total_price).to.eql('600.00');",
+              "    pm.expect(jsonData.taxes).to.eql('114.00');",
+              "    pm.expect(jsonData.final_price).to.eql('714.00');",
+              "});",
+              "",
+              "pm.test(\"QR fields absent on creation (pending)\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.qr_code).to.be.null;",
+              "    pm.expect(jsonData.qr_is_valid).to.eql(true);",
+              "    pm.expect(jsonData.qr_generated_at).to.be.null;",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"hotel_id\": \"{{hotel_id}}\",\n  \"room_id\": \"{{room_id}}\",\n  \"start_time\": \"2026-09-01T15:00:00Z\",\n  \"end_time\": \"2026-09-05T11:00:00Z\",\n  \"room_type\": \"Deluxe\",\n  \"num_guests\": 2,\n  \"price_per_night\": 150.00,\n  \"traveler_name\": \"Test User\",\n  \"traveler_email\": \"test@example.com\",\n  \"traveler_phone\": \"+573001234567\",\n  \"traveler_document\": \"1234567890\",\n  \"notes\": \"Test booking\",\n  \"special_requests\": \"Late check-in\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/reservas/api/v1/bookings/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "reservas",
+            "api",
+            "v1",
+            "bookings",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "2. List User Bookings",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Response is an array\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.be.an('array');",
+              "});",
+              "",
+              "pm.test(\"Bookings have hotel_id and room_id\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    if (jsonData.length > 0) {",
+              "        pm.expect(jsonData[0]).to.have.property('hotel_id');",
+              "        pm.expect(jsonData[0]).to.have.property('room_id');",
+              "    }",
+              "});",
+              "",
+              "pm.test(\"Bookings expose QR fields\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    if (jsonData.length > 0) {",
+              "        pm.expect(jsonData[0]).to.have.property('qr_code');",
+              "        pm.expect(jsonData[0]).to.have.property('qr_is_valid');",
+              "        pm.expect(jsonData[0]).to.have.property('qr_generated_at');",
+              "    }",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/reservas/api/v1/bookings/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "reservas",
+            "api",
+            "v1",
+            "bookings",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "3. Get Booking by ID (pending - no QR yet)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Booking has correct ID\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.id).to.eql(pm.environment.get('booking_id'));",
+              "});",
+              "",
+              "pm.test(\"Has hotel_id and room_id\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('hotel_id');",
+              "    pm.expect(jsonData).to.have.property('room_id');",
+              "});",
+              "",
+              "pm.test(\"QR not generated yet for pending booking\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.qr_code).to.be.null;",
+              "    pm.expect(jsonData.qr_generated_at).to.be.null;",
+              "    pm.expect(jsonData.qr_is_valid).to.eql(true);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/reservas/api/v1/bookings/{{booking_id}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "reservas",
+            "api",
+            "v1",
+            "bookings",
+            "{{booking_id}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "4. Check Room Availability",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Response has room_id\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('room_id');",
+              "});",
+              "",
+              "pm.test(\"Has bookings array\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.bookings).to.be.an('array');",
+              "});",
+              "",
+              "pm.test(\"Has summary with status counts\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.summary).to.have.property('confirmed');",
+              "    pm.expect(jsonData.summary).to.have.property('pending');",
+              "    pm.expect(jsonData.summary).to.have.property('cancelled');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/reservas/api/v1/bookings/availability?room_id={{room_id}}&start_time=2026-09-01T00:00:00Z&end_time=2026-09-10T00:00:00Z",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "reservas",
+            "api",
+            "v1",
+            "bookings",
+            "availability"
+          ],
+          "query": [
+            {
+              "key": "room_id",
+              "value": "{{room_id}}"
+            },
+            {
+              "key": "start_time",
+              "value": "2026-09-01T00:00:00Z"
+            },
+            {
+              "key": "end_time",
+              "value": "2026-09-10T00:00:00Z"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "5. Update Booking",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Notes updated\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.notes).to.eql('Updated notes');",
+              "});",
+              "",
+              "pm.test(\"Updated timestamp changed\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.updated_at).to.not.eql(jsonData.created_at);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"notes\": \"Updated notes\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/reservas/api/v1/bookings/{{booking_id}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "reservas",
+            "api",
+            "v1",
+            "bookings",
+            "{{booking_id}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "6. Create Booking for Reject Test",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 201\", function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "",
+              "pm.test(\"Saves booking_id_reject\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('id');",
+              "    pm.environment.set(\"booking_id_reject\", jsonData.id);",
+              "});",
+              "",
+              "pm.test(\"Status is pending\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.status).to.eql('pending');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"hotel_id\": \"{{hotel_id}}\",\n  \"room_id\": \"{{room_id}}\",\n  \"start_time\": \"2026-10-01T15:00:00Z\",\n  \"end_time\": \"2026-10-03T11:00:00Z\",\n  \"room_type\": \"Deluxe\",\n  \"num_guests\": 1,\n  \"price_per_night\": 150.00,\n  \"traveler_name\": \"Reject Test User\",\n  \"traveler_email\": \"reject@example.com\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/reservas/api/v1/bookings/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "reservas",
+            "api",
+            "v1",
+            "bookings",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "7. Reject Booking (Hotel Admin)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Status changed to cancelled\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.status).to.eql('cancelled');",
+              "});",
+              "",
+              "pm.test(\"Rejection reason in notes\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.notes).to.include('[REJECTED by admin]');",
+              "});",
+              "",
+              "pm.test(\"Rejected booking has no QR (was never approved)\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.qr_code).to.be.null;",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{hotel_access_token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"rejection_reason\": \"Room not available\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/reservas/api/v1/bookings/{{booking_id_reject}}/reject",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "reservas",
+            "api",
+            "v1",
+            "bookings",
+            "{{booking_id_reject}}",
+            "reject"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "8. Approve Booking (Hotel Admin) - QR generated",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Status changed to confirmed\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.status).to.eql('confirmed');",
+              "});",
+              "",
+              "pm.test(\"QR code is generated on approval\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.qr_code).to.not.be.null;",
+              "    pm.expect(jsonData.qr_code).to.be.a('string');",
+              "    pm.expect(jsonData.qr_code.length).to.be.greaterThan(100);",
+              "    pm.environment.set(\"qr_code\", jsonData.qr_code);",
+              "});",
+              "",
+              "pm.test(\"QR is marked valid after approval\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.qr_is_valid).to.eql(true);",
+              "});",
+              "",
+              "pm.test(\"QR has generation timestamp\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.qr_generated_at).to.not.be.null;",
+              "    var generatedAt = new Date(jsonData.qr_generated_at);",
+              "    pm.expect(generatedAt.getTime()).to.be.greaterThan(0);",
+              "});",
+              "",
+              "pm.test(\"QR code is valid base64\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.qr_code).to.match(/^[A-Za-z0-9+\\/]+=*$/);",
+              "});",
+              "",
+              "pm.test(\"QR code encodes booking_code in payload\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    var decoded = Buffer.from(jsonData.qr_code, 'base64').toString('latin1');",
+              "    pm.expect(decoded).to.include(jsonData.booking_code);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{hotel_access_token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/reservas/api/v1/bookings/{{booking_id}}/approve",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "reservas",
+            "api",
+            "v1",
+            "bookings",
+            "{{booking_id}}",
+            "approve"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "9. Get Booking After Approval - verify QR persisted",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Booking is confirmed\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.status).to.eql('confirmed');",
+              "});",
+              "",
+              "pm.test(\"QR persisted in GET detail\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.qr_code).to.not.be.null;",
+              "    pm.expect(jsonData.qr_code).to.be.a('string');",
+              "    pm.expect(jsonData.qr_code.length).to.be.greaterThan(100);",
+              "});",
+              "",
+              "pm.test(\"QR remains valid\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.qr_is_valid).to.eql(true);",
+              "});",
+              "",
+              "pm.test(\"QR matches the one returned at approval\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    var savedQr = pm.environment.get('qr_code');",
+              "    pm.expect(jsonData.qr_code).to.eql(savedQr);",
+              "});",
+              "",
+              "pm.test(\"QR generation timestamp is present\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.qr_generated_at).to.not.be.null;",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/reservas/api/v1/bookings/{{booking_id}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "reservas",
+            "api",
+            "v1",
+            "bookings",
+            "{{booking_id}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "10. List Hotel Bookings (Hotel Role)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Response is an array\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.be.an('array');",
+              "});",
+              "",
+              "pm.test(\"All bookings belong to same hotel\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    var hotelId = pm.environment.get('hotel_id');",
+              "    jsonData.forEach(function(booking) {",
+              "        pm.expect(booking.hotel_id).to.eql(hotelId);",
+              "    });",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{hotel_access_token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/reservas/api/v1/bookings/hotel/{{hotel_id}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "reservas",
+            "api",
+            "v1",
+            "bookings",
+            "hotel",
+            "{{hotel_id}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "11. Cancel Booking - QR invalidated",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Status changed to cancelled\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.status).to.eql('cancelled');",
+              "});",
+              "",
+              "pm.test(\"Not cancellable anymore\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.cancellable).to.eql(false);",
+              "});",
+              "",
+              "pm.test(\"QR is invalidated after cancellation\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.qr_is_valid).to.eql(false);",
+              "});",
+              "",
+              "pm.test(\"QR code content is preserved for audit\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.qr_code).to.not.be.null;",
+              "    pm.expect(jsonData.qr_code.length).to.be.greaterThan(100);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/reservas/api/v1/bookings/{{booking_id}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "reservas",
+            "api",
+            "v1",
+            "bookings",
+            "{{booking_id}}"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://k8s-workload-travelhu-f26ddf980b-5888409b6dd7c4c7.elb.us-east-1.amazonaws.com",
+      "type": "string"
+    },
+    {
+      "key": "hotel_id",
+      "value": "550e8400-e29b-41d4-a716-446655440001",
+      "type": "string"
+    },
+    {
+      "key": "room_id",
+      "value": "550e8400-e29b-41d4-a716-446655440002",
+      "type": "string"
+    }
+  ]
 }
