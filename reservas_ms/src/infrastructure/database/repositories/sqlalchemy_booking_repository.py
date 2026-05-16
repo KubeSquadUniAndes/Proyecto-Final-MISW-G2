@@ -34,9 +34,9 @@ class SQLAlchemyBookingRepository(BookingRepositoryPort):
         if hasattr(raw, "value"):
             return BookingStatus(raw.value)
         try:
-            return BookingStatus(raw)          # value lookup: "confirmed" → CONFIRMED
+            return BookingStatus(raw)  # value lookup: "confirmed" → CONFIRMED
         except ValueError:
-            return BookingStatus[raw]          # name lookup:  "CONFIRMED" → CONFIRMED
+            return BookingStatus[raw]  # name lookup:  "CONFIRMED" → CONFIRMED
 
     def _to_domain(self, model: BookingModel, decrypted: dict | None = None) -> Booking:
         d = decrypted or {}
@@ -134,8 +134,9 @@ class SQLAlchemyBookingRepository(BookingRepositoryPort):
 
     async def save(self, booking: Booking) -> Booking:
         encrypted = await self._encrypt_sensitive(booking)
-        # Use a placeholder that satisfies the DB NOT NULL constraint;
-        # the real value is written immediately after with an explicit cast.
+        # Omit status from INSERT so PostgreSQL uses server_default ('pending'
+        # literal → booking_status_enum).  The real status is written right after
+        # flush via _update_status_raw() which uses an explicit CAST.
         model = BookingModel(
             id=booking.id,
             user_id=booking.user_id,
@@ -143,7 +144,6 @@ class SQLAlchemyBookingRepository(BookingRepositoryPort):
             room_id=booking.room_id,
             start_time=booking.start_time,
             end_time=booking.end_time,
-            status="pending",  # overwritten below with ::booking_status_enum cast
             notes=booking.notes,
             booking_code=booking.booking_code,
             room_type=booking.room_type,

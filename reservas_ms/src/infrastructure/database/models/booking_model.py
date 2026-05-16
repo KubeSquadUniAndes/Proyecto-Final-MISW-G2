@@ -33,7 +33,9 @@ class BookingModel(Base):
     # conflicts with asyncpg's codec cache in Python 3.12.  All writes to this
     # column use raw SQL with an explicit ::booking_status_enum cast; see
     # SQLAlchemyBookingRepository._update_status_raw().
-    status = Column(String(50), nullable=False, default=BookingStatus.PENDING.value)
+    # server_default uses a SQL literal so PostgreSQL handles the implicit cast
+    # to booking_status_enum — bypassing the ::VARCHAR that bound parameters send.
+    status = Column(String(50), nullable=False, server_default="'pending'")
     notes = Column(Text, nullable=True)
     # Booking identity
     booking_code = Column(String(15), nullable=True, unique=True, index=True)
