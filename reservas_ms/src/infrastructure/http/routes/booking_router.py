@@ -37,6 +37,9 @@ from src.infrastructure.http.middleware.auth_dependency import (
 from src.infrastructure.http.schemas.booking_schema import (
     AvailabilityResponse,
     BookingResponse,
+    BulkBookingDatesRequest,
+    BulkBookingDatesResponse,
+    BookingDateEntry,
     CheckInRequest,
     CreateBookingRequest,
     ErrorResponse,
@@ -129,6 +132,38 @@ async def check_availability(
 
 
 # ── GET /bookings/{booking_id} ─────────────────────────────────────────────────
+
+
+# ── POST /bookings/bulk-dates ─────────────────────────────────────────────────
+
+
+@router.post(
+    "/bulk-dates",
+    response_model=BulkBookingDatesResponse,
+    summary="Get date ranges for multiple bookings (internal, no auth)",
+)
+async def get_bulk_booking_dates(
+    body: BulkBookingDatesRequest,
+    db: AsyncSession = Depends(get_db),
+) -> BulkBookingDatesResponse:
+    """Return start/end times for the given booking IDs (pending/confirmed only)."""
+    repo = _make_repo(db)
+    results = await repo.get_dates_by_ids(
+        body.booking_ids,
+        checkin=body.checkin,
+        checkout=body.checkout,
+    )
+    return BulkBookingDatesResponse(
+        bookings=[
+            BookingDateEntry(
+                id=r.id,
+                status=r.status,
+                start_time=r.start_time,
+                end_time=r.end_time,
+            )
+            for r in results
+        ]
+    )
 
 
 @router.get(

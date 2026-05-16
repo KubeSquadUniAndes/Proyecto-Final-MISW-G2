@@ -110,3 +110,20 @@ class AvailabilityResponse(BaseModel):
     bookings: list[dict]
     total_bookings: int
     summary: dict
+
+
+class BulkBookingDatesRequest(BaseModel):
+    booking_ids: list[UUID]
+    checkin: datetime | None = None
+    checkout: datetime | None = None
+
+
+class BookingDateEntry(BaseModel):
+    id: UUID
+    status: str
+    start_time: datetime
+    end_time: datetime
+
+
+class BulkBookingDatesResponse(BaseModel):
+    bookings: list[BookingDateEntry]
