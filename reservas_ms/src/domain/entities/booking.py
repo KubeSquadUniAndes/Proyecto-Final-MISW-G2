@@ -10,6 +10,7 @@ class BookingStatus(str, Enum):
     CONFIRMED = "confirmed"
     CANCELLED = "cancelled"
     COMPLETED = "completed"
+    CHECK_IN = "checked_in"
 
 
 STATUS_DISPLAY = {
@@ -17,6 +18,7 @@ STATUS_DISPLAY = {
     BookingStatus.CONFIRMED: "Confirmada",
     BookingStatus.CANCELLED: "Cancelada",
     BookingStatus.COMPLETED: "Completada",
+    BookingStatus.CHECK_IN: "Check-In realizado",
 }
 
 
@@ -49,6 +51,10 @@ class Booking:
     qr_code: str | None = None
     qr_generated_at: datetime | None = None
     qr_is_valid: bool = True
+    checked_in_at: datetime | None = None
+    checkin_staff_id: str | None = None
+    checkin_device: str | None = None
+    checkin_ip: str | None = None
     created_at: datetime = field(default_factory=datetime.utcnow)
     updated_at: datetime = field(default_factory=datetime.utcnow)
 
@@ -72,8 +78,30 @@ class Booking:
         self.status = BookingStatus.CANCELLED
         self.updated_at = datetime.utcnow()
 
+    def check_in(
+        self,
+        staff_id: str | None = None,
+        device: str | None = None,
+        ip: str | None = None,
+    ) -> None:
+        if self.status != BookingStatus.CONFIRMED:
+            raise ValueError(
+                f"Cannot check-in a booking with status '{self.status}'. "
+                "Only confirmed bookings can be checked in."
+            )
+        self.status = BookingStatus.CHECK_IN
+        self.checked_in_at = datetime.utcnow()
+        self.checkin_staff_id = staff_id
+        self.checkin_device = device
+        self.checkin_ip = ip
+        self.updated_at = datetime.utcnow()
+
     def cancel(self) -> None:
-        if self.status in (BookingStatus.CANCELLED, BookingStatus.COMPLETED):
+        if self.status in (
+            BookingStatus.CANCELLED,
+            BookingStatus.COMPLETED,
+            BookingStatus.CHECK_IN,
+        ):
             raise ValueError(f"Cannot cancel a booking with status '{self.status}'")
         self.status = BookingStatus.CANCELLED
         self.updated_at = datetime.utcnow()

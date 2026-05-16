@@ -58,6 +58,11 @@ class BookingModel(Base):
     qr_code = Column(Text, nullable=True)
     qr_generated_at = Column(DateTime(timezone=True), nullable=True)
     qr_is_valid = Column(Boolean, nullable=False, server_default="true", default=True)
+    # Check-in audit (C7)
+    checked_in_at = Column(DateTime(timezone=True), nullable=True)
+    checkin_staff_id = Column(String(255), nullable=True)
+    checkin_device = Column(String(255), nullable=True)
+    checkin_ip = Column(String(45), nullable=True)
     created_at = Column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
