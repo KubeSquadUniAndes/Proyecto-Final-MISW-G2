@@ -76,6 +76,9 @@ class BookingResponse(BaseModel):
     traveler_email: str | None
     traveler_phone: str | None
     traveler_document: str | None
+    qr_code: str | None = None
+    qr_generated_at: datetime | None = None
+    qr_is_valid: bool = True
     cancellable: bool
     created_at: datetime
     updated_at: datetime

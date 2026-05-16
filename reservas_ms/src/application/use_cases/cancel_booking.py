@@ -32,8 +32,10 @@ class CancelBookingUseCase:
         if not booking.cancellable:
             raise ValueError(f"Cannot cancel a booking with status '{booking.status}'")
 
-        # 4. Cancel and persist
+        # 4. Cancel and persist (invalidate QR if one exists — criteria 5)
         booking.cancel()
+        if booking.qr_code:
+            booking.invalidate_qr()
         updated = await self._repo.update(booking)
 
         # 5. Publish room availability event (fire-and-forget)

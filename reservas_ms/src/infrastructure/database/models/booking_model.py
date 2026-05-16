@@ -1,6 +1,7 @@
 import uuid
 
 from sqlalchemy import (
+    Boolean,
     Column,
     DateTime,
     Enum,
@@ -53,6 +54,10 @@ class BookingModel(Base):
     traveler_email = Column(LargeBinary, nullable=True)
     traveler_phone = Column(LargeBinary, nullable=True)
     traveler_document = Column(LargeBinary, nullable=True)
+    # QR check-in
+    qr_code = Column(Text, nullable=True)
+    qr_generated_at = Column(DateTime(timezone=True), nullable=True)
+    qr_is_valid = Column(Boolean, nullable=False, server_default="true", default=True)
     created_at = Column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
