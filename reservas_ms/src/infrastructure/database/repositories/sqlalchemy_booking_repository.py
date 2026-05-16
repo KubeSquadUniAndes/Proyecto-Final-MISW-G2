@@ -21,6 +21,23 @@ class SQLAlchemyBookingRepository(BookingRepositoryPort):
     # Mappers
     # -------------------------------------------------------------------------
 
+    @staticmethod
+    def _parse_status(raw) -> BookingStatus:
+        """Convert whatever asyncpg returns for the enum column to a BookingStatus.
+
+        asyncpg may return the Python enum member (when a codec is cached from a
+        previous Enum(BookingStatus,...) column definition), the lowercase value string
+        ("confirmed"), or the uppercase name string ("CONFIRMED").  Handle all cases.
+        """
+        if isinstance(raw, BookingStatus):
+            return raw
+        if hasattr(raw, "value"):
+            return BookingStatus(raw.value)
+        try:
+            return BookingStatus(raw)          # value lookup: "confirmed" → CONFIRMED
+        except ValueError:
+            return BookingStatus[raw]          # name lookup:  "CONFIRMED" → CONFIRMED
+
     def _to_domain(self, model: BookingModel, decrypted: dict | None = None) -> Booking:
         d = decrypted or {}
         return Booking(
@@ -30,7 +47,7 @@ class SQLAlchemyBookingRepository(BookingRepositoryPort):
             room_id=model.room_id,
             start_time=model.start_time,
             end_time=model.end_time,
-            status=BookingStatus(model.status),
+            status=self._parse_status(model.status),
             notes=model.notes,
             booking_code=model.booking_code,
             room_type=model.room_type,
@@ -117,6 +134,8 @@ class SQLAlchemyBookingRepository(BookingRepositoryPort):
 
     async def save(self, booking: Booking) -> Booking:
         encrypted = await self._encrypt_sensitive(booking)
+        # Use a placeholder that satisfies the DB NOT NULL constraint;
+        # the real value is written immediately after with an explicit cast.
         model = BookingModel(
             id=booking.id,
             user_id=booking.user_id,
@@ -124,7 +143,7 @@ class SQLAlchemyBookingRepository(BookingRepositoryPort):
             room_id=booking.room_id,
             start_time=booking.start_time,
             end_time=booking.end_time,
-            status=booking.status,
+            status="pending",  # overwritten below with ::booking_status_enum cast
             notes=booking.notes,
             booking_code=booking.booking_code,
             room_type=booking.room_type,
@@ -150,6 +169,7 @@ class SQLAlchemyBookingRepository(BookingRepositoryPort):
         )
         self._session.add(model)
         await self._session.flush()
+        await self._update_status_raw(model.id, booking.status.value)
         await self._session.refresh(model)
         decrypted = await self._decrypt_row(model)
         return self._to_domain(model, decrypted)
@@ -183,7 +203,7 @@ class SQLAlchemyBookingRepository(BookingRepositoryPort):
             select(BookingModel).where(
                 BookingModel.user_id == user_id,
                 BookingModel.status.in_(
-                    [BookingStatus.PENDING, BookingStatus.CONFIRMED]
+                    [BookingStatus.PENDING.value, BookingStatus.CONFIRMED.value]
                 ),
             )
         )
@@ -194,6 +214,21 @@ class SQLAlchemyBookingRepository(BookingRepositoryPort):
             bookings.append(self._to_domain(m, decrypted))
         return bookings
 
+    async def _update_status_raw(self, booking_id: UUID, status_value: str) -> None:
+        """Write status with explicit ::booking_status_enum cast.
+
+        String(50) generates ::VARCHAR which PostgreSQL rejects for enum columns.
+        Raw SQL with a named cast is the only reliable workaround for the
+        Python 3.12 + asyncpg + SQLAlchemy Enum C-extension incompatibility.
+        """
+        await self._session.execute(
+            text(
+                "UPDATE bookings SET status = CAST(:s AS booking_status_enum)"
+                " WHERE id = CAST(:id AS uuid)"
+            ),
+            {"s": status_value, "id": str(booking_id)},
+        )
+
     async def update(self, booking: Booking) -> Booking:
         result = await self._session.execute(
             select(BookingModel).where(BookingModel.id == booking.id)
@@ -202,7 +237,7 @@ class SQLAlchemyBookingRepository(BookingRepositoryPort):
         if not model:
             raise ValueError(f"Booking with id={booking.id} not found")
 
-        model.status = booking.status
+        await self._update_status_raw(booking.id, booking.status.value)
         model.notes = booking.notes
         model.start_time = booking.start_time
         model.end_time = booking.end_time

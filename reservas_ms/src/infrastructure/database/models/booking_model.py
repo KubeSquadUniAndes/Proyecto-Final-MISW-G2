@@ -4,7 +4,6 @@ from sqlalchemy import (
     Boolean,
     Column,
     DateTime,
-    Enum,
     Integer,
     JSON,
     LargeBinary,
@@ -18,6 +17,8 @@ from sqlalchemy.sql import func
 from src.infrastructure.database.base import Base
 from src.domain.entities.booking import BookingStatus
 
+_BOOKING_STATUS_VALUES = [e.value for e in BookingStatus]
+
 
 class BookingModel(Base):
     __tablename__ = "bookings"
@@ -28,11 +29,11 @@ class BookingModel(Base):
     room_id = Column(UUID(as_uuid=True), nullable=False, index=True)
     start_time = Column(DateTime(timezone=True), nullable=False)
     end_time = Column(DateTime(timezone=True), nullable=False)
-    status = Column(
-        Enum(BookingStatus, name="booking_status_enum"),
-        nullable=False,
-        default=BookingStatus.PENDING,
-    )
+    # NOTE: String(50) avoids SQLAlchemy's Enum C-extension validator which
+    # conflicts with asyncpg's codec cache in Python 3.12.  All writes to this
+    # column use raw SQL with an explicit ::booking_status_enum cast; see
+    # SQLAlchemyBookingRepository._update_status_raw().
+    status = Column(String(50), nullable=False, default=BookingStatus.PENDING.value)
     notes = Column(Text, nullable=True)
     # Booking identity
     booking_code = Column(String(15), nullable=True, unique=True, index=True)
