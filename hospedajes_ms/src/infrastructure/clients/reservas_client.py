@@ -53,7 +53,9 @@ class ReservasClient:
                 resp.raise_for_status()
                 data = resp.json()
         except httpx.TimeoutException:
-            logger.warning("Timeout fetching bulk booking dates for ids %s", booking_ids)
+            logger.warning(
+                "Timeout fetching bulk booking dates for ids %s", booking_ids
+            )
             return []
         except httpx.HTTPStatusError as exc:
             logger.error(
