@@ -37,8 +37,14 @@ from src.infrastructure.http.schemas.auth_schema import (
     TokenResponse,
     UserResponse,
 )
+from pydantic import BaseModel
 from src.infrastructure.security.bcrypt_password_service import BcryptPasswordService
 from src.infrastructure.security.jwt_service import JWTService
+
+
+class FcmTokenRequest(BaseModel):
+    fcm_token: str
+    platform: str = "android"
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
@@ -191,3 +197,43 @@ async def get_user_email(
     if not user:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="User not found")
     return {"email": user.email, "full_name": user.full_name}
+
+
+@router.post(
+    "/fcm-token",
+    status_code=status.HTTP_200_OK,
+    summary="Register or update FCM token for push notifications",
+)
+async def register_fcm_token(
+    body: FcmTokenRequest,
+    user_id: UUID = Depends(get_current_user_id),
+    db: AsyncSession = Depends(get_db),
+) -> dict:
+    from sqlalchemy import text
+    async with db as session:
+        await session.execute(
+            text("UPDATE users SET fcm_token = :token WHERE id = :id"),
+            {"token": body.fcm_token, "id": str(user_id)}
+        )
+        await session.commit()
+    return {"message": "FCM token registered successfully"}
+
+
+@router.get(
+    "/fcm-token/{user_id}",
+    status_code=status.HTTP_200_OK,
+    summary="Get FCM token for a user (internal)",
+)
+async def get_fcm_token(
+    user_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    _: None = Depends(require_internal_api_key),
+) -> dict:
+    from sqlalchemy import text
+    async with db as session:
+        result = await session.execute(
+            text("SELECT fcm_token FROM users WHERE id = :id"),
+            {"id": str(user_id)}
+        )
+        row = result.fetchone()
+    return {"fcm_token": row[0] if row else None}

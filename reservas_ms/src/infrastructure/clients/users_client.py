@@ -16,20 +16,21 @@ class UsersClient:
         self._api_key = api_key
 
     async def get_fcm_token(self, user_id: UUID) -> str | None:
-        """Returns the FCM token for a user, or None if not found/unavailable."""
-        url = f"{self._base_url}/api/v1/users/{user_id}/fcm-token"
+        """Returns the FCM token for a user from login_handler_ms."""
+        from src.infrastructure.config.settings import settings as s
+        url = f"{s.LOGIN_HANDLER_MS_URL}/api/v1/auth/fcm-token/{user_id}"
         try:
             async with httpx.AsyncClient(timeout=3.0) as client:
                 response = await client.get(
                     url,
-                    headers={"X-Internal-Api-Key": self._api_key},
+                    headers={"X-Api-Key": self._api_key},
                 )
                 if response.status_code == 200:
                     return response.json().get("fcm_token")
                 return None
         except Exception as exc:
             logger.warning(
-                "users_ms_fcm_token_unavailable user_id=%s error=%s",
+                "login_handler_fcm_token_unavailable user_id=%s error=%s",
                 user_id,
                 exc,
             )
