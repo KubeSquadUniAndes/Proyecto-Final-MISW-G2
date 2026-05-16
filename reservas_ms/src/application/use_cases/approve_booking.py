@@ -73,6 +73,30 @@ class ApproveBookingUseCase:
             updated.qr_is_valid = True
             updated = await self._repo.update(updated)
             logger.info("qr_generated booking_id=%s", updated.id)
+
+            # C1 – Send QR email (fire-and-forget, C7)
+            if (
+                self._notificaciones_client
+                and updated.traveler_email
+                and updated.qr_code
+            ):
+                try:
+                    await self._notificaciones_client.send_qr_checkin_email(
+                        reservation_code=str(updated.booking_code or updated.id),
+                        guest_name=updated.traveler_name or "Viajero",
+                        guest_email=updated.traveler_email,
+                        property_name="Hotel",
+                        property_address="Ver detalles en la app",
+                        check_in=updated.start_time.strftime("%Y-%m-%d"),
+                        check_out=updated.end_time.strftime("%Y-%m-%d"),
+                        room_type=updated.room_type or "Habitación estándar",
+                        num_guests=updated.num_guests,
+                        qr_code=updated.qr_code,
+                    )
+                except Exception as exc:
+                    logger.error(
+                        "qr_email_failed booking_id=%s error=%s", updated.id, exc
+                    )
         except Exception as exc:
             logger.error(
                 "qr_generation_failed booking_id=%s error=%s",

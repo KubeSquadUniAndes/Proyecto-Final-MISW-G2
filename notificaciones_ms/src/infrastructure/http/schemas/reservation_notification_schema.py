@@ -36,3 +36,30 @@ class ReservationConfirmationRequest(BaseModel):
 class ReservationConfirmationResponse(BaseModel):
     email_sent: bool
     errors: list[str]
+
+
+class QrCheckinEmailRequest(BaseModel):
+    reservation_code: str
+    guest_name: str
+    guest_email: str
+    property_name: str
+    property_address: str
+    check_in: date
+    check_out: date
+    room_type: str
+    num_guests: int
+    qr_code: str  # base64-encoded PNG
+
+
+class QrCancelledEmailRequest(BaseModel):
+    reservation_code: str
+    guest_name: str
+    guest_email: str
+    property_name: str
+    check_in: date
+    check_out: date
+
+
+class QrEmailResponse(BaseModel):
+    email_sent: bool
+    errors: list[str]

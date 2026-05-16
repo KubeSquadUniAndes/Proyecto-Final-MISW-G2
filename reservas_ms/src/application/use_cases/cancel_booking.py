@@ -5,6 +5,7 @@ from src.domain.ports.room_availability_publisher_port import (
     RoomAvailabilityPublisherPort,
 )
 from src.domain.repositories.booking_repository_port import BookingRepositoryPort
+from src.infrastructure.clients.notificaciones_client import NotificacionesClient
 
 logger = logging.getLogger(__name__)
 
@@ -14,9 +15,11 @@ class CancelBookingUseCase:
         self,
         booking_repo: BookingRepositoryPort,
         availability_publisher: RoomAvailabilityPublisherPort | None = None,
+        notificaciones_client: NotificacionesClient | None = None,
     ) -> None:
         self._repo = booking_repo
         self._availability_publisher = availability_publisher
+        self._notificaciones_client = notificaciones_client
 
     async def execute(self, dto: CancelBookingDTO) -> BookingResponseDTO:
         # 1. Load booking
@@ -60,6 +63,22 @@ class CancelBookingUseCase:
                     "availability_publish_failed booking_id=%s error=%s",
                     updated.id,
                     exc,
+                )
+
+        # C6 – Send QR invalidation email (fire-and-forget)
+        if self._notificaciones_client and updated.traveler_email and updated.qr_code:
+            try:
+                await self._notificaciones_client.send_qr_cancelled_email(
+                    reservation_code=str(updated.booking_code or updated.id),
+                    guest_name=updated.traveler_name or "Viajero",
+                    guest_email=updated.traveler_email,
+                    property_name="Hotel",
+                    check_in=updated.start_time.strftime("%Y-%m-%d"),
+                    check_out=updated.end_time.strftime("%Y-%m-%d"),
+                )
+            except Exception as exc:
+                logger.error(
+                    "qr_cancelled_email_failed booking_id=%s error=%s", updated.id, exc
                 )
 
         from src.application.use_cases.create_booking import _build_response
