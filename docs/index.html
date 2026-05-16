@@ -691,14 +691,13 @@
         <div class="card">
           <div class="card-title">Decisiones arquitectónicas clave</div>
           <p>• Microservicios desplegados en <strong style="color:var(--accent)">AWS EKS</strong> con escalado por pods (k8sPod).</p>
-          <p>• Separación de lectura y escritura: escritura transaccional en PostgreSQL, lectura rápida a través de <strong style="color:var(--accent)">Redis Cache</strong>.</p>
-          <p>• Comunicación asíncrona vía <strong style="color:var(--accent)">Message Broker</strong> (RabbitMQ / AWS SQS) para eventos entre servicios.</p>
+          <p>• Separación de lectura y escritura: escritura transaccional en PostgreSQL.</p>
           <p>• Cifrado de datos sensibles con extensión <strong style="color:var(--accent)">pgcrypto AES-256</strong> en PostgreSQL.</p>
         </div>
       </div>
 
       <div class="callout">
-        <strong>Meta de disponibilidad:</strong> RPO ≤ 5 min · RTO ≤ 15 min — garantizados mediante réplica PostgreSQL Multi-AZ y colas de eventos durables.
+        <strong>Meta de disponibilidad:</strong> RPO ≤ 5 min · RTO ≤ 15 min — garantizados mediante disponibilidad PostgreSQL y colas de eventos durables.
       </div>
 
       <div style="margin-top:20px;">
@@ -861,11 +860,6 @@
           <div class="sc-desc">Registro, autenticación y perfil de usuarios. Trabaja en conjunto con LoginHandler para validación de tokens.</div>
         </div>
         <div class="service-card sc-green">
-          <div class="sc-name">Búsqueda</div>
-          <div class="sc-tech">AWS Lambda · count 0..3</div>
-          <div class="sc-desc">Motor de búsqueda de disponibilidad. Lee de Redis Cache para respuestas en &lt;200ms. Se actualiza vía eventos asíncronos RoomAvailabilityChanged.</div>
-        </div>
-        <div class="service-card sc-green">
           <div class="sc-name">Notificaciones</div>
           <div class="sc-tech">AWS Lambda · count 0..3</div>
           <div class="sc-desc">Envío de notificaciones push a dispositivos móviles. Suscrito a eventos del Message Broker para notificar cambios de estado de reservas.</div>
@@ -973,11 +967,6 @@
           <p>Las operaciones de escritura pasan por el <strong style="color:var(--accent)">ApiGateway → Reservas/Hospedajes/Pagos → PostgreSQL</strong>. Cada transacción es atómica y escribe con <code style="font-family:var(--mono); font-size:12px; color:var(--accent3)">write(transaction)</code>.</p>
           <p>Al completarse, se publica el evento <code style="font-family:var(--mono); font-size:12px; color:var(--accent3)">RoomAvailabilityChanged</code> al Message Broker de forma asíncrona.</p>
         </div>
-        <div class="card">
-          <div class="card-title">Flujo de lectura (rápida)</div>
-          <p>Las búsquedas de disponibilidad consultan directamente <strong style="color:var(--accent)">Redis Cache</strong> con la clave <code style="font-family:var(--mono); font-size:11px; color:var(--accent3)">availability:{hotelId}:{date}</code>.</p>
-          <p>El servicio Búsqueda (Lambda) realiza <code style="font-family:var(--mono); font-size:12px; color:var(--accent3)">upd/read (hot path)</code> para respuestas &lt;200ms, actualizando el caché al recibir eventos del broker.</p>
-        </div>
       </div>
 
       <h3>Escalado de pods</h3>
@@ -1003,10 +992,6 @@
         </div>
         <div style="margin-top:12px; display:grid; grid-template-columns:repeat(3,1fr); gap:12px;">
           <div style="text-align:center; padding:12px; background:var(--surface2); border-radius:4px;">
-            <div style="font-family:var(--mono); font-size:11px; color:var(--text-faint)">Búsqueda (Lambda)</div>
-            <div style="font-size:22px; font-weight:700; color:var(--accent3); font-family:var(--display)">0..3</div>
-          </div>
-          <div style="text-align:center; padding:12px; background:var(--surface2); border-radius:4px;">
             <div style="font-family:var(--mono); font-size:11px; color:var(--text-faint)">Notificaciones (Lambda)</div>
             <div style="font-size:22px; font-weight:700; color:var(--accent3); font-family:var(--display)">0..3</div>
           </div>
@@ -1015,10 +1000,6 @@
             <div style="font-size:22px; font-weight:700; color:var(--text-dim); font-family:var(--display)">1</div>
           </div>
         </div>
-      </div>
-
-      <div class="callout callout-green" style="margin-top:16px;">
-        <strong>Pub/Sub:</strong> El eventHandler suscrito al Queue TravelHubTopics distribuye eventos <code style="font-family:var(--mono); font-size:11px;">RoomAvailabilityChanged</code> hacia Búsqueda y Notificaciones en paralelo. Las Lambdas escalan a 0 cuando no hay demanda.
       </div>
     </section>
 
@@ -1071,21 +1052,6 @@
           <div><span class="schema-field">date</span><span class="schema-type">: Date</span></div>
           <div><span class="schema-field">availableUnits, minPrice</span><span class="schema-type">: Int/Money</span></div>
         </div>
-      </div>
-
-      <h3>Estructuras Pub/Sub + Redis</h3>
-      <div class="schema-block" style="margin-top:4px;">
-        <div style="color:var(--text-dim); margin-bottom:8px;">// Evento publicado al Message Broker</div>
-        <div><span class="schema-entity">RoomAvailabilityChanged</span> <span class="schema-type">{</span></div>
-        <div style="padding-left:20px;"><span class="schema-field">stayId, hotelId</span><span class="schema-type">: UUID</span></div>
-        <div style="padding-left:20px;"><span class="schema-field">dateRange</span><span class="schema-type">: DateRange</span></div>
-        <div style="padding-left:20px;"><span class="schema-field">availability, minPrice</span><span class="schema-type">: Int / Money</span></div>
-        <div style="padding-left:20px;"><span class="schema-field">updatedAt</span><span class="schema-type">: Timestamp</span></div>
-        <div style="padding-left:20px;"><span class="schema-field">version</span><span class="schema-type">: Int</span></div>
-        <div><span class="schema-type">}</span></div>
-        <br>
-        <div style="color:var(--text-dim); margin-bottom:8px;">// Clave Redis para caché de disponibilidad</div>
-        <div><span class="schema-field">availability:</span><span class="schema-pk">{hotelId}</span><span class="schema-field">:</span><span class="schema-pk">{date}</span> <span class="schema-type">→ { availableUnits, minPrice, lastUpdated }</span></div>
       </div>
     </section>
 
