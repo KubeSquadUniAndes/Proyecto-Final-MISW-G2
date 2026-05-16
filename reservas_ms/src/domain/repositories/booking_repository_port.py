@@ -1,7 +1,17 @@
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
+from datetime import datetime
 from uuid import UUID
 
 from src.domain.entities.booking import Booking
+
+
+@dataclass
+class BookingDateInfo:
+    id: UUID
+    status: str
+    start_time: datetime
+    end_time: datetime
 
 
 class BookingRepositoryPort(ABC):
@@ -32,3 +42,11 @@ class BookingRepositoryPort(ABC):
 
     @abstractmethod
     async def list_by_hotel(self, hotel_id: UUID) -> list[Booking]: ...
+
+    @abstractmethod
+    async def get_dates_by_ids(
+        self,
+        booking_ids: list[UUID],
+        checkin: datetime | None = None,
+        checkout: datetime | None = None,
+    ) -> list[BookingDateInfo]: ...

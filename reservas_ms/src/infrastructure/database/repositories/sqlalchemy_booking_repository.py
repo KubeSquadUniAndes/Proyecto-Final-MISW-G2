@@ -1,3 +1,4 @@
+from datetime import datetime
 from decimal import Decimal
 from uuid import UUID
 
@@ -305,3 +306,45 @@ class SQLAlchemyBookingRepository(BookingRepositoryPort):
             decrypted = await self._decrypt_row(m)
             bookings.append(self._to_domain(m, decrypted))
         return bookings
+
+    async def get_dates_by_ids(
+        self,
+        booking_ids: list[UUID],
+        checkin: datetime | None = None,
+        checkout: datetime | None = None,
+    ) -> list:
+        """Get date info for multiple booking IDs (pending/confirmed only).
+
+        If checkin/checkout are provided, only bookings that overlap with the
+        given date range are returned (SQL-level filtering).
+        """
+        from src.domain.repositories.booking_repository_port import BookingDateInfo
+
+        if not booking_ids:
+            return []
+        filters = [
+            BookingModel.id.in_(booking_ids),
+            BookingModel.status.in_([BookingStatus.PENDING, BookingStatus.CONFIRMED]),
+        ]
+        if checkin is not None and checkout is not None:
+            filters += [
+                BookingModel.start_time < checkout,
+                BookingModel.end_time > checkin,
+            ]
+        result = await self._session.execute(
+            select(
+                BookingModel.id,
+                BookingModel.status,
+                BookingModel.start_time,
+                BookingModel.end_time,
+            ).where(*filters)
+        )
+        return [
+            BookingDateInfo(
+                id=row.id,
+                status=row.status,
+                start_time=row.start_time,
+                end_time=row.end_time,
+            )
+            for row in result.all()
+        ]

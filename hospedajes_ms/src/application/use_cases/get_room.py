@@ -16,6 +16,7 @@ class GetRoomUseCase:
             id=room.id,
             hotel_id=room.hotel_id,
             hotel_name=room.hotel_name,
+            destination=room.destination,
             name=room.name,
             room_type=room.room_type,
             price=room.price,
@@ -24,6 +25,7 @@ class GetRoomUseCase:
             size=room.size,
             status=room.status,
             amenities=room.amenities,
+            booking_ids=room.booking_ids,
             created_at=room.created_at,
             updated_at=room.updated_at,
         )
