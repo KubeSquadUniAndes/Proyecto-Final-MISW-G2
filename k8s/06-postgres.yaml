@@ -65,7 +65,7 @@ spec:
           exec:
             command: ["sh", "-c", "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB"]
           initialDelaySeconds: 10
-          periodSeconds: 10
+          periodSeconds: 1000
           failureThreshold: 6
         # Uncomment for persistent storage (EKS with gp3 StorageClass):
         # volumeMounts:

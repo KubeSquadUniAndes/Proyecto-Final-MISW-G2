@@ -75,7 +75,7 @@ spec:
             path: /health
             port: 8000
           initialDelaySeconds: 5
-          periodSeconds: 10
+          periodSeconds: 1000
           failureThreshold: 3
         livenessProbe:
           httpGet:
@@ -163,7 +163,7 @@ spec:
             path: /health
             port: 8003
           initialDelaySeconds: 5
-          periodSeconds: 10
+          periodSeconds: 1000
           failureThreshold: 3
         livenessProbe:
           httpGet:
@@ -251,7 +251,7 @@ spec:
             path: /health
             port: 8000
           initialDelaySeconds: 5
-          periodSeconds: 10
+          periodSeconds: 1000
           failureThreshold: 3
         livenessProbe:
           httpGet:
@@ -329,7 +329,7 @@ spec:
             path: /health
             port: 8000
           initialDelaySeconds: 5
-          periodSeconds: 10
+          periodSeconds: 1000
           failureThreshold: 3
         livenessProbe:
           httpGet:
@@ -421,7 +421,7 @@ spec:
             path: /health
             port: 8000
           initialDelaySeconds: 5
-          periodSeconds: 10
+          periodSeconds: 1000
           failureThreshold: 3
         livenessProbe:
           httpGet:
@@ -508,7 +508,7 @@ spec:
             path: /health
             port: 8000
           initialDelaySeconds: 5
-          periodSeconds: 10
+          periodSeconds: 1000
           failureThreshold: 3
         livenessProbe:
           httpGet:
@@ -596,7 +596,7 @@ spec:
             path: /health
             port: 8000
           initialDelaySeconds: 5
-          periodSeconds: 10
+          periodSeconds: 1000
           failureThreshold: 3
         livenessProbe:
           httpGet:
