@@ -1,0 +1,177 @@
+---
+# Grafana Alloy — log collector for Loki
+#
+# Uses loki.source.kubernetes which tails logs via the Kubernetes API (no node
+# filesystem mount required). A single Deployment on the observability node
+# is sufficient to collect logs from ALL pods cluster-wide.
+# This avoids a DaemonSet and keeps the t3.small observability node usable.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: alloy
+  namespace: istio-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: alloy
+rules:
+  - apiGroups: [""]
+    resources: [nodes, nodes/proxy, services, endpoints, pods, pods/log, namespaces]
+    verbs: [get, list, watch]
+  - apiGroups: [discovery.k8s.io]
+    resources: [endpointslices]
+    verbs: [get, list, watch]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: alloy
+subjects:
+  - kind: ServiceAccount
+    name: alloy
+    namespace: istio-system
+roleRef:
+  kind: ClusterRole
+  name: alloy
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alloy-config
+  namespace: istio-system
+data:
+  config.alloy: |
+    // ── Discovery: find all Kubernetes pods ─────────────────────────────────────
+    discovery.kubernetes "pods" {
+      role = "pod"
+    }
+
+    // ── Relabel: promote useful pod metadata as Loki stream labels ───────────────
+    discovery.relabel "pods" {
+      targets = discovery.kubernetes.pods.targets
+
+      rule {
+        source_labels = ["__meta_kubernetes_namespace"]
+        target_label  = "namespace"
+      }
+      rule {
+        source_labels = ["__meta_kubernetes_pod_name"]
+        target_label  = "pod"
+      }
+      rule {
+        source_labels = ["__meta_kubernetes_pod_container_name"]
+        target_label  = "container"
+      }
+      // use app label if present; fall back to app.kubernetes.io/name
+      rule {
+        source_labels = ["__meta_kubernetes_pod_label_app"]
+        regex         = "(.+)"
+        target_label  = "app"
+      }
+      rule {
+        source_labels = ["__meta_kubernetes_pod_label_app_kubernetes_io_name"]
+        regex         = "(.+)"
+        target_label  = "app"
+      }
+      rule {
+        source_labels = ["__meta_kubernetes_pod_node_name"]
+        target_label  = "node"
+      }
+    }
+
+    // ── Source: tail logs from all pods via Kubernetes API ───────────────────────
+    // No privileged container, no root, no node filesystem access needed.
+    loki.source.kubernetes "pods" {
+      targets    = discovery.relabel.pods.output
+      forward_to = [loki.write.loki.receiver]
+    }
+
+    // ── Write: push batched log streams to Loki ──────────────────────────────────
+    loki.write "loki" {
+      endpoint {
+        url        = "http://loki.istio-system.svc.cluster.local:3100/loki/api/v1/push"
+        batch_wait = "5s"        // longer batching reduces CPU spikes on t3.small
+        batch_size = "512KiB"   // 512 KiB per push
+      }
+      external_labels = {
+        cluster = "travelhub-prod",
+      }
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alloy
+  namespace: istio-system
+  labels:
+    app: alloy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: alloy
+  template:
+    metadata:
+      labels:
+        app: alloy
+        sidecar.istio.io/inject: "false"   # infrastructure pod — no Istio proxy
+    spec:
+      serviceAccountName: alloy
+      # Pin to the observability node
+      nodeSelector:
+        role: observability
+      # Must tolerate the observability node taint
+      tolerations:
+        - key: dedicated
+          value: observability
+          effect: NoSchedule
+      containers:
+        - name: alloy
+          image: grafana/alloy:v1.8.3
+          args:
+            - run
+            - /etc/alloy/config.alloy
+            - --server.http.listen-addr=0.0.0.0:12345
+            - --storage.path=/tmp/alloy
+          ports:
+            - name: http-metrics
+              containerPort: 12345
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 473
+            capabilities:
+              drop: [ALL]
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 300m
+              memory: 256Mi
+          readinessProbe:
+            httpGet:
+              path: /-/ready
+              port: http-metrics
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /-/healthy
+              port: http-metrics
+            initialDelaySeconds: 30
+            periodSeconds: 15
+          volumeMounts:
+            - name: config
+              mountPath: /etc/alloy
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: config
+          configMap:
+            name: alloy-config
+        - name: tmp
+          emptyDir: {}

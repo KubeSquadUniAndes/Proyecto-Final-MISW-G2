@@ -402,7 +402,9 @@ async def test_create_booking_success(app):
             "src.infrastructure.http.routes.booking_router.CreateBookingUseCase"
         ) as MockUC,
     ):
-        mock_client.validate = AsyncMock(return_value=uid)
+        mock_client.validate_with_role = AsyncMock(
+            return_value={"user_id": uid, "role": "traveler"}
+        )
         mock_uc = AsyncMock()
         mock_uc.execute.return_value = mock_result
         MockUC.return_value = mock_uc
@@ -443,7 +445,9 @@ async def test_create_booking_conflict(app):
             "src.infrastructure.http.routes.booking_router.CreateBookingUseCase"
         ) as MockUC,
     ):
-        mock_client.validate = AsyncMock(return_value=uid)
+        mock_client.validate_with_role = AsyncMock(
+            return_value={"user_id": uid, "role": "traveler"}
+        )
         mock_uc = AsyncMock()
         mock_uc.execute.side_effect = ValueError("schedule conflict")
         MockUC.return_value = mock_uc

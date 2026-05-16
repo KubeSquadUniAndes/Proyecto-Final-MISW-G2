@@ -1,19 +1,30 @@
 from fastapi import APIRouter, Depends, HTTPException, Header, status
 
-from src.application.dtos.reservation_confirmation_dto import ReservationConfirmationDTO
 from src.application.dtos.payment_voucher_dto import PaymentVoucherDTO
+from src.application.dtos.qr_checkin_email_dto import (
+    QrCancelledEmailDTO,
+    QrCheckinEmailDTO,
+)
+from src.application.dtos.reservation_confirmation_dto import ReservationConfirmationDTO
+from src.application.use_cases.send_payment_voucher import SendPaymentVoucherUseCase
+from src.application.use_cases.send_qr_checkin_email import (
+    SendQrCancelledEmailUseCase,
+    SendQrCheckinEmailUseCase,
+)
 from src.application.use_cases.send_reservation_confirmation import (
     SendReservationConfirmationUseCase,
 )
-from src.application.use_cases.send_payment_voucher import SendPaymentVoucherUseCase
 from src.infrastructure.config.settings import settings
-from src.infrastructure.http.schemas.reservation_notification_schema import (
-    ReservationConfirmationRequest,
-    ReservationConfirmationResponse,
-)
 from src.infrastructure.http.schemas.payment_voucher_schema import (
     PaymentVoucherRequest,
     PaymentVoucherResponse,
+)
+from src.infrastructure.http.schemas.reservation_notification_schema import (
+    QrCancelledEmailRequest,
+    QrCheckinEmailRequest,
+    QrEmailResponse,
+    ReservationConfirmationRequest,
+    ReservationConfirmationResponse,
 )
 
 router = APIRouter(prefix="/notifications", tags=["Reservations"])
@@ -72,3 +83,48 @@ async def send_payment_voucher(
     dto = PaymentVoucherDTO(**body.model_dump())
     result = await use_case.execute(dto)
     return PaymentVoucherResponse(**result.model_dump())
+
+
+@router.post(
+    "/reservations/qr-checkin",
+    response_model=QrEmailResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Send QR check-in email with PNG and PDF attachments",
+    description=(
+        "Called by **reservas_ms** after approving a booking and generating the QR. "
+        "Also called on resend request (C5). "
+        "Sends an email with the QR inline, a PNG attachment, and a PDF with booking details.\n\n"
+        "Requires `X-Api-Key` header. Email errors are logged but do not affect the reservation."
+    ),
+    responses={403: {"description": "Invalid API key"}},
+)
+async def send_qr_checkin_email(
+    body: QrCheckinEmailRequest,
+    _: None = Depends(require_internal_api_key),
+) -> QrEmailResponse:
+    use_case = SendQrCheckinEmailUseCase()
+    dto = QrCheckinEmailDTO(**body.model_dump())
+    result = await use_case.execute(dto)
+    return QrEmailResponse(**result.model_dump())
+
+
+@router.post(
+    "/reservations/qr-cancelled",
+    response_model=QrEmailResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Notify traveler that their QR has been invalidated (cancellation)",
+    description=(
+        "Called by **reservas_ms** when a confirmed booking with a QR is cancelled. "
+        "Sends an email informing the traveler that the QR is no longer valid.\n\n"
+        "Requires `X-Api-Key` header."
+    ),
+    responses={403: {"description": "Invalid API key"}},
+)
+async def send_qr_cancelled_email(
+    body: QrCancelledEmailRequest,
+    _: None = Depends(require_internal_api_key),
+) -> QrEmailResponse:
+    use_case = SendQrCancelledEmailUseCase()
+    dto = QrCancelledEmailDTO(**body.model_dump())
+    result = await use_case.execute(dto)
+    return QrEmailResponse(**result.model_dump())

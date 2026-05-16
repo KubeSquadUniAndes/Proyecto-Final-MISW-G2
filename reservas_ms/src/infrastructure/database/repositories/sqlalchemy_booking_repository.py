@@ -1,3 +1,4 @@
+from datetime import datetime
 from decimal import Decimal
 from uuid import UUID
 
@@ -21,6 +22,23 @@ class SQLAlchemyBookingRepository(BookingRepositoryPort):
     # Mappers
     # -------------------------------------------------------------------------
 
+    @staticmethod
+    def _parse_status(raw) -> BookingStatus:
+        """Convert whatever asyncpg returns for the enum column to a BookingStatus.
+
+        asyncpg may return the Python enum member (when a codec is cached from a
+        previous Enum(BookingStatus,...) column definition), the lowercase value string
+        ("confirmed"), or the uppercase name string ("CONFIRMED").  Handle all cases.
+        """
+        if isinstance(raw, BookingStatus):
+            return raw
+        if hasattr(raw, "value"):
+            return BookingStatus(raw.value)
+        try:
+            return BookingStatus(raw)  # value lookup: "confirmed" → CONFIRMED
+        except ValueError:
+            return BookingStatus[raw]  # name lookup:  "CONFIRMED" → CONFIRMED
+
     def _to_domain(self, model: BookingModel, decrypted: dict | None = None) -> Booking:
         d = decrypted or {}
         return Booking(
@@ -30,7 +48,7 @@ class SQLAlchemyBookingRepository(BookingRepositoryPort):
             room_id=model.room_id,
             start_time=model.start_time,
             end_time=model.end_time,
-            status=BookingStatus(model.status),
+            status=self._parse_status(model.status),
             notes=model.notes,
             booking_code=model.booking_code,
             room_type=model.room_type,
@@ -53,6 +71,10 @@ class SQLAlchemyBookingRepository(BookingRepositoryPort):
             qr_code=model.qr_code,
             qr_generated_at=model.qr_generated_at,
             qr_is_valid=model.qr_is_valid if model.qr_is_valid is not None else True,
+            checked_in_at=model.checked_in_at,
+            checkin_staff_id=model.checkin_staff_id,
+            checkin_device=model.checkin_device,
+            checkin_ip=model.checkin_ip,
             created_at=model.created_at,
             updated_at=model.updated_at,
         )
@@ -113,6 +135,9 @@ class SQLAlchemyBookingRepository(BookingRepositoryPort):
 
     async def save(self, booking: Booking) -> Booking:
         encrypted = await self._encrypt_sensitive(booking)
+        # Omit status from INSERT so PostgreSQL uses server_default ('pending'
+        # literal → booking_status_enum).  The real status is written right after
+        # flush via _update_status_raw() which uses an explicit CAST.
         model = BookingModel(
             id=booking.id,
             user_id=booking.user_id,
@@ -120,7 +145,6 @@ class SQLAlchemyBookingRepository(BookingRepositoryPort):
             room_id=booking.room_id,
             start_time=booking.start_time,
             end_time=booking.end_time,
-            status=booking.status,
             notes=booking.notes,
             booking_code=booking.booking_code,
             room_type=booking.room_type,
@@ -146,6 +170,7 @@ class SQLAlchemyBookingRepository(BookingRepositoryPort):
         )
         self._session.add(model)
         await self._session.flush()
+        await self._update_status_raw(model.id, booking.status.value)
         await self._session.refresh(model)
         decrypted = await self._decrypt_row(model)
         return self._to_domain(model, decrypted)
@@ -175,12 +200,12 @@ class SQLAlchemyBookingRepository(BookingRepositoryPort):
         return bookings
 
     async def get_active_by_user(self, user_id: UUID) -> list[Booking]:
+        # Use SQL literal for enum filter — bound parameters are sent as ::VARCHAR
+        # which PostgreSQL rejects when comparing against booking_status_enum.
         result = await self._session.execute(
             select(BookingModel).where(
                 BookingModel.user_id == user_id,
-                BookingModel.status.in_(
-                    [BookingStatus.PENDING, BookingStatus.CONFIRMED]
-                ),
+                text("status IN ('pending', 'confirmed')"),
             )
         )
         models = result.scalars().all()
@@ -190,6 +215,21 @@ class SQLAlchemyBookingRepository(BookingRepositoryPort):
             bookings.append(self._to_domain(m, decrypted))
         return bookings
 
+    async def _update_status_raw(self, booking_id: UUID, status_value: str) -> None:
+        """Write status with explicit ::booking_status_enum cast.
+
+        String(50) generates ::VARCHAR which PostgreSQL rejects for enum columns.
+        Raw SQL with a named cast is the only reliable workaround for the
+        Python 3.12 + asyncpg + SQLAlchemy Enum C-extension incompatibility.
+        """
+        await self._session.execute(
+            text(
+                "UPDATE bookings SET status = CAST(:s AS booking_status_enum)"
+                " WHERE id = CAST(:id AS uuid)"
+            ),
+            {"s": status_value, "id": str(booking_id)},
+        )
+
     async def update(self, booking: Booking) -> Booking:
         result = await self._session.execute(
             select(BookingModel).where(BookingModel.id == booking.id)
@@ -198,7 +238,7 @@ class SQLAlchemyBookingRepository(BookingRepositoryPort):
         if not model:
             raise ValueError(f"Booking with id={booking.id} not found")
 
-        model.status = booking.status
+        await self._update_status_raw(booking.id, booking.status.value)
         model.notes = booking.notes
         model.start_time = booking.start_time
         model.end_time = booking.end_time
@@ -209,6 +249,10 @@ class SQLAlchemyBookingRepository(BookingRepositoryPort):
         model.qr_code = booking.qr_code
         model.qr_generated_at = booking.qr_generated_at
         model.qr_is_valid = booking.qr_is_valid
+        model.checked_in_at = booking.checked_in_at
+        model.checkin_staff_id = booking.checkin_staff_id
+        model.checkin_device = booking.checkin_device
+        model.checkin_ip = booking.checkin_ip
 
         if booking.traveler_name:
             encrypted = await self._encrypt_sensitive(booking)
@@ -262,3 +306,45 @@ class SQLAlchemyBookingRepository(BookingRepositoryPort):
             decrypted = await self._decrypt_row(m)
             bookings.append(self._to_domain(m, decrypted))
         return bookings
+
+    async def get_dates_by_ids(
+        self,
+        booking_ids: list[UUID],
+        checkin: datetime | None = None,
+        checkout: datetime | None = None,
+    ) -> list:
+        """Get date info for multiple booking IDs (pending/confirmed only).
+
+        If checkin/checkout are provided, only bookings that overlap with the
+        given date range are returned (SQL-level filtering).
+        """
+        from src.domain.repositories.booking_repository_port import BookingDateInfo
+
+        if not booking_ids:
+            return []
+        filters = [
+            BookingModel.id.in_(booking_ids),
+            text("status = ANY(ARRAY['pending', 'confirmed']::booking_status_enum[])"),
+        ]
+        if checkin is not None and checkout is not None:
+            filters += [
+                BookingModel.start_time < checkout,
+                BookingModel.end_time > checkin,
+            ]
+        result = await self._session.execute(
+            select(
+                BookingModel.id,
+                BookingModel.status,
+                BookingModel.start_time,
+                BookingModel.end_time,
+            ).where(*filters)
+        )
+        return [
+            BookingDateInfo(
+                id=row.id,
+                status=row.status,
+                start_time=row.start_time,
+                end_time=row.end_time,
+            )
+            for row in result.all()
+        ]

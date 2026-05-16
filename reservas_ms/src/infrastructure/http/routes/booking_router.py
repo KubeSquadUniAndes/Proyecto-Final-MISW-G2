@@ -1,12 +1,13 @@
 from datetime import datetime
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.application.dtos.booking_dto import (
     ApproveBookingDTO,
     CancelBookingDTO,
+    CheckInBookingDTO,
     CreateBookingDTO,
     RejectBookingDTO,
     UpdateBookingDTO,
@@ -14,7 +15,9 @@ from src.application.dtos.booking_dto import (
 from src.application.dtos.availability_dto import AvailabilityQueryDTO
 from src.application.use_cases.approve_booking import ApproveBookingUseCase
 from src.application.use_cases.cancel_booking import CancelBookingUseCase
+from src.application.use_cases.checkin_booking import CheckInBookingUseCase
 from src.application.use_cases.check_availability import CheckAvailabilityUseCase
+from src.application.use_cases.resend_qr_email import ResendQrEmailUseCase
 from src.application.use_cases.create_booking import CreateBookingUseCase
 from src.application.use_cases.list_bookings import ListBookingsUseCase
 from src.application.use_cases.reject_booking import RejectBookingUseCase
@@ -35,6 +38,10 @@ from src.infrastructure.http.middleware.auth_dependency import (
 from src.infrastructure.http.schemas.booking_schema import (
     AvailabilityResponse,
     BookingResponse,
+    BulkBookingDatesRequest,
+    BulkBookingDatesResponse,
+    BookingDateEntry,
+    CheckInRequest,
     CreateBookingRequest,
     ErrorResponse,
     RejectBookingRequest,
@@ -128,6 +135,38 @@ async def check_availability(
 # ── GET /bookings/{booking_id} ─────────────────────────────────────────────────
 
 
+# ── POST /bookings/bulk-dates ─────────────────────────────────────────────────
+
+
+@router.post(
+    "/bulk-dates",
+    response_model=BulkBookingDatesResponse,
+    summary="Get date ranges for multiple bookings (internal, no auth)",
+)
+async def get_bulk_booking_dates(
+    body: BulkBookingDatesRequest,
+    db: AsyncSession = Depends(get_db),
+) -> BulkBookingDatesResponse:
+    """Return start/end times for the given booking IDs (pending/confirmed only)."""
+    repo = _make_repo(db)
+    results = await repo.get_dates_by_ids(
+        body.booking_ids,
+        checkin=body.checkin,
+        checkout=body.checkout,
+    )
+    return BulkBookingDatesResponse(
+        bookings=[
+            BookingDateEntry(
+                id=r.id,
+                status=r.status,
+                start_time=r.start_time,
+                end_time=r.end_time,
+            )
+            for r in results
+        ]
+    )
+
+
 @router.get(
     "/{booking_id}",
     response_model=BookingResponse,
@@ -174,9 +213,10 @@ async def get_booking(
 )
 async def create_booking(
     body: CreateBookingRequest,
-    user_id: UUID = Depends(get_current_user_id),
+    user_role: tuple[UUID, str] = Depends(get_current_user_role),
     db: AsyncSession = Depends(get_db),
 ) -> BookingResponse:
+    user_id, role = user_role
     repo = _make_repo(db)
     domain_service = BookingDomainService(repo)
     use_case = CreateBookingUseCase(
@@ -188,6 +228,7 @@ async def create_booking(
     try:
         dto = CreateBookingDTO(
             user_id=user_id,
+            user_role=role,
             hotel_id=body.hotel_id,
             room_id=body.room_id,
             start_time=body.start_time,
@@ -325,7 +366,9 @@ async def cancel_booking(
 ) -> BookingResponse:
     repo = _make_repo(db)
     use_case = CancelBookingUseCase(
-        repo, availability_publisher=_availability_publisher
+        repo,
+        availability_publisher=_availability_publisher,
+        notificaciones_client=_notificaciones_client,
     )
     try:
         dto = CancelBookingDTO(booking_id=booking_id, user_id=user_id)
@@ -459,6 +502,77 @@ async def approve_booking(
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc))
 
 
+# ── POST /bookings/checkin ─────────────────────────────────────────────────────
+
+
+@router.post(
+    "/checkin",
+    response_model=BookingResponse,
+    summary="Process hotel check-in by scanning the booking QR code (hotel admin)",
+    responses={
+        400: {"model": ErrorResponse, "description": "Date mismatch or invalid QR"},
+        401: {"model": ErrorResponse},
+        403: {"model": ErrorResponse},
+        404: {"model": ErrorResponse},
+        409: {
+            "model": ErrorResponse,
+            "description": "Already checked-in or state conflict",
+        },
+    },
+)
+async def checkin_booking(
+    body: CheckInRequest,
+    request: Request,
+    user_role: tuple[UUID, str] = Depends(get_current_user_role),
+    db: AsyncSession = Depends(get_db),
+) -> BookingResponse:
+    """Scan the traveler's QR code to register check-in.
+
+    The hotel app decodes the QR (base64 PNG → QR reader → JSON payload) and
+    sends the extracted booking_code and booking_id to this endpoint.
+    """
+    user_id, role = user_role
+
+    if role != "hotel":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Solo el personal del hotel puede registrar el check-in",
+        )
+
+    client_ip = request.headers.get("X-Forwarded-For") or (
+        request.client.host if request.client else None
+    )
+
+    repo = _make_repo(db)
+    use_case = CheckInBookingUseCase(
+        repo,
+        notificaciones_client=_notificaciones_client,
+        users_client=_users_client,
+    )
+    try:
+        dto = CheckInBookingDTO(
+            booking_code=body.booking_code,
+            booking_id=body.booking_id,
+            staff_id=str(user_id),
+            device=body.device,
+            ip=client_ip,
+        )
+        result = await use_case.execute(dto)
+        return BookingResponse(**result.model_dump())
+    except LookupError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc))
+    except ValueError as exc:
+        detail = str(exc)
+        # Date-related errors → 400 (not a state conflict, just wrong timing)
+        if (
+            "fecha" in detail.lower()
+            or "expirado" in detail.lower()
+            or "disponible" in detail.lower()
+        ):
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=detail)
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=detail)
+
+
 # ── PATCH /bookings/{booking_id}/reject ───────────────────────────────────────
 
 
@@ -515,6 +629,45 @@ async def reject_booking(
         except Exception:
             pass
         return BookingResponse(**result.model_dump())
+    except LookupError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc))
+    except PermissionError as exc:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(exc))
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc))
+
+
+# ── POST /bookings/{booking_id}/resend-qr ─────────────────────────────────────
+
+
+@router.post(
+    "/{booking_id}/resend-qr",
+    status_code=status.HTTP_200_OK,
+    summary="Resend QR check-in email to the traveler (C5)",
+    responses={
+        200: {"description": "Email sent or queued"},
+        401: {"model": ErrorResponse},
+        403: {"model": ErrorResponse},
+        404: {"model": ErrorResponse},
+        409: {"model": ErrorResponse},
+    },
+)
+async def resend_qr_email(
+    booking_id: UUID,
+    user_id: UUID = Depends(get_current_user_id),
+    db: AsyncSession = Depends(get_db),
+) -> dict:
+    """Resend the QR check-in email to the traveler's registered address."""
+    repo = _make_repo(db)
+    use_case = ResendQrEmailUseCase(repo, _notificaciones_client)
+    try:
+        sent = await use_case.execute(booking_id=booking_id, user_id=user_id)
+        return {
+            "email_sent": sent,
+            "message": "Email enviado correctamente."
+            if sent
+            else "El email no pudo enviarse, pero el QR sigue disponible en la app.",
+        }
     except LookupError as exc:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc))
     except PermissionError as exc:

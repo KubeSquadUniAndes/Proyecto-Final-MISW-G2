@@ -15,6 +15,7 @@ class ListRoomsUseCase:
                 id=r.id,
                 hotel_id=r.hotel_id,
                 hotel_name=r.hotel_name,
+                destination=r.destination,
                 name=r.name,
                 room_type=r.room_type,
                 price=r.price,
@@ -23,6 +24,7 @@ class ListRoomsUseCase:
                 size=r.size,
                 status=r.status,
                 amenities=r.amenities,
+                booking_ids=r.booking_ids,
                 created_at=r.created_at,
                 updated_at=r.updated_at,
             )

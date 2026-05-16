@@ -1,0 +1,12 @@
+---
+# Enable Istio access logs mesh-wide so that Promtail has HTTP request data to scrape.
+# In ambient mode this affects ztunnel and waypoint proxy logs.
+apiVersion: telemetry.istio.io/v1
+kind: Telemetry
+metadata:
+  name: mesh-default-access-logs
+  namespace: istio-system
+spec:
+  accessLogging:
+    - providers:
+        - name: envoy

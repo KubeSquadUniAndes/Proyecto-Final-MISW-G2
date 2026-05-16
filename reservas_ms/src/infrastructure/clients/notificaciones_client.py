@@ -109,6 +109,88 @@ class NotificacionesClient:
             )
             return False
 
+    async def send_qr_checkin_email(
+        self,
+        reservation_code: str,
+        guest_name: str,
+        guest_email: str,
+        property_name: str,
+        property_address: str,
+        check_in: str,
+        check_out: str,
+        room_type: str,
+        num_guests: int,
+        qr_code: str,
+    ) -> bool:
+        """Send QR check-in email with PNG + PDF attachments. Never raises."""
+        url = f"{self._base_url}/api/v1/notifications/reservations/qr-checkin"
+        payload = {
+            "reservation_code": reservation_code,
+            "guest_name": guest_name,
+            "guest_email": guest_email,
+            "property_name": property_name,
+            "property_address": property_address,
+            "check_in": check_in,
+            "check_out": check_out,
+            "room_type": room_type,
+            "num_guests": num_guests,
+            "qr_code": qr_code,
+        }
+        try:
+            async with httpx.AsyncClient(timeout=10.0) as client:
+                response = await client.post(
+                    url, json=payload, headers={"X-Api-Key": self._api_key}
+                )
+                response.raise_for_status()
+                logger.info(
+                    "qr_checkin_email_sent reservation_code=%s", reservation_code
+                )
+                return True
+        except Exception as exc:
+            logger.error(
+                "qr_checkin_email_failed reservation_code=%s error=%s",
+                reservation_code,
+                exc,
+            )
+            return False
+
+    async def send_qr_cancelled_email(
+        self,
+        reservation_code: str,
+        guest_name: str,
+        guest_email: str,
+        property_name: str,
+        check_in: str,
+        check_out: str,
+    ) -> bool:
+        """Notify traveler that their QR was invalidated. Never raises."""
+        url = f"{self._base_url}/api/v1/notifications/reservations/qr-cancelled"
+        payload = {
+            "reservation_code": reservation_code,
+            "guest_name": guest_name,
+            "guest_email": guest_email,
+            "property_name": property_name,
+            "check_in": check_in,
+            "check_out": check_out,
+        }
+        try:
+            async with httpx.AsyncClient(timeout=5.0) as client:
+                response = await client.post(
+                    url, json=payload, headers={"X-Api-Key": self._api_key}
+                )
+                response.raise_for_status()
+                logger.info(
+                    "qr_cancelled_email_sent reservation_code=%s", reservation_code
+                )
+                return True
+        except Exception as exc:
+            logger.error(
+                "qr_cancelled_email_failed reservation_code=%s error=%s",
+                reservation_code,
+                exc,
+            )
+            return False
+
     async def send_reservation_confirmation(
         self,
         reservation_code: str,

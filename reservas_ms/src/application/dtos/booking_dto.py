@@ -9,6 +9,7 @@ from src.domain.entities.booking import BookingStatus
 
 class CreateBookingDTO(BaseModel):
     user_id: UUID
+    user_role: str | None = None
     hotel_id: UUID
     room_id: UUID
     start_time: datetime
@@ -68,6 +69,14 @@ class RejectBookingDTO(BaseModel):
     rejection_reason: str
 
 
+class CheckInBookingDTO(BaseModel):
+    booking_code: str
+    booking_id: UUID
+    staff_id: str | None = None
+    device: str | None = None
+    ip: str | None = None
+
+
 class BookingResponseDTO(BaseModel):
     id: UUID
     user_id: UUID
@@ -98,6 +107,8 @@ class BookingResponseDTO(BaseModel):
     qr_code: str | None = None
     qr_generated_at: datetime | None = None
     qr_is_valid: bool = True
+    checked_in_at: datetime | None = None
+    checkin_staff_id: str | None = None
     cancellable: bool
     created_at: datetime
     updated_at: datetime

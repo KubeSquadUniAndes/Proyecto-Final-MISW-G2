@@ -4,7 +4,6 @@ from sqlalchemy import (
     Boolean,
     Column,
     DateTime,
-    Enum,
     Integer,
     JSON,
     LargeBinary,
@@ -18,6 +17,8 @@ from sqlalchemy.sql import func
 from src.infrastructure.database.base import Base
 from src.domain.entities.booking import BookingStatus
 
+_BOOKING_STATUS_VALUES = [e.value for e in BookingStatus]
+
 
 class BookingModel(Base):
     __tablename__ = "bookings"
@@ -28,11 +29,13 @@ class BookingModel(Base):
     room_id = Column(UUID(as_uuid=True), nullable=False, index=True)
     start_time = Column(DateTime(timezone=True), nullable=False)
     end_time = Column(DateTime(timezone=True), nullable=False)
-    status = Column(
-        Enum(BookingStatus, name="booking_status_enum"),
-        nullable=False,
-        default=BookingStatus.PENDING,
-    )
+    # NOTE: String(50) avoids SQLAlchemy's Enum C-extension validator which
+    # conflicts with asyncpg's codec cache in Python 3.12.  All writes to this
+    # column use raw SQL with an explicit ::booking_status_enum cast; see
+    # SQLAlchemyBookingRepository._update_status_raw().
+    # server_default uses a SQL literal so PostgreSQL handles the implicit cast
+    # to booking_status_enum — bypassing the ::VARCHAR that bound parameters send.
+    status = Column(String(50), nullable=False, server_default="'pending'")
     notes = Column(Text, nullable=True)
     # Booking identity
     booking_code = Column(String(15), nullable=True, unique=True, index=True)
@@ -58,6 +61,11 @@ class BookingModel(Base):
     qr_code = Column(Text, nullable=True)
     qr_generated_at = Column(DateTime(timezone=True), nullable=True)
     qr_is_valid = Column(Boolean, nullable=False, server_default="true", default=True)
+    # Check-in audit (C7)
+    checked_in_at = Column(DateTime(timezone=True), nullable=True)
+    checkin_staff_id = Column(String(255), nullable=True)
+    checkin_device = Column(String(255), nullable=True)
+    checkin_ip = Column(String(45), nullable=True)
     created_at = Column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )

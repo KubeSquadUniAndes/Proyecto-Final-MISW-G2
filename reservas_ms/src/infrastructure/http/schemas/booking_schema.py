@@ -79,6 +79,8 @@ class BookingResponse(BaseModel):
     qr_code: str | None = None
     qr_generated_at: datetime | None = None
     qr_is_valid: bool = True
+    checked_in_at: datetime | None = None
+    checkin_staff_id: str | None = None
     cancellable: bool
     created_at: datetime
     updated_at: datetime
@@ -95,6 +97,12 @@ class RejectBookingRequest(BaseModel):
     rejection_reason: str
 
 
+class CheckInRequest(BaseModel):
+    booking_code: str
+    booking_id: UUID
+    device: str | None = None
+
+
 class AvailabilityResponse(BaseModel):
     room_id: UUID
     query_range: dict
@@ -102,3 +110,20 @@ class AvailabilityResponse(BaseModel):
     bookings: list[dict]
     total_bookings: int
     summary: dict
+
+
+class BulkBookingDatesRequest(BaseModel):
+    booking_ids: list[UUID]
+    checkin: datetime | None = None
+    checkout: datetime | None = None
+
+
+class BookingDateEntry(BaseModel):
+    id: UUID
+    status: str
+    start_time: datetime
+    end_time: datetime
+
+
+class BulkBookingDatesResponse(BaseModel):
+    bookings: list[BookingDateEntry]

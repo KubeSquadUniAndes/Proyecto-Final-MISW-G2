@@ -10,5 +10,5 @@ class ListBookingsUseCase:
         self._repo = booking_repo
 
     async def execute(self, user_id: UUID) -> list[BookingResponseDTO]:
-        bookings = await self._repo.get_active_by_user(user_id)
+        bookings = await self._repo.list_by_user(user_id)
         return [_build_response(b) for b in bookings]
