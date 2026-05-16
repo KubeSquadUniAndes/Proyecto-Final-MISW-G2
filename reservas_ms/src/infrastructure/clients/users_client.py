@@ -18,6 +18,7 @@ class UsersClient:
     async def get_fcm_token(self, user_id: UUID) -> str | None:
         """Returns the FCM token for a user from login_handler_ms."""
         from src.infrastructure.config.settings import settings as s
+
         url = f"{s.LOGIN_HANDLER_MS_URL}/api/v1/auth/fcm-token/{user_id}"
         try:
             async with httpx.AsyncClient(timeout=3.0) as client:

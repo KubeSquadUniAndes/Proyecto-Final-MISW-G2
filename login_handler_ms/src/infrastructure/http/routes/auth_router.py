@@ -46,6 +46,7 @@ class FcmTokenRequest(BaseModel):
     fcm_token: str
     platform: str = "android"
 
+
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
 # Shared service instances (stateless, safe to reuse)
@@ -210,10 +211,11 @@ async def register_fcm_token(
     db: AsyncSession = Depends(get_db),
 ) -> dict:
     from sqlalchemy import text
+
     async with db as session:
         await session.execute(
             text("UPDATE users SET fcm_token = :token WHERE id = :id"),
-            {"token": body.fcm_token, "id": str(user_id)}
+            {"token": body.fcm_token, "id": str(user_id)},
         )
         await session.commit()
     return {"message": "FCM token registered successfully"}
@@ -230,10 +232,10 @@ async def get_fcm_token(
     _: None = Depends(require_internal_api_key),
 ) -> dict:
     from sqlalchemy import text
+
     async with db as session:
         result = await session.execute(
-            text("SELECT fcm_token FROM users WHERE id = :id"),
-            {"id": str(user_id)}
+            text("SELECT fcm_token FROM users WHERE id = :id"), {"id": str(user_id)}
         )
         row = result.fetchone()
     return {"fcm_token": row[0] if row else None}
