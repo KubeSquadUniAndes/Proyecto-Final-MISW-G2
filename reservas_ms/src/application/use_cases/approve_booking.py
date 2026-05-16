@@ -1,6 +1,7 @@
 """Use case: Approve a pending booking (hotel admin action)."""
 
 import logging
+from datetime import datetime
 
 from src.application.dtos.booking_dto import ApproveBookingDTO, BookingResponseDTO
 from src.domain.entities.booking import BookingStatus
@@ -55,6 +56,29 @@ class ApproveBookingUseCase:
             dto.booking_id,
             dto.admin_user_id,
         )
+
+        # Generate QR code for check-in (fire-and-forget — criteria 7)
+        try:
+            from src.infrastructure.services.qr_generator import generate_booking_qr
+
+            updated.qr_code = generate_booking_qr(
+                booking_code=updated.booking_code or str(updated.id),
+                booking_id=updated.id,
+                guest_name=updated.traveler_name,
+                check_in=updated.start_time.strftime("%Y-%m-%d"),
+                check_out=updated.end_time.strftime("%Y-%m-%d"),
+                room_type=updated.room_type,
+            )
+            updated.qr_generated_at = datetime.utcnow()
+            updated.qr_is_valid = True
+            updated = await self._repo.update(updated)
+            logger.info("qr_generated booking_id=%s", updated.id)
+        except Exception as exc:
+            logger.error(
+                "qr_generation_failed booking_id=%s error=%s",
+                updated.id,
+                exc,
+            )
 
         # Publish room availability event (fire-and-forget)
         if self._availability_publisher:
@@ -128,6 +152,9 @@ class ApproveBookingUseCase:
             traveler_email=updated.traveler_email,
             traveler_phone=updated.traveler_phone,
             traveler_document=updated.traveler_document,
+            qr_code=updated.qr_code,
+            qr_generated_at=updated.qr_generated_at,
+            qr_is_valid=updated.qr_is_valid,
             cancellable=updated.cancellable,
             created_at=updated.created_at,
             updated_at=updated.updated_at,

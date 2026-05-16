@@ -115,3 +115,93 @@ async def test_cancel_booking_not_cancellable():
 
     with pytest.raises(ValueError, match="Cannot cancel"):
         await use_case.execute(dto)
+
+
+# ── QR invalidation on cancel (criteria 5) ────────────────────────────────────
+
+
+@pytest.mark.asyncio
+async def test_cancel_confirmed_booking_invalidates_qr():
+    """Cancelling a confirmed booking with a QR must set qr_is_valid=False."""
+    repo = MockBookingRepository()
+    use_case = CancelBookingUseCase(repo)
+
+    booking_id = uuid4()
+    user_id = uuid4()
+
+    booking = Booking(
+        id=booking_id,
+        user_id=user_id,
+        hotel_id=uuid4(),
+        room_id=uuid4(),
+        start_time=datetime.utcnow() + timedelta(days=1),
+        end_time=datetime.utcnow() + timedelta(days=3),
+        status=BookingStatus.CONFIRMED,
+        qr_code="SOME_BASE64_QR==",
+        qr_is_valid=True,
+    )
+    repo.bookings[booking_id] = booking
+
+    dto = CancelBookingDTO(booking_id=booking_id, user_id=user_id)
+    result = await use_case.execute(dto)
+
+    assert result.status == "cancelled"
+    assert result.qr_is_valid is False
+    assert repo.bookings[booking_id].qr_is_valid is False
+
+
+@pytest.mark.asyncio
+async def test_cancel_confirmed_booking_preserves_qr_code_value():
+    """After invalidation the qr_code bytes must still be present (for audit)."""
+    repo = MockBookingRepository()
+    use_case = CancelBookingUseCase(repo)
+
+    booking_id = uuid4()
+    user_id = uuid4()
+    qr_content = "SOME_BASE64_QR=="
+
+    booking = Booking(
+        id=booking_id,
+        user_id=user_id,
+        hotel_id=uuid4(),
+        room_id=uuid4(),
+        start_time=datetime.utcnow() + timedelta(days=1),
+        end_time=datetime.utcnow() + timedelta(days=3),
+        status=BookingStatus.CONFIRMED,
+        qr_code=qr_content,
+        qr_is_valid=True,
+    )
+    repo.bookings[booking_id] = booking
+
+    dto = CancelBookingDTO(booking_id=booking_id, user_id=user_id)
+    result = await use_case.execute(dto)
+
+    assert result.qr_code == qr_content
+
+
+@pytest.mark.asyncio
+async def test_cancel_pending_booking_without_qr_succeeds():
+    """Cancelling a pending booking that never had a QR must not raise."""
+    repo = MockBookingRepository()
+    use_case = CancelBookingUseCase(repo)
+
+    booking_id = uuid4()
+    user_id = uuid4()
+
+    booking = Booking(
+        id=booking_id,
+        user_id=user_id,
+        hotel_id=uuid4(),
+        room_id=uuid4(),
+        start_time=datetime.utcnow() + timedelta(days=1),
+        end_time=datetime.utcnow() + timedelta(days=3),
+        status=BookingStatus.PENDING,
+        qr_code=None,
+    )
+    repo.bookings[booking_id] = booking
+
+    dto = CancelBookingDTO(booking_id=booking_id, user_id=user_id)
+    result = await use_case.execute(dto)
+
+    assert result.status == "cancelled"
+    assert result.qr_code is None
