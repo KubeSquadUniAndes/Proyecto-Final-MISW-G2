@@ -117,7 +117,7 @@ def test_build_qr_html_contains_reservation_code(checkin_dto):
     assert "TH-2026-QR001" in html
     assert "Ana Torres" in html
     assert "Hotel Bogotá Plaza" in html
-    assert "data:image/png;base64," in html
+    assert "cid:qr_checkin_image" in html
 
 
 def test_build_qr_html_contains_dates(checkin_dto):

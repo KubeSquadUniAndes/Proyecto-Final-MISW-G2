@@ -17,6 +17,9 @@ class MockBookingRepository:
     async def get_active_by_user(self, user_id):
         return [b for b in self.bookings if b.user_id == user_id]
 
+    async def list_by_user(self, user_id):
+        return [b for b in self.bookings if b.user_id == user_id]
+
 
 @pytest.mark.asyncio
 async def test_list_bookings_success():

@@ -4,7 +4,7 @@ import string
 from decimal import Decimal, ROUND_HALF_UP
 
 from src.application.dtos.booking_dto import BookingResponseDTO, CreateBookingDTO
-from src.domain.entities.booking import Booking, BookingStatus
+from src.domain.entities.booking import Booking
 from src.domain.repositories.booking_repository_port import BookingRepositoryPort
 from src.domain.services.booking_domain_service import BookingDomainService
 
@@ -129,9 +129,6 @@ class CreateBookingUseCase:
 
         if not booking.is_valid():
             raise ValueError("Booking dates are not valid")
-
-        if dto.user_role == "traveler":
-            booking.status = BookingStatus.CONFIRMED
 
         # 4. Check schedule conflicts
         has_conflict = await self._domain_service.has_schedule_conflict(
