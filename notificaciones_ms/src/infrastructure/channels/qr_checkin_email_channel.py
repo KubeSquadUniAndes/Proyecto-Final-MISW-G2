@@ -169,7 +169,7 @@ def _build_qr_pdf(dto: QrCheckinEmailDTO) -> bytes:
 # ── HTML builder ──────────────────────────────────────────────────────────────
 
 
-def _build_qr_html(dto: QrCheckinEmailDTO) -> str:
+def _build_qr_html(dto: QrCheckinEmailDTO, cid: str = "qr_checkin_image") -> str:
     def row(label: str, value: str, alt: bool = False) -> str:
         bg = "#f2f2f2" if alt else "#ffffff"
         return (
@@ -190,7 +190,7 @@ def _build_qr_html(dto: QrCheckinEmailDTO) -> str:
 para registrar el check-in en <b>{dto.property_name}</b>.</p>
 
 <div style="text-align:center;margin:24px 0;">
-  <img src="data:image/png;base64,{dto.qr_code}"
+  <img src="cid:{cid}"
        alt="QR Check-In {dto.reservation_code}"
        style="width:200px;height:200px;border:1px solid #ddd;padding:8px;">
   <p style="font-size:12px;color:#7f8c8d;">
@@ -295,13 +295,28 @@ async def send_qr_checkin_email(dto: QrCheckinEmailDTO) -> bool:
         return False
 
     qr_bytes = base64.b64decode(dto.qr_code)
+    cid = "qr_checkin_image"
 
+    # Structure: multipart/mixed
+    #   └── multipart/related
+    #         ├── text/html  (references cid:qr_checkin_image)
+    #         └── image/png  (Content-ID: <qr_checkin_image>, inline)
+    #   ├── image/png  (attachment copy)
+    #   └── application/pdf (attachment)
     msg = MIMEMultipart("mixed")
     msg["Subject"] = subject
     msg["From"] = settings.EMAIL_FROM
     msg["To"] = dto.guest_email
 
-    msg.attach(MIMEText(_build_qr_html(dto), "html"))
+    related = MIMEMultipart("related")
+    related.attach(MIMEText(_build_qr_html(dto, cid=cid), "html"))
+
+    inline_img = MIMEImage(qr_bytes, _subtype="png")
+    inline_img.add_header("Content-ID", f"<{cid}>")
+    inline_img.add_header("Content-Disposition", "inline", filename="qr.png")
+    related.attach(inline_img)
+
+    msg.attach(related)
 
     # PNG attachment (C3)
     png_attachment = MIMEImage(qr_bytes, _subtype="png")

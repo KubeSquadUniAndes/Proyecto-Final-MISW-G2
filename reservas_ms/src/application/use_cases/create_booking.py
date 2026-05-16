@@ -130,9 +130,6 @@ class CreateBookingUseCase:
         if not booking.is_valid():
             raise ValueError("Booking dates are not valid")
 
-        if dto.user_role == "traveler":
-            booking.status = BookingStatus.CONFIRMED
-
         # 4. Check schedule conflicts
         has_conflict = await self._domain_service.has_schedule_conflict(
             user_id=booking.user_id,
