@@ -324,7 +324,7 @@ class SQLAlchemyBookingRepository(BookingRepositoryPort):
             return []
         filters = [
             BookingModel.id.in_(booking_ids),
-            BookingModel.status.in_([BookingStatus.PENDING, BookingStatus.CONFIRMED]),
+            text("status = ANY(ARRAY['pending', 'confirmed']::booking_status_enum[])"),
         ]
         if checkin is not None and checkout is not None:
             filters += [

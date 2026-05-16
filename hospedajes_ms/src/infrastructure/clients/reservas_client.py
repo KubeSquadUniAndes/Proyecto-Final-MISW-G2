@@ -41,7 +41,7 @@ class ReservasClient:
         if not booking_ids:
             return []
 
-        url = f"{self._base_url}/bookings/bulk-dates"
+        url = f"{self._base_url}/api/v1/bookings/bulk-dates"
         payload = {
             "booking_ids": booking_ids,
             "checkin": checkin.isoformat(),
@@ -63,7 +63,7 @@ class ReservasClient:
                 exc.response.status_code,
                 exc.response.text,
             )
-            raise
+            return []
         except httpx.HTTPError as exc:
             logger.warning("Network error fetching bulk booking dates: %s", exc)
             return []

@@ -213,9 +213,10 @@ async def get_booking(
 )
 async def create_booking(
     body: CreateBookingRequest,
-    user_id: UUID = Depends(get_current_user_id),
+    user_role: tuple[UUID, str] = Depends(get_current_user_role),
     db: AsyncSession = Depends(get_db),
 ) -> BookingResponse:
+    user_id, role = user_role
     repo = _make_repo(db)
     domain_service = BookingDomainService(repo)
     use_case = CreateBookingUseCase(
@@ -227,6 +228,7 @@ async def create_booking(
     try:
         dto = CreateBookingDTO(
             user_id=user_id,
+            user_role=role,
             hotel_id=body.hotel_id,
             room_id=body.room_id,
             start_time=body.start_time,

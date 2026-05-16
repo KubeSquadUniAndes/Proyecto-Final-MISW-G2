@@ -6,7 +6,7 @@ from src.domain.repositories.room_repository_port import RoomRepositoryPort
 
 logger = logging.getLogger(__name__)
 
-_OCCUPY_STATUSES = {"pending", "confirmed"}
+_OCCUPY_STATUSES = {"pending", "confirmed", "checked_in"}
 _FREE_STATUSES = {"cancelled", "completed"}
 
 

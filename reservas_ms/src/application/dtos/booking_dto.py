@@ -9,6 +9,7 @@ from src.domain.entities.booking import BookingStatus
 
 class CreateBookingDTO(BaseModel):
     user_id: UUID
+    user_role: str | None = None
     hotel_id: UUID
     room_id: UUID
     start_time: datetime
