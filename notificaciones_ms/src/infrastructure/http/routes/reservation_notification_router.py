@@ -1,7 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, Header, status
 
 from src.application.dtos.payment_voucher_dto import PaymentVoucherDTO
-from src.application.dtos.qr_checkin_email_dto import QrCancelledEmailDTO, QrCheckinEmailDTO
+from src.application.dtos.qr_checkin_email_dto import (
+    QrCancelledEmailDTO,
+    QrCheckinEmailDTO,
+)
 from src.application.dtos.reservation_confirmation_dto import ReservationConfirmationDTO
 from src.application.use_cases.send_payment_voucher import SendPaymentVoucherUseCase
 from src.application.use_cases.send_qr_checkin_email import (

@@ -111,16 +111,19 @@ def _build_qr_pdf(dto: QrCheckinEmailDTO) -> bytes:
     story.append(HRFlowable(width="100%", thickness=1.5, color=_GREEN, spaceAfter=10))
     story.append(Paragraph("QR DE CHECK-IN", title))
     story.append(
-        Paragraph(
-            f"Reserva: <b>{dto.reservation_code}</b>", instructions_style
-        )
+        Paragraph(f"Reserva: <b>{dto.reservation_code}</b>", instructions_style)
     )
     story.append(Spacer(1, 8))
 
     # QR centered
     qr_table = Table([[qr_image]], colWidths=[16.7 * cm])
     qr_table.setStyle(
-        TableStyle([("ALIGN", (0, 0), (-1, -1), "CENTER"), ("VALIGN", (0, 0), (-1, -1), "MIDDLE")])
+        TableStyle(
+            [
+                ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+                ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+            ]
+        )
     )
     story.append(qr_table)
     story.append(Spacer(1, 6))
@@ -286,7 +289,9 @@ async def send_qr_checkin_email(dto: QrCheckinEmailDTO) -> bool:
     try:
         pdf_bytes = _build_qr_pdf(dto)
     except Exception as exc:
-        logger.error("qr_pdf_build_error reservation_code=%s error=%s", dto.reservation_code, exc)
+        logger.error(
+            "qr_pdf_build_error reservation_code=%s error=%s", dto.reservation_code, exc
+        )
         return False
 
     qr_bytes = base64.b64decode(dto.qr_code)
@@ -301,14 +306,18 @@ async def send_qr_checkin_email(dto: QrCheckinEmailDTO) -> bool:
     # PNG attachment (C3)
     png_attachment = MIMEImage(qr_bytes, _subtype="png")
     png_attachment.add_header(
-        "Content-Disposition", "attachment", filename=f"qr-checkin-{dto.reservation_code}.png"
+        "Content-Disposition",
+        "attachment",
+        filename=f"qr-checkin-{dto.reservation_code}.png",
     )
     msg.attach(png_attachment)
 
     # PDF attachment (C3)
     pdf_attachment = MIMEApplication(pdf_bytes, _subtype="pdf")
     pdf_attachment.add_header(
-        "Content-Disposition", "attachment", filename=f"checkin-{dto.reservation_code}.pdf"
+        "Content-Disposition",
+        "attachment",
+        filename=f"checkin-{dto.reservation_code}.pdf",
     )
     msg.attach(pdf_attachment)
 

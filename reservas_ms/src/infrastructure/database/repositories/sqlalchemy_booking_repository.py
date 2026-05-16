@@ -199,12 +199,12 @@ class SQLAlchemyBookingRepository(BookingRepositoryPort):
         return bookings
 
     async def get_active_by_user(self, user_id: UUID) -> list[Booking]:
+        # Use SQL literal for enum filter — bound parameters are sent as ::VARCHAR
+        # which PostgreSQL rejects when comparing against booking_status_enum.
         result = await self._session.execute(
             select(BookingModel).where(
                 BookingModel.user_id == user_id,
-                BookingModel.status.in_(
-                    [BookingStatus.PENDING.value, BookingStatus.CONFIRMED.value]
-                ),
+                text("status IN ('pending', 'confirmed')"),
             )
         )
         models = result.scalars().all()
