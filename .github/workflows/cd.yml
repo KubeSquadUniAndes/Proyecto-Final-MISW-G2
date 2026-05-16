@@ -351,7 +351,7 @@ jobs:
             --env-var test_email=newman.test@example.com \
             --env-var test_password=SecurePass123! \
             --env-var hotel_email=hotel-admin@example.com \
-            --env-var hotel_password=${{ secrets.RESERVAS_HOTEL_PASSWORD }} \
+            --env-var hotel_password=SecurePass123! \
             --env-var hotel_id=${{ secrets.RESERVAS_HOTEL_ID }} \
             --env-var room_id=${{ secrets.RESERVAS_ROOM_ID }} \
             -r cli,htmlextra \
