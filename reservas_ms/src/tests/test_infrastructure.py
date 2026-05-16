@@ -152,7 +152,11 @@ async def test_no_conflict_different_resource():
     rid1 = uuid4()
     rid2 = uuid4()
     existing = Booking(
-        user_id=uid, hotel_id=uuid4(), room_id=rid1, start_time=now, end_time=now + timedelta(hours=2)
+        user_id=uid,
+        hotel_id=uuid4(),
+        room_id=rid1,
+        start_time=now,
+        end_time=now + timedelta(hours=2),
     )
     mock_repo = AsyncMock()
     mock_repo.list_by_user.return_value = [existing]
@@ -167,7 +171,11 @@ async def test_conflict_same_resource():
     uid = uuid4()
     rid = uuid4()
     existing = Booking(
-        user_id=uid, hotel_id=uuid4(), room_id=rid, start_time=now, end_time=now + timedelta(hours=2)
+        user_id=uid,
+        hotel_id=uuid4(),
+        room_id=rid,
+        start_time=now,
+        end_time=now + timedelta(hours=2),
     )
     mock_repo = AsyncMock()
     mock_repo.list_by_user.return_value = [existing]

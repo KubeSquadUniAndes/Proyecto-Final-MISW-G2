@@ -42,7 +42,9 @@ def _capture_payload(**overrides) -> dict:
         # make() and make_image() need a real QRCode object, so we still
         # need to call them — just patch make_image to return a dummy
         mock_img = MagicMock()
-        mock_img.save = lambda buf, format: buf.write(b"\x89PNG\r\n\x1a\n" + b"\x00" * 8)
+        mock_img.save = lambda buf, format: buf.write(
+            b"\x89PNG\r\n\x1a\n" + b"\x00" * 8
+        )
         with patch.object(qrcode.QRCode, "make_image", return_value=mock_img):
             with patch.object(qrcode.QRCode, "make"):
                 _generate_default(**overrides)
@@ -131,7 +133,9 @@ def test_payload_is_valid_json():
     with patch.object(qrcode.QRCode, "add_data", fake_add_data):
         with patch.object(qrcode.QRCode, "make"):
             mock_img = MagicMock()
-            mock_img.save = lambda buf, format: buf.write(b"\x89PNG\r\n\x1a\n" + b"\x00" * 8)
+            mock_img.save = lambda buf, format: buf.write(
+                b"\x89PNG\r\n\x1a\n" + b"\x00" * 8
+            )
             with patch.object(qrcode.QRCode, "make_image", return_value=mock_img):
                 _generate_default()
 
