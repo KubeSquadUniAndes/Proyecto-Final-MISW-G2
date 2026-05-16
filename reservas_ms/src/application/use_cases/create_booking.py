@@ -4,7 +4,7 @@ import string
 from decimal import Decimal, ROUND_HALF_UP
 
 from src.application.dtos.booking_dto import BookingResponseDTO, CreateBookingDTO
-from src.domain.entities.booking import Booking, BookingStatus
+from src.domain.entities.booking import Booking
 from src.domain.repositories.booking_repository_port import BookingRepositoryPort
 from src.domain.services.booking_domain_service import BookingDomainService
 
