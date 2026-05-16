@@ -352,8 +352,8 @@ jobs:
             --env-var test_password=SecurePass123! \
             --env-var hotel_email=hotel-admin@example.com \
             --env-var hotel_password=SecurePass123! \
-            --env-var hotel_id=${{ secrets.RESERVAS_HOTEL_ID }} \
-            --env-var room_id=${{ secrets.RESERVAS_ROOM_ID }} \
+            --env-var hotel_id=550e8400-e29b-41d4-a716-446655440001 \
+            --env-var room_id=550e8400-e29b-41d4-a716-446655440002 \
             -r cli,htmlextra \
             --reporter-htmlextra-export postman/report-reservas.html \
             --insecure \
