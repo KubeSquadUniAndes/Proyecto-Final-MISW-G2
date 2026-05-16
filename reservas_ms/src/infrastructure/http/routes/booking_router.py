@@ -17,6 +17,7 @@ from src.application.use_cases.approve_booking import ApproveBookingUseCase
 from src.application.use_cases.cancel_booking import CancelBookingUseCase
 from src.application.use_cases.checkin_booking import CheckInBookingUseCase
 from src.application.use_cases.check_availability import CheckAvailabilityUseCase
+from src.application.use_cases.resend_qr_email import ResendQrEmailUseCase
 from src.application.use_cases.create_booking import CreateBookingUseCase
 from src.application.use_cases.list_bookings import ListBookingsUseCase
 from src.application.use_cases.reject_booking import RejectBookingUseCase
@@ -363,7 +364,9 @@ async def cancel_booking(
 ) -> BookingResponse:
     repo = _make_repo(db)
     use_case = CancelBookingUseCase(
-        repo, availability_publisher=_availability_publisher
+        repo,
+        availability_publisher=_availability_publisher,
+        notificaciones_client=_notificaciones_client,
     )
     try:
         dto = CancelBookingDTO(booking_id=booking_id, user_id=user_id)
@@ -624,6 +627,45 @@ async def reject_booking(
         except Exception:
             pass
         return BookingResponse(**result.model_dump())
+    except LookupError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc))
+    except PermissionError as exc:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(exc))
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc))
+
+
+# ── POST /bookings/{booking_id}/resend-qr ─────────────────────────────────────
+
+
+@router.post(
+    "/{booking_id}/resend-qr",
+    status_code=status.HTTP_200_OK,
+    summary="Resend QR check-in email to the traveler (C5)",
+    responses={
+        200: {"description": "Email sent or queued"},
+        401: {"model": ErrorResponse},
+        403: {"model": ErrorResponse},
+        404: {"model": ErrorResponse},
+        409: {"model": ErrorResponse},
+    },
+)
+async def resend_qr_email(
+    booking_id: UUID,
+    user_id: UUID = Depends(get_current_user_id),
+    db: AsyncSession = Depends(get_db),
+) -> dict:
+    """Resend the QR check-in email to the traveler's registered address."""
+    repo = _make_repo(db)
+    use_case = ResendQrEmailUseCase(repo, _notificaciones_client)
+    try:
+        sent = await use_case.execute(booking_id=booking_id, user_id=user_id)
+        return {
+            "email_sent": sent,
+            "message": "Email enviado correctamente."
+            if sent
+            else "El email no pudo enviarse, pero el QR sigue disponible en la app.",
+        }
     except LookupError as exc:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc))
     except PermissionError as exc:

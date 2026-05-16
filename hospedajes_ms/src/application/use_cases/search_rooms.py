@@ -65,8 +65,7 @@ class SearchRoomsUseCase:
                 continue
 
             if not bookings or not any(
-                b.start_time < checkout and b.end_time > checkin
-                for b in bookings
+                b.start_time < checkout and b.end_time > checkin for b in bookings
             ):
                 available.append(self._to_dto(room))
 

@@ -89,18 +89,19 @@ class CheckInBookingUseCase:
                 "Solo las reservas confirmadas pueden hacer check-in."
             )
 
-        # C2 / C3 – Date validation (same calendar day, UTC)
+        # C2 / C3 – Date validation: allow check-in from checkin_date through checkout_date.
         today = date.today()
         checkin_date = booking.start_time.date()
+        checkout_date = booking.end_time.date()
         if today < checkin_date:
             raise ValueError(
                 f"El check-in aún no está disponible. "
                 f"La fecha de llegada es {checkin_date.isoformat()}."
             )
-        if today > checkin_date:
+        if today > checkout_date:
             raise ValueError(
                 f"El código QR ha expirado. "
-                f"La fecha de check-in registrada fue {checkin_date.isoformat()} "
+                f"La estadía finalizó el {checkout_date.isoformat()} "
                 f"y la fecha actual es {today.isoformat()}."
             )
 

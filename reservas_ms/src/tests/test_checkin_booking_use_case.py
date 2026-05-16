@@ -133,8 +133,30 @@ async def test_checkin_rejected_when_date_is_future():
 
 
 @pytest.mark.asyncio
-async def test_checkin_rejected_when_date_is_past():
-    booking = _confirmed_booking(start_time=PAST_DATE)
+async def test_checkin_allowed_when_start_is_past_but_still_within_stay():
+    """Guest arrives a day late — check-in allowed as long as today <= checkout."""
+    booking = _confirmed_booking(
+        start_time=PAST_DATE,
+        end_time=TODAY_DATE + timedelta(days=2),
+    )
+    use_case, mock_repo = _make_use_case(booking)
+    dto = _make_dto(booking_id=booking.id, booking_code=booking.booking_code)
+
+    with patch("src.application.use_cases.checkin_booking.date") as mock_date:
+        mock_date.today.return_value = TODAY_DATE.date()
+        result = await use_case.execute(dto)
+
+    assert result.status == BookingStatus.CHECK_IN
+    mock_repo.update.assert_called_once()
+
+
+@pytest.mark.asyncio
+async def test_checkin_rejected_when_past_checkout_date():
+    """QR expired: today is after the checkout date."""
+    booking = _confirmed_booking(
+        start_time=PAST_DATE - timedelta(days=3),
+        end_time=PAST_DATE,
+    )
     use_case, mock_repo = _make_use_case(booking)
     dto = _make_dto(booking_id=booking.id, booking_code=booking.booking_code)
 
