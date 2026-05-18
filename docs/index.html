@@ -651,6 +651,10 @@
   <a class="nav-item" href="#gitflow"><span class="icon">◈</span>GitFlow</a>
   <a class="nav-item" href="#testing"><span class="icon">◈</span>Pruebas</a>
   <a class="nav-item" href="#infraestructura"><span class="icon">◈</span>Infraestructura</a>
+
+  <div class="nav-section">Service Mesh</div>
+  <a class="nav-item" href="#servicemesh"><span class="icon">◈</span>Istio Ambient</a>
+  <a class="nav-item" href="#observabilidad"><span class="icon">◈</span>Observabilidad</a>
 </nav>
 
 <!-- MAIN -->
@@ -664,9 +668,12 @@
     <div class="tech-pills">
       <span class="pill pill-blue">Python · FastAPI</span>
       <span class="pill pill-blue">AWS EKS · K8s</span>
+      <span class="pill pill-blue">Istio Ambient · Service Mesh</span>
       <span class="pill pill-purple">Android · Kotlin</span>
       <span class="pill pill-purple">Angular · CloudFront</span>
-      <span class="pill pill-green">PostgreSQL</span>
+      <span class="pill pill-green">PostgreSQL · AWS RDS</span>
+      <span class="pill pill-green">Prometheus · Grafana · Loki</span>
+      <span class="pill pill-orange">Terraform · IaC</span>
       <span class="pill pill-orange">GitHub Actions CI/CD</span>
       <span class="pill pill-orange">Docker · Alembic</span>
     </div>
@@ -690,8 +697,11 @@
         <div class="card">
           <div class="card-title">Decisiones arquitectónicas clave</div>
           <p>• Microservicios desplegados en <strong style="color:var(--accent)">AWS EKS</strong> con escalado por pods (k8sPod).</p>
+          <p>• <strong style="color:var(--accent)">Istio Ambient Mode</strong> (sidecarless): service mesh con ztunnel (mTLS L4) y waypoint proxy (políticas L7) sin inyección de sidecars.</p>
           <p>• Separación de lectura y escritura: escritura transaccional en PostgreSQL.</p>
           <p>• Cifrado de datos sensibles con extensión <strong style="color:var(--accent)">pgcrypto AES-256</strong> en PostgreSQL.</p>
+          <p>• Secretos gestionados en <strong style="color:var(--accent)">AWS Secrets Manager</strong> con sincronización automática vía External Secrets Operator.</p>
+          <p>• Arquitectura hexagonal (puertos y adaptadores) en cada microservicio para independencia de infraestructura.</p>
         </div>
       </div>
 
@@ -710,12 +720,13 @@
           </div>
         </div>
         <div class="arch-layer">
-          <div class="arch-layer-header" style="color:var(--accent)">⚡ &nbsp;API Gateway / Intermediación</div>
+          <div class="arch-layer-header" style="color:var(--accent)">⚡ &nbsp;API Gateway / Service Mesh</div>
           <div class="arch-layer-body">
             <ul>
-              <li>ApiGateway (k8sPod)</li>
+              <li>travelhub-gateway · Istio · AWS NLB</li>
+              <li>waypoint-private · Istio Waypoint (L7)</li>
+              <li>ztunnel · mTLS automático (L4)</li>
               <li>LoginHandler · Token Validator</li>
-              <li>ProveedoresPagos · GateWay</li>
             </ul>
           </div>
         </div>
@@ -739,9 +750,23 @@
           <div class="arch-layer-header" style="color:var(--warn)">🗄️ &nbsp;Persistencia</div>
           <div class="arch-layer-body">
             <ul>
-              <li>PostgreSQL · TravelHubDB (Primary + Replica)</li>
-              <li>Redis · SessionCache / DisponibilidadPrecios</li>
-              <li>AWS SQS · TravelHubTopics</li>
+              <li>PostgreSQL · AWS RDS (Primary + Replica)</li>
+              <li>AWS SQS · hospedajes-availability + DLQ</li>
+              <li>AWS SNS · room-availability</li>
+              <li>AWS S3 · imágenes de hospedajes</li>
+              <li>AWS Secrets Manager · secretos de aplicación</li>
+            </ul>
+          </div>
+        </div>
+        <div class="arch-layer">
+          <div class="arch-layer-header" style="color:var(--text-dim)">📊 &nbsp;Observabilidad</div>
+          <div class="arch-layer-body">
+            <ul>
+              <li>Prometheus · métricas Istio + pods</li>
+              <li>Grafana Alloy → Loki · logs centralizados</li>
+              <li>Jaeger · trazas distribuidas</li>
+              <li>Kiali · topología del service mesh</li>
+              <li>Grafana · dashboards unificados</li>
             </ul>
           </div>
         </div>
@@ -1274,6 +1299,315 @@
           <div class="card-title">IaC</div>
           <p>Toda la infraestructura AWS está definida como código con <strong style="color:var(--accent)">Terraform</strong>: VPC, subredes, Security Groups, EKS cluster, RDS, ElastiCache y SQS.</p>
         </div>
+      </div>
+    </section>
+
+    <!-- ══ 11. SERVICE MESH ══ -->
+    <section id="servicemesh">
+      <div class="section-header">
+        <span class="section-number">11</span>
+        <h2 class="section-title">Service Mesh — <span class="accent">Istio Ambient</span></h2>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Modo Ambient (Sidecarless)</div>
+          <p>TravelHub usa Istio en <strong style="color:var(--text)">modo ambient</strong>, eliminando la necesidad de inyectar sidecars en cada pod. La malla se divide en dos capas independientes: el proxy <strong style="color:var(--accent)">ztunnel</strong> a nivel de nodo (L4) y el proxy <strong style="color:var(--accent)">waypoint</strong> para políticas L7 por namespace.</p>
+          <p>El namespace <code style="font-family:var(--mono);font-size:11px;color:var(--accent3)">workloads</code> está etiquetado con <code style="font-family:var(--mono);font-size:11px;color:var(--accent3)">istio.io/dataplane-mode: ambient</code>. Todos los servicios apuntan al waypoint con <code style="font-family:var(--mono);font-size:11px;color:var(--accent3)">istio.io/use-waypoint: waypoint-private</code>.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">Componentes del plano de datos</div>
+          <p><strong style="color:var(--accent)">ztunnel</strong> — DaemonSet por nodo. Intercepta todo el tráfico TCP, provee mTLS transparente con identidades SPIFFE/SVID basadas en ServiceAccounts, telemetría L4 y reenvío seguro vía protocolo HBONE.</p>
+          <p><strong style="color:var(--accent)">waypoint-private</strong> — Proxy Envoy dedicado (Gateway API, clase <code style="font-family:var(--mono);font-size:11px;color:var(--accent3)">istio-waypoint</code>, puerto 15008). Aplica políticas L7: AuthorizationPolicies, DestinationRules, retries y rate limiting antes de entregar al pod destino.</p>
+        </div>
+      </div>
+
+      <h3>Flujo de tráfico norte-sur y este-oeste</h3>
+      <div class="pipeline">
+        <div class="pipeline-step">
+          <div class="ps-tag" style="color:var(--text-faint)">internet</div>
+          <div class="ps-title">Cliente</div>
+          <ul class="ps-items"><li>HTTPS · HTTP</li></ul>
+        </div>
+        <div class="pipeline-step">
+          <div class="ps-tag" style="color:var(--accent)">aws</div>
+          <div class="ps-title">NLB</div>
+          <ul class="ps-items"><li>Network Load</li><li>Balancer</li></ul>
+        </div>
+        <div class="pipeline-step">
+          <div class="ps-tag" style="color:var(--accent)">gateway</div>
+          <div class="ps-title">travelhub-gateway</div>
+          <ul class="ps-items"><li>TLS termination</li><li>Path-based routing</li></ul>
+        </div>
+        <div class="pipeline-step">
+          <div class="ps-tag" style="color:var(--accent2)">istio l7</div>
+          <div class="ps-title">waypoint-private</div>
+          <ul class="ps-items"><li>AuthzPolicy</li><li>OutlierDetect</li><li>RateLimit</li></ul>
+        </div>
+        <div class="pipeline-step">
+          <div class="ps-tag" style="color:var(--accent3)">k8s</div>
+          <div class="ps-title">ClusterIP Service</div>
+          <ul class="ps-items"><li>7 servicios</li></ul>
+        </div>
+        <div class="pipeline-step">
+          <div class="ps-tag" style="color:var(--accent3)">workloads</div>
+          <div class="ps-title">Pod (FastAPI)</div>
+          <ul class="ps-items"><li>ztunnel mTLS</li><li>sin sidecar</li></ul>
+        </div>
+      </div>
+
+      <h3>Rutas HTTP — 07-http-routes.yaml</h3>
+      <div class="card" style="padding:0; overflow:hidden; margin-top:8px;">
+        <table class="domain-table">
+          <thead>
+            <tr>
+              <th>Path</th>
+              <th>Servicio destino</th>
+              <th>Puerto</th>
+              <th>Rewrite</th>
+              <th>Response Header inyectado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="entity-name">/detector-anomalias</span></td>
+              <td class="attr-list">detector-anomalias-service</td>
+              <td class="attr-list">80</td>
+              <td class="attr-list">Strip prefix</td>
+              <td class="attr-list">—</td>
+            </tr>
+            <tr>
+              <td><span class="entity-name">/hospedajes</span></td>
+              <td class="attr-list">hospedajes-service</td>
+              <td class="attr-list">80</td>
+              <td class="attr-list">Strip prefix</td>
+              <td class="attr-list">—</td>
+            </tr>
+            <tr>
+              <td><span class="entity-name">/login-handler</span></td>
+              <td class="attr-list">login-handler-service</td>
+              <td class="attr-list">80</td>
+              <td class="attr-list">Strip prefix</td>
+              <td class="attr-list">x-travelhub-header: login-handler-service</td>
+            </tr>
+            <tr>
+              <td><span class="entity-name">/notificaciones</span></td>
+              <td class="attr-list">notificaciones-service</td>
+              <td class="attr-list">80</td>
+              <td class="attr-list">Strip prefix</td>
+              <td class="attr-list">x-travelhub-header: notificaciones-service</td>
+            </tr>
+            <tr>
+              <td><span class="entity-name">/reservas</span></td>
+              <td class="attr-list">reservas-service</td>
+              <td class="attr-list">80</td>
+              <td class="attr-list">Strip prefix</td>
+              <td class="attr-list">x-travelhub-header: reservas-service</td>
+            </tr>
+            <tr>
+              <td><span class="entity-name">/users</span></td>
+              <td class="attr-list">users-service</td>
+              <td class="attr-list">80</td>
+              <td class="attr-list">Strip prefix</td>
+              <td class="attr-list">x-travelhub-header: users-service</td>
+            </tr>
+            <tr>
+              <td><span class="entity-name">/pagos</span></td>
+              <td class="attr-list">pagos-service</td>
+              <td class="attr-list">80</td>
+              <td class="attr-list">Strip prefix</td>
+              <td class="attr-list">x-travelhub-header: pagos-service</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="grid-2" style="margin-top:20px;">
+        <div class="card">
+          <div class="card-title">mTLS automático (ztunnel)</div>
+          <p>Todo el tráfico este-oeste entre pods del namespace <code style="font-family:var(--mono);font-size:11px;color:var(--accent3)">workloads</code> viaja cifrado con <strong style="color:var(--text)">mTLS mutuo</strong>. El ztunnel establece identidades SPIFFE/SVID basadas en los ServiceAccounts de Kubernetes —sin configuración adicional— ambient mode lo habilita automáticamente para todos los pods en el namespace.</p>
+          <p>Para AWS: los microservicios usan <strong style="color:var(--accent)">IRSA</strong> (IAM Roles for Service Accounts) en lugar de EC2 IMDS, evitando conflictos con el tráfico interceptado por ztunnel.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">Waypoint — políticas L7 (02-waypoint.yaml)</div>
+          <p>El waypoint <code style="font-family:var(--mono);font-size:11px;color:var(--accent3)">waypoint-private</code> (HBONE port 15008) es el único punto donde se evalúan políticas L7. Recibe tráfico del ztunnel del nodo destino, aplica AuthorizationPolicies, DestinationRules (outlier detection, connection pools) y rate limits, luego reenvía al pod final.</p>
+          <p>Subsets definidos: <code style="font-family:var(--mono);font-size:11px;color:var(--accent3)">hospedajes-v1</code> y <code style="font-family:var(--mono);font-size:11px;color:var(--accent3)">users-v1</code> —preparados para canary deployments y traffic shifting.</p>
+        </div>
+      </div>
+
+      <h3>Resiliencia — Destination Rules (05-destination-rules.yaml)</h3>
+      <div class="card" style="padding:0; overflow:hidden; margin-top:8px;">
+        <table class="domain-table">
+          <thead>
+            <tr>
+              <th>Servicio</th>
+              <th>Max TCP Conn.</th>
+              <th>5xx threshold</th>
+              <th>Ejection window</th>
+              <th>Max ejected</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="entity-name">detector-anomalias</span></td>
+              <td class="attr-list">800</td>
+              <td class="attr-list">3 consecutivos</td>
+              <td class="attr-list">30 s</td>
+              <td class="attr-list">50 %</td>
+            </tr>
+            <tr>
+              <td><span class="entity-name">hospedajes</span></td>
+              <td class="attr-list">800</td>
+              <td class="attr-list">2 consecutivos</td>
+              <td class="attr-list">30 s</td>
+              <td class="attr-list">50 %</td>
+            </tr>
+            <tr>
+              <td><span class="entity-name">login-handler</span></td>
+              <td class="attr-list">800</td>
+              <td class="attr-list">3 consecutivos</td>
+              <td class="attr-list">30 s</td>
+              <td class="attr-list">50 %</td>
+            </tr>
+            <tr>
+              <td><span class="entity-name">notificaciones</span></td>
+              <td class="attr-list">800</td>
+              <td class="attr-list">3 consecutivos</td>
+              <td class="attr-list">30 s</td>
+              <td class="attr-list">50 %</td>
+            </tr>
+            <tr>
+              <td><span class="entity-name">reservas</span></td>
+              <td class="attr-list">800</td>
+              <td class="attr-list">3 consecutivos</td>
+              <td class="attr-list">30 s</td>
+              <td class="attr-list">50 %</td>
+            </tr>
+            <tr>
+              <td><span class="entity-name">users</span></td>
+              <td class="attr-list">800</td>
+              <td class="attr-list">3 consecutivos</td>
+              <td class="attr-list">30 s</td>
+              <td class="attr-list">50 %</td>
+            </tr>
+            <tr>
+              <td><span class="entity-name">pagos</span></td>
+              <td class="attr-list">800</td>
+              <td class="attr-list">3 consecutivos</td>
+              <td class="attr-list">30 s</td>
+              <td class="attr-list">50 %</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="grid-2" style="margin-top:20px;">
+        <div class="card">
+          <div class="card-title">Authorization Policies — mínimo privilegio (11-authorization-policies.yaml)</div>
+          <p>El ServiceAccount <code style="font-family:var(--mono);font-size:11px;color:var(--accent3)">login-handler-sa</code> tiene una política <strong style="color:var(--warn)">DENY</strong> que impide al microservicio login-handler llamar a detector-anomalias, notificaciones, reservas y hospedajes. login-handler solo puede comunicarse con users-service, aplicando el principio de mínimo privilegio a nivel de service mesh sin modificar código de aplicación.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">Rate Limiting local (13-rate-limit.yaml)</div>
+          <p>EnvoyFilter aplicado al pod <code style="font-family:var(--mono);font-size:11px;color:var(--accent3)">reservas-app</code>: <strong style="color:var(--accent)">100 req/s</strong> sostenidas con burst de <strong style="color:var(--accent)">500 tokens</strong> (capacidad 5×). Rate limiting local por instancia —cada réplica mantiene su propio bucket de tokens. Cuando se excede el límite el proxy responde HTTP 429 con header <code style="font-family:var(--mono);font-size:11px;color:var(--accent3)">x-local-rate-limit: true</code>.</p>
+        </div>
+      </div>
+
+      <div class="callout" style="margin-top:16px;">
+        <strong>Access Logging mesh-wide (16-istio-access-logging.yaml):</strong> El recurso <code style="font-family:var(--mono);font-size:11px">Telemetry</code> en <code style="font-family:var(--mono);font-size:11px">istio-system</code> habilita logging HTTP via proveedor <code style="font-family:var(--mono);font-size:11px">envoy</code> para todos los proxies de la malla — ztunnel y waypoint registran método, URL, status code, latencia y bytes en cada salto de tráfico.
+      </div>
+    </section>
+
+    <!-- ══ 12. OBSERVABILIDAD ══ -->
+    <section id="observabilidad">
+      <div class="section-header">
+        <span class="section-number">12</span>
+        <h2 class="section-title">Stack de <span class="accent">Observabilidad</span></h2>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Arquitectura del stack</div>
+        <p>La observabilidad cubre los tres pilares: <strong style="color:var(--accent)">métricas</strong> (Prometheus + Grafana), <strong style="color:var(--accent2)">logs</strong> (Alloy → Loki → Grafana) y <strong style="color:var(--accent3)">trazas distribuidas</strong> (Jaeger). Todo el stack corre en un node group dedicado con taint <code style="font-family:var(--mono);font-size:11px;color:var(--accent3)">dedicated=observability:NO_SCHEDULE</code>, aislado de los pods de negocio para evitar contención de recursos.</p>
+      </div>
+
+      <div class="pipeline" style="margin-top:20px;">
+        <div class="pipeline-step">
+          <div class="ps-tag" style="color:var(--accent3)">fuente</div>
+          <div class="ps-title">Pods + Mesh</div>
+          <ul class="ps-items"><li>7 microservicios</li><li>ztunnel metrics</li><li>waypoint metrics</li></ul>
+        </div>
+        <div class="pipeline-step">
+          <div class="ps-tag" style="color:var(--accent)">colección</div>
+          <div class="ps-title">Prometheus</div>
+          <ul class="ps-items"><li>Scrape Istio</li><li>Scrape pods</li></ul>
+        </div>
+        <div class="pipeline-step">
+          <div class="ps-tag" style="color:var(--accent2)">logs</div>
+          <div class="ps-title">Alloy → Loki</div>
+          <ul class="ps-items"><li>K8s pod logs</li><li>Push cada 5s</li></ul>
+        </div>
+        <div class="pipeline-step">
+          <div class="ps-tag" style="color:var(--accent3)">trazas</div>
+          <div class="ps-title">Jaeger</div>
+          <ul class="ps-items"><li>B3 / W3C</li><li>Trace context</li></ul>
+        </div>
+        <div class="pipeline-step">
+          <div class="ps-tag" style="color:var(--accent2)">mesh</div>
+          <div class="ps-title">Kiali</div>
+          <ul class="ps-items"><li>Topology</li><li>AuthzPolicy</li></ul>
+        </div>
+        <div class="pipeline-step">
+          <div class="ps-tag" style="color:var(--warn)">visualización</div>
+          <div class="ps-title">Grafana</div>
+          <ul class="ps-items"><li>Metrics + Logs</li><li>Dashboards</li></ul>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-top:20px;">
+        <div class="card">
+          <div class="card-title">Pipeline de logs — Grafana Alloy (15-alloy.yaml)</div>
+          <p><strong style="color:var(--accent)">Grafana Alloy</strong> se despliega en el namespace <code style="font-family:var(--mono);font-size:11px;color:var(--accent3)">istio-system</code> con un único deployment (no DaemonSet). Accede a los logs de todos los pods del cluster vía la API de Kubernetes (<code style="font-family:var(--mono);font-size:11px;color:var(--accent3)">loki.source.kubernetes</code>), evitando montaje de volúmenes en los nodos.</p>
+          <p>Labels promovidos a Loki: <code style="font-family:var(--mono);font-size:11px;color:var(--accent3)">namespace</code>, <code style="font-family:var(--mono);font-size:11px;color:var(--accent3)">app</code>, <code style="font-family:var(--mono);font-size:11px;color:var(--accent3)">container</code>, <code style="font-family:var(--mono);font-size:11px;color:var(--accent3)">node</code>. Label externo: <code style="font-family:var(--mono);font-size:11px;color:var(--accent3)">cluster=travelhub-prod</code>. Batching de 5 s / 512 KiB.</p>
+          <p>Seguridad: uid 473 (non-root), filesystem de solo lectura, sin capabilities adicionales. Node selector: <code style="font-family:var(--mono);font-size:11px;color:var(--accent3)">role: observability</code>.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">Métricas — Prometheus &amp; Grafana</div>
+          <p>Prometheus recolecta las métricas estándar de Istio expuestas por ztunnel y waypoint. Métricas clave disponibles:</p>
+          <p>• <code style="font-family:var(--mono);font-size:11px;color:var(--accent3)">istio_requests_total</code> — total de peticiones HTTP por servicio, código y método.<br>
+          • <code style="font-family:var(--mono);font-size:11px;color:var(--accent3)">istio_request_duration_milliseconds</code> — latencia p50/p90/p99.<br>
+          • <code style="font-family:var(--mono);font-size:11px;color:var(--accent3)">istio_tcp_sent_bytes_total</code> — bytes TCP transmitidos por ztunnel.</p>
+          <p>Dashboards Grafana recomendados: <em>Istio Mesh Dashboard</em>, <em>Istio Service Dashboard</em>, <em>Istio Workload Dashboard</em>, <em>Istio Control Plane</em>.</p>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-top:16px;">
+        <div class="card">
+          <div class="card-title">Trazas distribuidas — Jaeger</div>
+          <p>Istio propagates automáticamente los headers de trace context <strong style="color:var(--text)">B3</strong> y <strong style="color:var(--text)">W3C TraceContext</strong> a través del ztunnel y del waypoint proxy. Cada salto de tráfico (gateway → waypoint → pod) genera un span hijo vinculado a la traza raíz.</p>
+          <p>Jaeger almacena y visualiza las trazas, permitiendo identificar qué microservicio introduce latencia en flujos multi-servicio como reserva → pago → notificación. La integración se configura en el <code style="font-family:var(--mono);font-size:11px;color:var(--accent3)">MeshConfig</code> de Istio con <code style="font-family:var(--mono);font-size:11px;color:var(--accent3)">extensionProviders</code> apuntando al colector Jaeger.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">Kiali — Topología del service mesh</div>
+          <p><strong style="color:var(--accent2)">Kiali</strong> provee una vista gráfica del service mesh en tiempo real: grafo de dependencias entre microservicios, estado de salud por servicio, tráfico en req/s y tasa de error, y visualización de las AuthorizationPolicies activas.</p>
+          <p>En modo ambient, Kiali muestra los ztunnels y el waypoint como nodos del grafo, permitiendo ver qué tráfico pasa por políticas L7. Resulta especialmente útil para auditar las reglas DENY del <code style="font-family:var(--mono);font-size:11px;color:var(--accent3)">login-handler-sa</code> y verificar que el aislamiento de servicios funcione como se diseñó.</p>
+        </div>
+      </div>
+
+      <h3>Separación de nodos — Terraform EKS Node Groups</h3>
+      <div class="card" style="padding:0; overflow:hidden; margin-top:8px;">
+        <div class="infra-row">
+          <div class="infra-component">workloads-ng</div>
+          <div class="infra-desc">Node group para los 7 microservicios FastAPI. Instancia <code style="font-family:var(--mono);font-size:11px;color:var(--accent3)">t3.medium</code>, min 1 / max 2 nodos. Label <code style="font-family:var(--mono);font-size:11px;color:var(--accent3)">role=workloads</code>. Sin taint — todos los pods de negocio pueden desplegarse.</div>
+          <div class="infra-tech">t3.medium · 1–2 nodes</div>
+        </div>
+        <div class="infra-row">
+          <div class="infra-component">observability-ng</div>
+          <div class="infra-desc">Node group dedicado a Prometheus, Grafana, Loki, Kiali, Jaeger y Alloy. Instancia <code style="font-family:var(--mono);font-size:11px;color:var(--accent3)">t3.small</code>. Taint <code style="font-family:var(--mono);font-size:11px;color:var(--warn)">dedicated=observability:NO_SCHEDULE</code> impide que pods sin toleración se desplieguen aquí. Alloy declara esta toleración explícitamente.</div>
+          <div class="infra-tech">t3.small · 1–2 nodes</div>
+        </div>
+      </div>
+
+      <div class="callout callout-green" style="margin-top:16px;">
+        <strong>Zero-trust con observabilidad completa:</strong> la combinación de mTLS automático vía ztunnel, AuthorizationPolicies aplicadas en el waypoint, access logging mesh-wide y métricas/trazas/logs en el stack de observabilidad provee visibilidad y control total del tráfico sin modificar una sola línea de código de los microservicios.
       </div>
     </section>
 
